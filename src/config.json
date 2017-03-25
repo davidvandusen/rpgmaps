@@ -1,0 +1,36 @@
+{
+  "canvas": {
+    "resolution": {
+      "width": 240,
+      "height": 135
+    }
+  },
+  "brush": {
+    "size": {
+      "default": 15,
+      "min": 1,
+      "max": 100
+    }
+  },
+  "mapTypes": [{
+    "name": "world",
+    "grid": 10,
+    "terrains": [{
+      "name": "ocean",
+      "color": "#4b8394"
+    }, {
+      "name": "land",
+      "color": "#ecddaf"
+    }]
+  }, {
+    "name": "town",
+    "grid": 20,
+    "terrains": [{
+      "name": "land",
+      "color": "#d3e5b5"
+    }, {
+      "name": "road",
+      "color": "#797470"
+    }]
+  }]
+}
