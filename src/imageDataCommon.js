@@ -18,9 +18,7 @@ function countPixelColors(imageData) {
   let colors = {};
   for (let i = 0; i < data.length; i += 4) {
     const color = `rgba(${data[i]},${data[i + 1]},${data[i + 2]},${data[i + 3]})`;
-    if (!colors[color]) {
-      colors[color] = 0;
-    }
+    if (!colors[color]) colors[color] = 0;
     colors[color]++;
   }
   return colors;
@@ -28,55 +26,33 @@ function countPixelColors(imageData) {
 
 function detectAreas(imageData) {
   let pixels = new Uint32Array(imageData.data.buffer);
-  return contiguousArea(pixels, imageData.width, 0).then(area => {
-    return Promise.resolve([area]);
-  });
+  return contiguousArea(pixels, imageData.width, 0).then(area =>
+    Promise.resolve([area]));
 }
 
 function contiguousArea(pixels, width, startIndex) {
   return new Promise((resolve, reject) => {
     const targetColor = pixels[startIndex];
-    let out = new Uint8Array(pixels.length);
+    let bits = new Uint8Array(pixels.length);
     (function floodFill(index) {
       // target is already set, return
-      if (out[index]) return Promise.resolve();
+      if (bits[index]) return Promise.resolve();
       // if target is not same colour, return
       if (pixels[index] !== targetColor) return Promise.resolve();
       // set the target bit
-      out[index] = 0xff;
-      const promises = [];
-      if (index >= width) {
-        promises.push(new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(floodFill(index - width));
-          }, 0);
-        }));
-      }
-      if (index % width !== width - 1) {
-        promises.push(new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(floodFill(index + 1));
-          }, 0);
-        }));
-      }
-      if (pixels.length >= index + width) {
-        promises.push(new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(floodFill(index + width));
-          }, 0);
-        }));
-      }
-      if (index > 0 && index % width > 0) {
-        promises.push(new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(floodFill(index - 1));
-          }, 0);
-        }));
-      }
-      return Promise.all(promises);
-    }(startIndex)).then(() => {
-      resolve(out);
-    });
+      bits[index] = 1;
+      const nextIndices = [];
+      if (index >= width) nextIndices.push(index - width);
+      if (index % width !== width - 1) nextIndices.push(index + 1);
+      if (pixels.length >= index + width) nextIndices.push(index + width);
+      if (index > 0 && index % width > 0) nextIndices.push(index - 1);
+      return Promise.all(
+        nextIndices.map(index =>
+          new Promise((resolve, reject) =>
+            setTimeout(() =>
+              resolve(floodFill(index)), 0))));
+    }(startIndex)).then(() =>
+      resolve(bits));
   });
 }
 
