@@ -1,23 +1,7 @@
+import {coordsFromDataPoint, fillImageData} from './imageDataCommon';
+import {pointInCircle} from './geometryCommon';
+
 class InputMap {
-
-  static coordsFromDataPoint(i, w, bytes = 4) {
-    const n = Math.floor(i / bytes);
-    return [n % w, Math.floor(n / w)];
-  }
-
-  static pointInCircle(x, y, cx, cy, r) {
-    return Math.sqrt(Math.pow(Math.abs(x - cx), 2) + Math.pow(Math.abs(y - cy), 2)) <= r;
-  }
-
-  static fillImageData(imageData, color) {
-    for (let i = 0; i < imageData.length; i += 4) {
-      imageData[i] = color[0];
-      imageData[i + 1] = color[1];
-      imageData[i + 2] = color[2];
-      imageData[i + 3] = color[3] || 0xff;
-    }
-  }
-
   constructor(config) {
     this.config = config;
     this.canvas = document.createElement('canvas');
@@ -28,8 +12,6 @@ class InputMap {
     this.canvas.width = this.config.canvas.resolution.width;
     this.canvas.height = this.config.canvas.resolution.height;
     this.canvas.style.imageRendering = 'pixelated';
-    this.updateCanvasSize();
-    document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
     this.mouse = {x: this.canvas.width / 2, y: this.canvas.height / 2, buttons: [false, false, false]};
     this.brush = {size: this.config.brush.size.default, color: [0, 0, 0]};
@@ -46,17 +28,24 @@ class InputMap {
     ];
     this.currentColor = 1;
     this.brush.color = this.colors[this.currentColor];
-    InputMap.fillImageData(this.paintLayer.data, this.colors[0]);
-    this.update(true);
+  }
+
+  init() {
     window.addEventListener('resize', this.updateCanvasSize.bind(this));
     document.addEventListener('keypress', this.cycleColors.bind(this));
     document.addEventListener('keypress', this.updateBrushSize.bind(this));
     document.addEventListener('mousemove', this.updateMousePosition.bind(this));
+    document.addEventListener('mousedown', this.updateMousePosition.bind(this));
+    document.addEventListener('mouseup', this.updateMousePosition.bind(this));
     document.addEventListener('mousedown', this.updateMouseButtonsDown.bind(this));
     document.addEventListener('mouseup', this.updateMouseButtonsUp.bind(this));
     document.addEventListener('mousemove', this.addPaintStroke.bind(this));
     document.addEventListener('mousedown', this.addPaintStroke.bind(this));
     document.addEventListener('mouseup', this.update.bind(this, true));
+    this.updateCanvasSize();
+    fillImageData(this.paintLayer, this.colors[0]);
+    this.update(true);
+    document.body.appendChild(this.canvas);
   }
 
   updateCanvasSize() {
@@ -100,8 +89,8 @@ class InputMap {
     if (this.mouse.buttons[0]) {
       const data = this.paintLayer.data;
       for (let i = 0; i < data.length; i += 4) {
-        const [x, y] = InputMap.coordsFromDataPoint(i, this.paintLayer.width);
-        if (InputMap.pointInCircle(x, y, this.mouse.x, this.mouse.y, this.brush.size)) {
+        const [x, y] = coordsFromDataPoint(i, this.paintLayer.width);
+        if (pointInCircle(x, y, this.mouse.x, this.mouse.y, this.brush.size)) {
           data[i] = this.brush.color[0];
           data[i + 1] = this.brush.color[1];
           data[i + 2] = this.brush.color[2];
@@ -122,7 +111,7 @@ class InputMap {
 
   update(publish = false) {
     if (publish && typeof this.onUpdate === 'function') {
-      this.onUpdate.call(null, this.paintLayer.data);
+      this.onUpdate.call(null, this.paintLayer);
     }
     this.draw();
   }

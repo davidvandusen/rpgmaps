@@ -1,30 +1,27 @@
 const config = require('./config.json');
-
 import InputMap from './InputMap';
+import {countPixelColors, detectAreas} from './imageDataCommon';
 
 const inputMap = new InputMap(config);
-
-function countPixelColors(imageData) {
-  let colors = {};
-  for (let i = 0; i < imageData.length; i += 4) {
-    const color = `rgba(${imageData[i]},${imageData[i + 1]},${imageData[i + 2]},${imageData[i + 3]})`;
-    if (!colors[color]) {
-      colors[color] = 0;
-    }
-    colors[color]++;
-  }
-  return colors;
-}
-
-function detectAreas(imageData) {
-  let areas = [];
-  return areas;
-}
 
 inputMap.onUpdate = function (imageData) {
   console.log('map updated');
   let colors = countPixelColors(imageData);
   console.log(colors);
-  let areas = detectAreas(imageData);
-  console.log(areas);
+  detectAreas(imageData).then(areas => {
+    areas.forEach((area, i) => {
+      console.log('Area:', i + 1);
+      let f = '';
+      for (let i = 0; i < area.length / imageData.width; i++) {
+        let l = '';
+        for (let j = 0; j < imageData.width; j++) {
+          l += area[j + i * imageData.width] ? 'O' : '.';
+        }
+        f += l + '\n';
+      }
+      console.log(f);
+    });
+  });
 };
+
+inputMap.init();
