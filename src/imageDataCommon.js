@@ -24,23 +24,46 @@ function countPixelColors(imageData) {
   return colors;
 }
 
+function isIndexActiveInArea(index, area) {
+  const word = Math.floor(index / 8);
+  const bit = index % 8;
+  return !!(area[word] & 1 << bit);
+}
+
+function setIndexActiveInArea(index, area) {
+  const word = Math.floor(index / 8);
+  const bit = index % 8;
+  area[word] |= 1 << bit;
+}
+
+function firstUnincludedPixel(length, areas) {
+  if (!areas.length) return 0;
+  for (let index = 0; index < length; index++)
+    if (!areas.some(area => isIndexActiveInArea(index, area)))
+      return index;
+  return -1;
+}
+
 function detectAreas(imageData) {
   let pixels = new Uint32Array(imageData.data.buffer);
-  return contiguousArea(pixels, imageData.width, 0).then(area =>
-    Promise.resolve([area]));
+  return detectAreasRecursive(pixels, imageData.width, []);
+}
+
+function detectAreasRecursive(pixels, width, areas) {
+  const startIndex = firstUnincludedPixel(pixels.length, areas);
+  if (startIndex === -1) return Promise.resolve(areas);
+  else return contiguousArea(pixels, width, startIndex)
+    .then(area => detectAreasRecursive(pixels, width, areas.concat([area])));
 }
 
 function contiguousArea(pixels, width, startIndex) {
   return new Promise((resolve, reject) => {
     const targetColor = pixels[startIndex];
-    let bits = new Uint8Array(pixels.length);
+    let area = new Uint8Array(Math.ceil(pixels.length / 8));
     (function floodFill(index) {
-      // target is already set, return
-      if (bits[index]) return Promise.resolve();
-      // if target is not same colour, return
+      if (isIndexActiveInArea(index, area)) return Promise.resolve();
       if (pixels[index] !== targetColor) return Promise.resolve();
-      // set the target bit
-      bits[index] = 1;
+      setIndexActiveInArea(index, area);
       const nextIndices = [];
       if (index >= width) nextIndices.push(index - width);
       if (index % width !== width - 1) nextIndices.push(index + 1);
@@ -52,7 +75,7 @@ function contiguousArea(pixels, width, startIndex) {
             setTimeout(() =>
               resolve(floodFill(index)), 0))));
     }(startIndex)).then(() =>
-      resolve(bits));
+      resolve(area));
   });
 }
 

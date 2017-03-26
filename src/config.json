@@ -1,13 +1,13 @@
 {
   "canvas": {
     "resolution": {
-      "width": 192,
-      "height": 108
+      "width": 48,
+      "height": 27
     }
   },
   "brush": {
     "size": {
-      "default": 15,
+      "default": 4,
       "min": 1,
       "max": 100
     }
