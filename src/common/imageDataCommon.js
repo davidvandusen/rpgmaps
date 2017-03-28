@@ -1,4 +1,4 @@
-function coordsFromDataPoint(i, w, components = 4) {
+function coordsFromDataPoint(i, w, components = 1) {
   const n = Math.floor(i / components);
   return [n % w, Math.floor(n / w)];
 }
@@ -13,22 +13,22 @@ function fillImageData(imageData, red, green, blue, alpha) {
   }
 }
 
-function isIndexActiveInArea(index, area) {
+function isBitActiveInBytes(index, bytes) {
   const word = Math.floor(index / 8);
   const bit = index % 8;
-  return !!(area[word] & 1 << bit);
+  return !!(bytes[word] & 1 << bit);
 }
 
-function setIndexActiveInArea(index, area) {
+function setBitActiveInBytes(index, bytes) {
   const word = Math.floor(index / 8);
   const bit = index % 8;
-  area[word] |= 1 << bit;
+  bytes[word] |= 1 << bit;
 }
 
 function firstUnincludedPixel(length, areas) {
   if (!areas.length) return 0;
   for (let index = 0; index < length; index++)
-    if (!areas.some(area => isIndexActiveInArea(index, area.data)))
+    if (!areas.some(area => isBitActiveInBytes(index, area.data)))
       return index;
   return -1;
 }
@@ -55,9 +55,9 @@ function describeContiguousArea(pixels, width, startIndex) {
     const color = pixels[startIndex];
     let data = new Uint8Array(Math.ceil(pixels.length / 8));
     (function floodFill(index) {
-      if (isIndexActiveInArea(index, data)) return Promise.resolve();
+      if (isBitActiveInBytes(index, data)) return Promise.resolve();
       if (pixels[index] !== color) return Promise.resolve();
-      setIndexActiveInArea(index, data);
+      setBitActiveInBytes(index, data);
       const nextIndices = [];
       if (index >= width) nextIndices.push(index - width);
       if (index % width !== width - 1) nextIndices.push(index + 1);
@@ -77,5 +77,7 @@ function describeContiguousArea(pixels, width, startIndex) {
 export {
   coordsFromDataPoint,
   fillImageData,
-  detectAreas
+  detectAreas,
+  isBitActiveInBytes,
+  setBitActiveInBytes
 };

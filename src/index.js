@@ -9,4 +9,7 @@ const inputMap = new InputMap(inputMapDiv, config);
 const outputMapDiv = document.getElementById('output-map');
 const outputMap = new OutputMap(outputMapDiv, config, inputMap);
 
+inputMap.onUpdate = outputMap.setInput.bind(outputMap);
+
 inputMap.init();
+outputMap.init();

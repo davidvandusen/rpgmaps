@@ -16,6 +16,7 @@
   },
   "output": {
     "canvas": {
+      "color": "#000",
       "resolution": {
         "width": 1280,
         "height": 720
@@ -29,11 +30,15 @@
       "terrains": [
         {
           "name": "Grass",
-          "color": "#d3e5b5"
+          "color": "#d3e5b5",
+          "proc": "closeUpGrass",
+          "priority": 1
         },
         {
           "name": "Road",
-          "color": "#797470"
+          "color": "#797470",
+          "proc": "closeUpRoad",
+          "priority": 2
         }
       ]
     }

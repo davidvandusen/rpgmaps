@@ -1,32 +1,20 @@
-import {detectAreas} from './imageDataCommon';
-import {intToCssHex} from './colorCommon';
+import {detectAreas} from './common/imageDataCommon';
+import {intToCssHex} from './common/colorCommon';
+import * as terrains from './terrains';
 
 class OutputMap {
-  constructor(el, config, inputMap) {
+  constructor(el, config) {
     this.el = el;
     this.config = config;
-    this.inputMap = inputMap;
-    const originalOnInit = this.inputMap.onInit;
-    this.inputMap.onInit = () => {
-      if (typeof originalOnInit === 'function') originalOnInit();
-      this.init();
-    };
-    const originalOnUpdate = this.inputMap.onUpdate;
-    this.inputMap.onUpdate = (imageData) => {
-      if (typeof originalOnUpdate === 'function') originalOnUpdate();
-      detectAreas(imageData)
-        .then(areas => {
-          areas.forEach(area => area.color = intToCssHex(area.color));
-          return areas;
-        });
-    };
     this.canvas = document.createElement('canvas');
     this.canvas.width = this.config.output.canvas.resolution.width;
     this.canvas.height = this.config.output.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
+    this.areas = [];
   }
 
   init() {
+    window.addEventListener('resize', this.updateCanvasSize.bind(this));
     this.updateCanvasSize();
     this.el.appendChild(this.canvas);
     this.draw();
@@ -40,15 +28,39 @@ class OutputMap {
     this.draw();
   }
 
-  draw() {
-    if (this._pendingAnimationFrameId) return;
-    this._pendingAnimationFrameId = requestAnimationFrame(() => {
-      this._pendingAnimationFrameId = undefined;
-      this.ctx.fillStyle = '#000';
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    });
+  getTerrainFromArea(area) {
+    const configTerrains = this.config.mapTypes[0].terrains;
+    const cssHex = intToCssHex(area.color);
+    return configTerrains.find(terrain => terrain.color === cssHex);
   }
 
+  setInput(imageData) {
+    detectAreas(imageData).then(areas => {
+      this.areas = areas.map(area => {
+        const terrain = this.getTerrainFromArea(area);
+        return {
+          priority: terrain.priority,
+          data: area.data,
+          proc: terrains[terrain.proc]
+        };
+      }).sort((areaA, areaB) => areaA.priority - areaB.priority);
+    }).then(this.draw.bind(this));
+  }
+
+  draw() {
+    requestAnimationFrame(() => {
+      this.ctx.fillStyle = this.config.output.canvas.color;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.areas.forEach(area => area.proc(
+        area.data,
+        this.config.input.canvas.resolution.width,
+        this.config.input.canvas.resolution.height,
+        this.canvas.width,
+        this.canvas.height,
+        this.ctx
+      ));
+    });
+  }
 }
 
 export default OutputMap;

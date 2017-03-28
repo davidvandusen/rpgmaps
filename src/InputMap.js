@@ -1,6 +1,6 @@
-import {coordsFromDataPoint, fillImageData} from './imageDataCommon';
-import {pointInCircle} from './geometryCommon';
-import {rgbaToCss, cssToRgba} from './colorCommon';
+import {coordsFromDataPoint, fillImageData} from './common/imageDataCommon';
+import {pointInCircle} from './common/geometryCommon';
+import {rgbaToCss, cssToRgba} from './common/colorCommon';
 
 class InputMap {
   constructor(el, config) {
@@ -72,7 +72,7 @@ class InputMap {
     if (this.mouse.buttons[0]) {
       const data = this.paintLayer.data;
       for (let i = 0; i < data.length; i += 4) {
-        const [x, y] = coordsFromDataPoint(i, this.paintLayer.width);
+        const [x, y] = coordsFromDataPoint(i, this.paintLayer.width, 4);
         if (pointInCircle(x + 0.5, y + 0.5, this.mouse.x, this.mouse.y, this.brush.size)) {
           data[i] = this.brush.color[0];
           data[i + 1] = this.brush.color[1];
@@ -92,7 +92,7 @@ class InputMap {
     }
   }
 
-  update(publish = false) {
+  update(publish) {
     if (publish && typeof this.onUpdate === 'function') {
       this.onUpdate.call(null, this.paintLayer);
     }
@@ -110,7 +110,6 @@ class InputMap {
       this.ctx.stroke();
       this.ctx.beginPath();
       this.ctx.arc(this.mouse.x, this.mouse.y, this.brush.size - 1, 0, Math.PI * 2, true);
-      console.log(rgbaToCss(...this.brush.color.slice(0, 3), this.mouse.buttons[0] ? 255 : 127));
       this.ctx.fillStyle = rgbaToCss(...this.brush.color.slice(0, 3), this.mouse.buttons[0] ? 255 : 127);
       this.ctx.fill();
     });

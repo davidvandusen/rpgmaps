@@ -8,7 +8,6 @@ function intToRgba(int) {
 }
 
 function rgbaToCss(red, green, blue, alpha) {
-  console.log(arguments);
   return `rgba(${red},${green},${blue},${alpha / 255})`;
 }
 
