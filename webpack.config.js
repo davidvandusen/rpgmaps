@@ -8,7 +8,11 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   module: {
-    loaders: [{
+    rules: [{
+      test: /\.scss$/,
+      include: [path.resolve(__dirname, "styles")],
+      use: [{loader: "style-loader"}, {loader: "css-loader"}, {loader: "sass-loader"}]
+    }, {
       test: /\.js$/,
       loader: 'babel-loader',
       include: [path.resolve(__dirname, "src")],

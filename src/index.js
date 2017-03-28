@@ -1,21 +1,12 @@
+import '../styles/main.scss';
 import config from './config.json';
 import InputMap from './InputMap';
-import {countPixelColors, detectAreas} from './imageDataCommon';
-import base64 from 'base64-js';
+import OutputMap from './OutputMap';
 
-const inputMap = new InputMap(config);
+const inputMapDiv = document.getElementById('input-map');
+const inputMap = new InputMap(inputMapDiv, config);
 
-inputMap.onUpdate = function (imageData) {
-  console.log('map updated');
-  let colors = countPixelColors(imageData);
-  console.log(colors);
-  if (Object.keys(colors).length > 1) {
-    detectAreas(imageData).then(areas => {
-      areas.forEach(area => {
-        console.log(base64.fromByteArray(area));
-      });
-    });
-  }
-};
+const outputMapDiv = document.getElementById('output-map');
+const outputMap = new OutputMap(outputMapDiv, config, inputMap);
 
 inputMap.init();

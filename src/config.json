@@ -1,36 +1,41 @@
 {
-  "canvas": {
-    "resolution": {
-      "width": 48,
-      "height": 27
+  "input": {
+    "canvas": {
+      "resolution": {
+        "width": 128,
+        "height": 72
+      }
+    },
+    "brush": {
+      "size": {
+        "default": 5,
+        "min": 1,
+        "max": 64
+      }
     }
   },
-  "brush": {
-    "size": {
-      "default": 4,
-      "min": 1,
-      "max": 100
+  "output": {
+    "canvas": {
+      "resolution": {
+        "width": 1280,
+        "height": 720
+      }
     }
   },
-  "mapTypes": [{
-    "name": "world",
-    "grid": 10,
-    "terrains": [{
-      "name": "ocean",
-      "color": "#4b8394"
-    }, {
-      "name": "land",
-      "color": "#ecddaf"
-    }]
-  }, {
-    "name": "town",
-    "grid": 20,
-    "terrains": [{
-      "name": "land",
-      "color": "#d3e5b5"
-    }, {
-      "name": "road",
-      "color": "#797470"
-    }]
-  }]
+  "mapTypes": [
+    {
+      "name": "Road Encounter",
+      "grid": 20,
+      "terrains": [
+        {
+          "name": "Grass",
+          "color": "#d3e5b5"
+        },
+        {
+          "name": "Road",
+          "color": "#797470"
+        }
+      ]
+    }
+  ]
 }
