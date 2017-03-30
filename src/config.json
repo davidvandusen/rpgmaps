@@ -31,14 +31,14 @@
         {
           "name": "Grass",
           "color": "#d3e5b5",
-          "proc": "closeUpGrass",
-          "priority": 1
+          "procName": "closeUpGrass",
+          "layer": 1
         },
         {
           "name": "Road",
           "color": "#797470",
-          "proc": "closeUpRoad",
-          "priority": 2
+          "procName": "closeUpRoad",
+          "layer": 2
         }
       ]
     }

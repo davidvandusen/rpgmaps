@@ -1,6 +1,9 @@
 import {detectAreas} from './common/imageDataCommon';
 import {intToCssHex} from './common/colorCommon';
-import * as terrains from './terrains';
+import * as terrainProcs from './terrains';
+
+const READY = 0;
+const PROCESSING = 1;
 
 class OutputMap {
   constructor(el, config) {
@@ -11,6 +14,7 @@ class OutputMap {
     this.canvas.height = this.config.output.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
     this.areas = [];
+    this.status = READY;
   }
 
   init() {
@@ -35,30 +39,63 @@ class OutputMap {
   }
 
   setInput(imageData) {
-    detectAreas(imageData).then(areas => {
-      this.areas = areas.map(area => {
-        const terrain = this.getTerrainFromArea(area);
-        return {
-          priority: terrain.priority,
-          data: area.data,
-          proc: terrains[terrain.proc]
-        };
-      }).sort((areaA, areaB) => areaA.priority - areaB.priority);
-    }).then(this.draw.bind(this));
+    this.nextInput = imageData;
+    this.processInput();
+  }
+
+  processInput() {
+    if (this.status !== READY) return;
+    this.status = PROCESSING;
+    const localInput = this.nextInput;
+    this.nextInput = undefined;
+    detectAreas(localInput)
+      .then(areas => {
+        this.areas = areas.map(area => {
+          const terrain = this.getTerrainFromArea(area);
+          return {
+            layer: terrain.layer,
+            data: area.data,
+            proc: terrainProcs[terrain.procName]
+          };
+        }).sort((areaA, areaB) => areaA.layer - areaB.layer);
+      })
+      .then(this.draw.bind(this))
+      .then(() => {
+        this.status = READY;
+        if (this.nextInput) setTimeout(this.processInput.bind(this), 0);
+      });
   }
 
   draw() {
-    requestAnimationFrame(() => {
-      this.ctx.fillStyle = this.config.output.canvas.color;
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      this.areas.forEach(area => area.proc(
-        area.data,
-        this.config.input.canvas.resolution.width,
-        this.config.input.canvas.resolution.height,
-        this.canvas.width,
-        this.canvas.height,
-        this.ctx
-      ));
+    return new Promise((resolve, reject) => {
+      requestAnimationFrame(() => {
+        this.ctx.fillStyle = this.config.output.canvas.color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.areas.forEach(area => area.proc(
+          area.data,
+          this.config.input.canvas.resolution.width,
+          this.config.input.canvas.resolution.height,
+          this.canvas.width,
+          this.canvas.height,
+          this.ctx
+        ));
+        const gridSpacing = this.canvas.width / 32;
+        this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+        this.ctx.lineWidth = 1;
+        for (let i = gridSpacing; i < this.canvas.width; i += gridSpacing) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(i, 0);
+          this.ctx.lineTo(i, this.canvas.height);
+          this.ctx.stroke();
+        }
+        for (let i = gridSpacing; i < this.canvas.height; i += gridSpacing) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, i);
+          this.ctx.lineTo(this.canvas.width, i);
+          this.ctx.stroke();
+        }
+        resolve();
+      });
     });
   }
 }

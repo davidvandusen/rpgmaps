@@ -2,7 +2,24 @@ body {
   margin: 0;
 }
 
-.container {
-  margin: 0 auto;
-  max-width: 960px;
+#input-map {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
+
+#output-map {
+  height: 15.75vw;
+  opacity: 0.8;
+  position: absolute;
+  right: 1.5vw;
+  top: 1.5vw;
+  width: 28vw;
+
+  canvas {
+    box-shadow: -2px 2px 8px rgba(0,0,0,0.25);
+  }
+}
+

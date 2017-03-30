@@ -18,10 +18,8 @@ function closeUpRoad(srcData, srcWidth, srcHeight, dstWidth, dstHeight, ctx) {
       const [srcX, srcY] = coordsFromDataPoint(index, srcWidth);
       const dstX = srcX * scaleFactorX;
       const dstY = srcY * scaleFactorY;
-      ctx.beginPath();
-      ctx.arc(dstX + scaleFactorX * 0.5 * rng() , dstY + scaleFactorY * 0.5 * rng(), scaleFactorX * 0.5, 0, Math.PI * 2);
       ctx.fillStyle = baseColors[Math.floor(rng() * baseColors.length)];
-      ctx.fill();
+      ctx.fillRect(dstX, dstY, scaleFactorX, scaleFactorY);
     }
   }
 }
