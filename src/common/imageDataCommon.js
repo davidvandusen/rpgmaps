@@ -74,10 +74,16 @@ function describeContiguousArea(pixels, width, startIndex) {
   });
 }
 
+function outlinePoints(data, width) {
+  return [5, 5, 5, 10, 10, 10, 10, 5];
+}
+
+
 export {
   coordsFromDataPoint,
   fillImageData,
   detectAreas,
   isBitActiveInBytes,
-  setBitActiveInBytes
+  setBitActiveInBytes,
+  outlinePoints
 };

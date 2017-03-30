@@ -5,7 +5,7 @@ import * as terrainProcs from './terrains';
 const READY = 0;
 const PROCESSING = 1;
 
-class OutputMap {
+export default class OutputMap {
   constructor(el, config) {
     this.el = el;
     this.config = config;
@@ -99,5 +99,3 @@ class OutputMap {
     });
   }
 }
-
-export default OutputMap;

@@ -1,4 +1,4 @@
-import {isBitActiveInBytes, coordsFromDataPoint} from '../common/imageDataCommon';
+import {isBitActiveInBytes, coordsFromDataPoint, outlinePoints} from '../common/imageDataCommon';
 import seedrandom from 'seedrandom';
 
 const baseColors = [
@@ -22,6 +22,16 @@ function closeUpRoad(srcData, srcWidth, srcHeight, dstWidth, dstHeight, ctx) {
       ctx.fillRect(dstX, dstY, scaleFactorX, scaleFactorY);
     }
   }
+  const points = outlinePoints(srcData, srcWidth);
+  ctx.beginPath();
+  ctx.moveTo(points[0] * scaleFactorX, points[1] * scaleFactorY);
+  for (let i = 2; i < points.length; i += 2) {
+    ctx.lineTo(points[i] * scaleFactorX, points[i + 1] * scaleFactorY);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(0,0,0,1)';
+  ctx.lineWidth = 10;
+  ctx.stroke();
 }
 
 export default closeUpRoad;

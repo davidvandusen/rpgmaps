@@ -2,7 +2,7 @@ import {coordsFromDataPoint, fillImageData} from './common/imageDataCommon';
 import {pointInCircle} from './common/geometryCommon';
 import {rgbaToCss, cssToRgba} from './common/colorCommon';
 
-class InputMap {
+export default class InputMap {
   constructor(el, config) {
     this.el = el;
     this.config = config;
@@ -115,5 +115,3 @@ class InputMap {
     });
   }
 }
-
-export default InputMap;
