@@ -16,7 +16,7 @@
   },
   "output": {
     "canvas": {
-      "color": "#000",
+      "color": "#fff",
       "resolution": {
         "width": 1280,
         "height": 720

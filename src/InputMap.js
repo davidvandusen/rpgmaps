@@ -1,4 +1,4 @@
-import {coordsFromDataPoint, fillImageData} from './common/imageDataCommon';
+import {fillImageData} from './common/imageDataCommon';
 import {pointInCircle} from './common/geometryCommon';
 import {rgbaToCss, cssToRgba} from './common/colorCommon';
 
@@ -71,13 +71,15 @@ export default class InputMap {
   addPaintStroke() {
     if (this.mouse.buttons[0]) {
       const data = this.paintLayer.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const [x, y] = coordsFromDataPoint(i, this.paintLayer.width, 4);
+      for (let index = 0; index < data.length; index += 4) {
+        const n = Math.floor(index / 4);
+        const x = n % this.paintLayer.width;
+        const y = Math.floor(n / this.paintLayer.width);
         if (pointInCircle(x + 0.5, y + 0.5, this.mouse.x, this.mouse.y, this.brush.size)) {
-          data[i] = this.brush.color[0];
-          data[i + 1] = this.brush.color[1];
-          data[i + 2] = this.brush.color[2];
-          data[i + 3] = 0xff;
+          data[index] = this.brush.color[0];
+          data[index + 1] = this.brush.color[1];
+          data[index + 2] = this.brush.color[2];
+          data[index + 3] = 0xff;
         }
       }
       this.update();

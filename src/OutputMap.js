@@ -17,12 +17,34 @@ export default class OutputMap {
     this.status = READY;
   }
 
-  init() {
-    window.addEventListener('resize', this.updateCanvasSize.bind(this));
-    this.updateCanvasSize();
-    this.el.appendChild(this.canvas);
-    this.draw();
-    if (typeof this.onInit === 'function') this.onInit();
+  drawGrid() {
+    const gridSpacing = this.canvas.width / 32;
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    this.ctx.lineWidth = 1;
+    for (let i = gridSpacing; i < this.canvas.width; i += gridSpacing) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(i, 0);
+      this.ctx.lineTo(i, this.canvas.height);
+      this.ctx.stroke();
+    }
+    for (let i = gridSpacing; i < this.canvas.height; i += gridSpacing) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, i);
+      this.ctx.lineTo(this.canvas.width, i);
+      this.ctx.stroke();
+    }
+  }
+
+  draw() {
+    return new Promise((resolve, reject) => {
+      requestAnimationFrame(() => {
+        this.ctx.fillStyle = this.config.output.canvas.color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.areas.forEach(area => area.proc(area.mask, this.ctx));
+        this.drawGrid();
+        resolve();
+      });
+    });
   }
 
   updateCanvasSize() {
@@ -32,10 +54,12 @@ export default class OutputMap {
     this.draw();
   }
 
-  getTerrainFromArea(area) {
-    const configTerrains = this.config.mapTypes[0].terrains;
-    const cssHex = intToCssHex(area.color);
-    return configTerrains.find(terrain => terrain.color === cssHex);
+  init() {
+    window.addEventListener('resize', this.updateCanvasSize.bind(this));
+    this.updateCanvasSize();
+    this.el.appendChild(this.canvas);
+    this.draw();
+    if (typeof this.onInit === 'function') this.onInit();
   }
 
   setInput(imageData) {
@@ -43,59 +67,35 @@ export default class OutputMap {
     this.processInput();
   }
 
+  getTerrainFromArea(area) {
+    const configTerrains = this.config.mapTypes[0].terrains;
+    const cssHex = intToCssHex(area.color);
+    return configTerrains.find(terrain => terrain.color === cssHex);
+  }
+
+  updateAreas() {
+    return detectAreas(this.input).then(areas => {
+      return this.areas = areas.map(area => {
+        const terrain = this.getTerrainFromArea(area);
+        return {
+          layer: terrain.layer,
+          mask: area.mask,
+          proc: terrainProcs[terrain.procName]
+        };
+      }).sort((areaA, areaB) => areaA.layer - areaB.layer);
+    });
+  }
+
   processInput() {
     if (this.status !== READY) return;
     this.status = PROCESSING;
-    const localInput = this.nextInput;
+    this.input = this.nextInput;
     this.nextInput = undefined;
-    detectAreas(localInput)
-      .then(areas => {
-        this.areas = areas.map(area => {
-          const terrain = this.getTerrainFromArea(area);
-          return {
-            layer: terrain.layer,
-            data: area.data,
-            proc: terrainProcs[terrain.procName]
-          };
-        }).sort((areaA, areaB) => areaA.layer - areaB.layer);
-      })
+    this.updateAreas()
       .then(this.draw.bind(this))
       .then(() => {
         this.status = READY;
         if (this.nextInput) setTimeout(this.processInput.bind(this), 0);
       });
-  }
-
-  draw() {
-    return new Promise((resolve, reject) => {
-      requestAnimationFrame(() => {
-        this.ctx.fillStyle = this.config.output.canvas.color;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.areas.forEach(area => area.proc(
-          area.data,
-          this.config.input.canvas.resolution.width,
-          this.config.input.canvas.resolution.height,
-          this.canvas.width,
-          this.canvas.height,
-          this.ctx
-        ));
-        const gridSpacing = this.canvas.width / 32;
-        this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-        this.ctx.lineWidth = 1;
-        for (let i = gridSpacing; i < this.canvas.width; i += gridSpacing) {
-          this.ctx.beginPath();
-          this.ctx.moveTo(i, 0);
-          this.ctx.lineTo(i, this.canvas.height);
-          this.ctx.stroke();
-        }
-        for (let i = gridSpacing; i < this.canvas.height; i += gridSpacing) {
-          this.ctx.beginPath();
-          this.ctx.moveTo(0, i);
-          this.ctx.lineTo(this.canvas.width, i);
-          this.ctx.stroke();
-        }
-        resolve();
-      });
-    });
   }
 }
