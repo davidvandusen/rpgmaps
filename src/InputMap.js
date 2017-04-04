@@ -75,7 +75,7 @@ export default class InputMap {
         const n = Math.floor(index / 4);
         const x = n % this.paintLayer.width;
         const y = Math.floor(n / this.paintLayer.width);
-        if (pointInCircle(x + 0.5, y + 0.5, this.mouse.x, this.mouse.y, this.brush.size)) {
+        if (pointInCircle(x, y, this.mouse.x, this.mouse.y, this.brush.size / 2)) {
           data[index] = this.brush.color[0];
           data[index + 1] = this.brush.color[1];
           data[index + 2] = this.brush.color[2];
@@ -107,11 +107,9 @@ export default class InputMap {
       this._pendingAnimationFrameId = undefined;
       this.ctx.putImageData(this.paintLayer, 0, 0);
       this.ctx.beginPath();
-      this.ctx.arc(this.mouse.x, this.mouse.y, this.brush.size - 0.5, 0, Math.PI * 2, true);
+      this.ctx.arc(this.mouse.x + 0.5, this.mouse.y + 0.5, this.brush.size / 2, 0, Math.PI * 2, true);
       this.ctx.strokeStyle = 'rgba(255,255,255,1)';
       this.ctx.stroke();
-      this.ctx.beginPath();
-      this.ctx.arc(this.mouse.x, this.mouse.y, this.brush.size - 1, 0, Math.PI * 2, true);
       this.ctx.fillStyle = rgbaToCss(...this.brush.color.slice(0, 3), this.mouse.buttons[0] ? 255 : 127);
       this.ctx.fill();
     });

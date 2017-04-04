@@ -53,13 +53,37 @@ function describeContiguousArea(pixels, width, startIndex) {
   });
 }
 
-function outlinePoints(mask) {
-  return [5, 5, 5, 10, 10, 10, 10, 5];
+function outline(mask) {
+  const points = [];
+  let index;
+  let i = 0;
+  while (index === undefined && i < mask.size) {
+    if (mask.get(i)) index = i;
+    else i++;
+  }
+  const width = mask.width;
+  while (index !== points[0]) {
+    const last = points[points.length - 1];
+    points.push(index);
+    const se = mask.get(index);
+    const ne = mask.get(index - width);
+    const sw = mask.get(index - 1);
+    const nw = mask.get(index - width - 1);
+    const e = index + 1;
+    const s = index + width;
+    const w = index - 1;
+    const n = index - width;
+    if (se !== ne && last !== e) index = e;
+    else if (se !== sw && last !== s) index = s;
+    else if (nw !== sw && last !== w) index = w;
+    else if (nw !== ne && last !== n) index = n;
+    else break;
+  }
+  return points;
 }
-
 
 export {
   fillImageData,
   detectAreas,
-  outlinePoints
+  outline
 };

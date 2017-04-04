@@ -7,13 +7,19 @@ export default class AreaMask {
   }
 
   coords(i) {
+    if (!this.valid(i)) return [0, 0];
     return [i % this.width, Math.floor(i / this.width)];
   }
 
   get(i) {
+    if (!this.valid(i)) return false;
     const word = Math.floor(i / 8);
     const bit = i % 8;
     return !!(this.data[word] & 1 << bit);
+  }
+
+  valid(i) {
+    return i >= 0 && i < this.size;
   }
 
   set(i, val) {

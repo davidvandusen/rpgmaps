@@ -21,6 +21,9 @@ export default class OutputMap {
     const gridSpacing = this.canvas.width / 32;
     this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     this.ctx.lineWidth = 1;
+    this.ctx.lineJoin = 'miter';
+    this.ctx.lineCap = 'butt';
+    this.ctx.setLineDash([]);
     for (let i = gridSpacing; i < this.canvas.width; i += gridSpacing) {
       this.ctx.beginPath();
       this.ctx.moveTo(i, 0);

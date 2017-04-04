@@ -1,4 +1,4 @@
-import {outlinePoints} from '../common/imageDataCommon';
+import {outline} from '../common/imageDataCommon';
 import seedrandom from 'seedrandom';
 
 const baseColors = [
@@ -22,15 +22,19 @@ function closeUpRoad(mask, ctx) {
       ctx.fillRect(dstX, dstY, scaleFactorX, scaleFactorY);
     }
   }
-  const points = outlinePoints(mask);
+  const points = outline(mask);
   ctx.beginPath();
-  ctx.moveTo(points[0] * scaleFactorX, points[1] * scaleFactorY);
-  for (let i = 2; i < points.length; i += 2) {
-    ctx.lineTo(points[i] * scaleFactorX, points[i + 1] * scaleFactorY);
+  const [x, y] = mask.coords(points[0]);
+  ctx.moveTo(x * scaleFactorX, y * scaleFactorY);
+  for (let i = 1; i < points.length; i++) {
+    const [x, y] = mask.coords(points[i]);
+    ctx.lineTo(x * scaleFactorX, y * scaleFactorY);
   }
   ctx.closePath();
-  ctx.strokeStyle = 'rgba(0,0,0,1)';
-  ctx.lineWidth = 10;
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
   ctx.stroke();
 }
 
