@@ -16,7 +16,6 @@
   },
   "output": {
     "canvas": {
-      "color": "#fff",
       "resolution": {
         "width": 1280,
         "height": 720
@@ -27,18 +26,31 @@
     {
       "name": "Road Encounter",
       "grid": 20,
+      "baseColor": "#d4d6a4",
       "terrains": [
         {
           "name": "Grass",
           "color": "#d3e5b5",
-          "procName": "closeUpGrass",
+          "className": "CloseUpGrass",
           "layer": 1
         },
         {
           "name": "Road",
           "color": "#797470",
-          "procName": "closeUpRoad",
+          "className": "CloseUpRoad",
           "layer": 2
+        },
+        {
+          "name": "Forest",
+          "color": "#394b2d",
+          "className": "CloseUpForest",
+          "layer": 4
+        },
+        {
+          "name": "River",
+          "color": "#8ec2d6",
+          "className": "CloseUpRiver",
+          "layer": 3
         }
       ]
     }

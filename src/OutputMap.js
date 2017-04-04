@@ -1,6 +1,6 @@
-import {detectAreas} from './common/imageDataCommon';
+import {detectAreas, addNoise} from './common/imageDataCommon';
 import {intToCssHex} from './common/colorCommon';
-import * as terrainProcs from './terrains';
+import * as terrainClasses from './terrains';
 
 const READY = 0;
 const PROCESSING = 1;
@@ -101,12 +101,15 @@ export default class OutputMap {
   draw() {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
-        this.ctx.fillStyle = this.config.output.canvas.color;
+        this.ctx.fillStyle = this.config.mapTypes[0].baseColor;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.areas.forEach(area => area.proc(area.mask, this.ctx));
+        const mapComponents = this.areas.map(area => new area.class(area.mask, this.ctx));
+        mapComponents.forEach(component => component.base());
+        mapComponents.forEach(component => component.overlay());
         this.drawGrid();
         this.drawBorder();
         this.applyGlobalLight();
+        addNoise(this.ctx, 8);
         resolve();
       });
     });
@@ -145,7 +148,7 @@ export default class OutputMap {
         return {
           layer: terrain.layer,
           mask: area.mask,
-          proc: terrainProcs[terrain.procName]
+          class: terrainClasses[terrain.className]
         };
       }).sort((areaA, areaB) => areaA.layer - areaB.layer);
     });

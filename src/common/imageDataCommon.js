@@ -1,3 +1,4 @@
+import seedrandom from 'seedrandom';
 import AreaMask from '../AreaMask';
 
 function fillImageData(imageData, red, green, blue, alpha) {
@@ -112,9 +113,22 @@ function smoothOutline(outline, amount) {
   return points;
 }
 
+function addNoise(ctx, amount) {
+  const rng = seedrandom('');
+  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    const by = (rng() * 2 - 1) * amount;
+    imageData.data[i] += by;
+    imageData.data[i + 1] += by;
+    imageData.data[i + 2] += by;
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
 export {
   fillImageData,
   detectAreas,
   outlineMask,
-  smoothOutline
+  smoothOutline,
+  addNoise
 };

@@ -1,7 +1,11 @@
-import closeUpGrass from './closeUpGrass';
-import closeUpRoad from './closeUpRoad';
+import CloseUpGrass from './CloseUpGrass';
+import CloseUpRoad from './CloseUpRoad';
+import CloseUpForest from './CloseUpForest';
+import CloseUpRiver from './CloseUpRiver';
 
 export {
-  closeUpGrass,
-  closeUpRoad
+  CloseUpGrass,
+  CloseUpRoad,
+  CloseUpForest,
+  CloseUpRiver
 };
