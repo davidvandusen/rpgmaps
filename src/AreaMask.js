@@ -11,6 +11,7 @@ export default class AreaMask {
   }
 
   index(x, y) {
+    if (x >= this.width || y >= this.height) return -1;
     return y * this.width + x;
   }
 

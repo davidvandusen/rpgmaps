@@ -2,17 +2,18 @@ import {outlineMask, smoothOutline} from '../common/imageDataCommon';
 import seedrandom from 'seedrandom';
 
 const baseColors = [
-  '#e0dac4',
-  '#dccab2',
-  '#e6d2b7',
-  '#d9c8b3',
-  '#d7ceb2'
+  'rgb(224,218,196)',
+  'rgb(220,202,178)',
+  'rgb(230,210,183)',
+  'rgb(217,200,179)',
+  'rgb(215,206,178)'
 ];
 
 function closeUpRoad(mask, ctx) {
   const rng = seedrandom('');
   const scaleFactorX = ctx.canvas.width / mask.width;
   const scaleFactorY = ctx.canvas.height / mask.height;
+
   for (let index = 0; index < mask.size; index++) {
     if (mask.get(index)) {
       const [srcX, srcY] = mask.coords(index);
@@ -22,19 +23,23 @@ function closeUpRoad(mask, ctx) {
       ctx.fillRect(dstX, dstY, scaleFactorX, scaleFactorY);
     }
   }
-  const points = smoothOutline(outlineMask(mask), 2);
-  // const points = outlineMask(mask);
+
+  const outline = smoothOutline(outlineMask(mask), 2);
+
   ctx.beginPath();
-  ctx.moveTo(points[0][0] * scaleFactorX, points[0][1] * scaleFactorY);
-  for (let i = 1; i < points.length; i++) {
-    ctx.lineTo(points[i][0] * scaleFactorX, points[i][1] * scaleFactorY);
+  for (let i = 0; i < outline.length; i++) {
+    ctx[i === 0 ? 'moveTo' : 'lineTo'](outline[i][0] * scaleFactorX, outline[i][1] * scaleFactorY);
   }
-  ctx.closePath();
-  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-  ctx.lineWidth = 3;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
+  ctx.fillStyle = 'rgba(217,200,179,0.2)';
+  ctx.globalCompositeOperation = 'screen';
+  ctx.fill();
+
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.strokeStyle = 'rgba(0,0,0,0.125)';
+  ctx.lineWidth = 1;
   ctx.stroke();
+
+  ctx.globalCompositeOperation = 'source-over';
 }
 
 export default closeUpRoad;
