@@ -38,6 +38,44 @@ export default class OutputMap {
     }
   }
 
+  drawBorder() {
+    const borderWidth = this.canvas.width / 64;
+
+    this.ctx.fillStyle = '#cab9a3';
+    this.ctx.fillRect(borderWidth, 0, this.canvas.width - 2 * borderWidth, borderWidth);
+    this.ctx.fillRect(0, borderWidth, borderWidth, this.canvas.height - 2 * borderWidth);
+    this.ctx.fillRect(borderWidth, this.canvas.height - borderWidth, this.canvas.width - 2 * borderWidth, borderWidth);
+    this.ctx.fillRect(this.canvas.width - borderWidth, borderWidth, borderWidth, this.canvas.height - 2 * borderWidth);
+
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    this.ctx.lineWidth = 4;
+    this.ctx.strokeRect(borderWidth - 2, borderWidth - 2, this.canvas.width - 2 * borderWidth + 4, this.canvas.height - 2 * borderWidth + 4);
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(borderWidth - 8, borderWidth - 8, this.canvas.width - 2 * borderWidth + 16, this.canvas.height - 2 * borderWidth + 16);
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.fillStyle = '#e0d088';
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    this.ctx.lineWidth = 1;
+    this.ctx.beginPath();
+    this.ctx.rect(0, 0, borderWidth, borderWidth);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.beginPath();
+    this.ctx.rect(this.canvas.width - borderWidth, 0, borderWidth, borderWidth);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.beginPath();
+    this.ctx.rect(0, this.canvas.height - borderWidth, borderWidth, borderWidth);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.beginPath();
+    this.ctx.rect(this.canvas.width - borderWidth, this.canvas.height - borderWidth, borderWidth, borderWidth);
+    this.ctx.fill();
+    this.ctx.stroke();
+  }
+
   draw() {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
@@ -45,6 +83,7 @@ export default class OutputMap {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.areas.forEach(area => area.proc(area.mask, this.ctx));
         this.drawGrid();
+        this.drawBorder();
         resolve();
       });
     });

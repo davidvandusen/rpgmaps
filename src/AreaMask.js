@@ -10,6 +10,14 @@ export default class AreaMask {
     return [i % this.width, Math.floor(i / this.width)];
   }
 
+  index(x, y) {
+    return y * this.width + x;
+  }
+
+  valid(i) {
+    return i >= 0 && i < this.size;
+  }
+
   get(i) {
     if (!this.valid(i)) return false;
     const word = Math.floor(i / 8);
@@ -17,8 +25,8 @@ export default class AreaMask {
     return !!(this.data[word] & 1 << bit);
   }
 
-  valid(i) {
-    return i >= 0 && i < this.size;
+  at(x, y) {
+    return this.get(this.index(x, y));
   }
 
   set(i, val) {

@@ -54,41 +54,45 @@ function describeContiguousArea(pixels, width, startIndex) {
 }
 
 function outlineMask(mask) {
-  let currentIndex;
-  for (let i = 0; currentIndex === undefined && i < mask.size; i++) if (mask.get(i)) currentIndex = i;
-  const indices = [];
-  while (currentIndex !== indices[0]) {
-    indices.push(currentIndex);
-    const se = mask.get(currentIndex);
-    const ne = mask.get(currentIndex - mask.width);
-    const sw = mask.get(currentIndex - 1);
-    const nw = mask.get(currentIndex - mask.width - 1);
-    const e = currentIndex + 1;
-    const s = currentIndex + mask.width;
-    const w = currentIndex - 1;
-    const n = currentIndex - mask.width;
-    const lastIndex = indices[indices.length - 2];
-    if (lastIndex === w) {
-      if (se !== sw) currentIndex = s;
-      else if (se !== ne) currentIndex = e;
-      else if (nw !== ne) currentIndex = n;
-    } else if (lastIndex === n) {
-      if (nw !== sw) currentIndex = w;
-      else if (se !== sw) currentIndex = s;
-      else if (se !== ne) currentIndex = e;
-    } else if (lastIndex === e) {
-      if (nw !== ne) currentIndex = n;
-      else if (nw !== sw) currentIndex = w;
-      else if (se !== sw) currentIndex = s;
-    } else if (lastIndex === s || lastIndex === undefined) {
-      if (se !== ne) currentIndex = e;
-      else if (nw !== ne) currentIndex = n;
-      else if (nw !== sw) currentIndex = w;
+  let pos;
+  let start;
+  for (let index = 0; pos === undefined && index < mask.size; index++) {
+    if (mask.get(index)) {
+      pos = mask.coords(index);
+      start = pos;
     }
   }
-  const points = [];
-  for (let i = 0; i < indices.length; i++) points.push(mask.coords(indices[i]));
-  return points;
+  const outline = [];
+  do {
+    const last = outline[outline.length - 1];
+    outline.push(pos);
+    const se = mask.at(pos[0], pos[1]);
+    const sw = mask.at(pos[0] - 1, pos[1]);
+    const nw = mask.at(pos[0] - 1, pos[1] - 1);
+    const ne = mask.at(pos[0], pos[1] - 1);
+    const s = [pos[0], pos[1] + 1];
+    const w = [pos[0] - 1, pos[1]];
+    const n = [pos[0], pos[1] - 1];
+    const e = [pos[0] + 1, pos[1]];
+    if (last === undefined || last[0] === s[0] && last[1] === s[1]) {
+      if (se !== ne) pos = e;
+      else if (nw !== ne) pos = n;
+      else if (nw !== sw) pos = w;
+    } else if (last[0] === w[0] && last[1] === w[1]) {
+      if (se !== sw) pos = s;
+      else if (se !== ne) pos = e;
+      else if (nw !== ne) pos = n;
+    } else if (last[0] === n[0] && last[1] === n[1]) {
+      if (nw !== sw) pos = w;
+      else if (se !== sw) pos = s;
+      else if (se !== ne) pos = e;
+    } else if (last[0] === e[0] && last[1] === e[1]) {
+      if (nw !== ne) pos = n;
+      else if (nw !== sw) pos = w;
+      else if (se !== sw) pos = s;
+    }
+  } while (!(pos[0] === start[0] && pos[1] === start[1]));
+  return outline;
 }
 
 function smoothOutline(outline, amount) {
