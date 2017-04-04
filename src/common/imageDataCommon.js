@@ -53,31 +53,57 @@ function describeContiguousArea(pixels, width, startIndex) {
   });
 }
 
-function outline(mask) {
-  const points = [];
-  let index;
-  let i = 0;
-  while (index === undefined && i < mask.size) {
-    if (mask.get(i)) index = i;
-    else i++;
+function outlineMask(mask) {
+  let currentIndex;
+  for (let i = 0; currentIndex === undefined && i < mask.size; i++) if (mask.get(i)) currentIndex = i;
+  const indices = [];
+  while (currentIndex !== indices[0]) {
+    indices.push(currentIndex);
+    const se = mask.get(currentIndex);
+    const ne = mask.get(currentIndex - mask.width);
+    const sw = mask.get(currentIndex - 1);
+    const nw = mask.get(currentIndex - mask.width - 1);
+    const e = currentIndex + 1;
+    const s = currentIndex + mask.width;
+    const w = currentIndex - 1;
+    const n = currentIndex - mask.width;
+    const lastIndex = indices[indices.length - 2];
+    if (lastIndex === w) {
+      if (se !== sw) currentIndex = s;
+      else if (se !== ne) currentIndex = e;
+      else if (nw !== ne) currentIndex = n;
+    } else if (lastIndex === n) {
+      if (nw !== sw) currentIndex = w;
+      else if (se !== sw) currentIndex = s;
+      else if (se !== ne) currentIndex = e;
+    } else if (lastIndex === e) {
+      if (nw !== ne) currentIndex = n;
+      else if (nw !== sw) currentIndex = w;
+      else if (se !== sw) currentIndex = s;
+    } else if (lastIndex === s || lastIndex === undefined) {
+      if (se !== ne) currentIndex = e;
+      else if (nw !== ne) currentIndex = n;
+      else if (nw !== sw) currentIndex = w;
+    }
   }
-  const width = mask.width;
-  while (index !== points[0]) {
-    const last = points[points.length - 1];
-    points.push(index);
-    const se = mask.get(index);
-    const ne = mask.get(index - width);
-    const sw = mask.get(index - 1);
-    const nw = mask.get(index - width - 1);
-    const e = index + 1;
-    const s = index + width;
-    const w = index - 1;
-    const n = index - width;
-    if (se !== ne && last !== e) index = e;
-    else if (se !== sw && last !== s) index = s;
-    else if (nw !== sw && last !== w) index = w;
-    else if (nw !== ne && last !== n) index = n;
-    else break;
+  const points = [];
+  for (let i = 0; i < indices.length; i++) points.push(mask.coords(indices[i]));
+  return points;
+}
+
+function smoothOutline(outline, amount) {
+  const amt = Math.floor(amount);
+  const n = amt * 2;
+  const points = [];
+  for (let i = 0; i < outline.length; i++) {
+    let sx = 0;
+    let sy = 0;
+    for (let p = i - amt; p < i + amt; p++) {
+      const index = p < 0 ? outline.length + p : p >= outline.length ? p - outline.length : p;
+      sx += outline[index][0];
+      sy += outline[index][1];
+    }
+    points.push([sx / n, sy / n]);
   }
   return points;
 }
@@ -85,5 +111,6 @@ function outline(mask) {
 export {
   fillImageData,
   detectAreas,
-  outline
+  outlineMask,
+  smoothOutline
 };

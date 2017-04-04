@@ -1,4 +1,4 @@
-import {outline} from '../common/imageDataCommon';
+import {outlineMask, smoothOutline} from '../common/imageDataCommon';
 import seedrandom from 'seedrandom';
 
 const baseColors = [
@@ -22,13 +22,12 @@ function closeUpRoad(mask, ctx) {
       ctx.fillRect(dstX, dstY, scaleFactorX, scaleFactorY);
     }
   }
-  const points = outline(mask);
+  const points = smoothOutline(outlineMask(mask), 2);
+  // const points = outlineMask(mask);
   ctx.beginPath();
-  const [x, y] = mask.coords(points[0]);
-  ctx.moveTo(x * scaleFactorX, y * scaleFactorY);
+  ctx.moveTo(points[0][0] * scaleFactorX, points[0][1] * scaleFactorY);
   for (let i = 1; i < points.length; i++) {
-    const [x, y] = mask.coords(points[i]);
-    ctx.lineTo(x * scaleFactorX, y * scaleFactorY);
+    ctx.lineTo(points[i][0] * scaleFactorX, points[i][1] * scaleFactorY);
   }
   ctx.closePath();
   ctx.strokeStyle = 'rgba(0,0,0,0.5)';

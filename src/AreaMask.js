@@ -7,7 +7,6 @@ export default class AreaMask {
   }
 
   coords(i) {
-    if (!this.valid(i)) return [0, 0];
     return [i % this.width, Math.floor(i / this.width)];
   }
 
