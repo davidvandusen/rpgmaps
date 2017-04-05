@@ -8,7 +8,7 @@ class CloseUpRoad extends BaseTerrain {
 
   overlay() {
     this.ctx.beginPath();
-    this.drawPath(this.smoothOutline);
+    this.drawPath(this.getSmoothOutline());
     this.ctx.strokeStyle = 'rgba(0,0,0,0.125)';
     this.ctx.lineWidth = 1;
     this.ctx.globalCompositeOperation = 'multiply';
