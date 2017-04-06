@@ -50,4 +50,8 @@ export default class AreaMask {
       this.data[word] &= ~(1 << bit);
     }
   }
+
+  forEach(fn) {
+    for (let i = 0; i < this.size; i++) if (this.get(i)) fn(...this.coords(i), i, this);
+  }
 }

@@ -21,34 +21,37 @@ export default class InputMap {
   }
 
   init() {
-    window.addEventListener('resize', this.updateCanvasSize.bind(this));
-    document.addEventListener('keypress', this.cycleColors.bind(this));
-    document.addEventListener('keypress', this.updateBrushSize.bind(this));
-    document.addEventListener('mousemove', this.updateMousePosition.bind(this));
-    document.addEventListener('mousedown', this.updateMousePosition.bind(this));
-    document.addEventListener('mouseup', this.updateMousePosition.bind(this));
-    document.addEventListener('mousedown', this.updateMouseButtonsDown.bind(this));
-    document.addEventListener('mouseup', this.updateMouseButtonsUp.bind(this));
-    document.addEventListener('mousemove', this.addPaintStroke.bind(this));
-    document.addEventListener('mousedown', this.addPaintStroke.bind(this));
-    document.addEventListener('mouseup', this.update.bind(this, true));
     this.updateCanvasSize();
     fillImageData(this.paintLayer, ...this.colors[0]);
     this.update(true);
     this.el.appendChild(this.canvas);
+    window.addEventListener('resize', this.updateCanvasSize.bind(this));
+    document.addEventListener('keypress', this.cycleColors.bind(this));
+    document.addEventListener('keypress', this.updateBrushSize.bind(this));
+    document.addEventListener('mousedown', this.updateMousePosition.bind(this));
+    document.addEventListener('mouseup', this.updateMousePosition.bind(this));
+    document.addEventListener('mousedown', this.updateMouseButtonsDown.bind(this));
+    document.addEventListener('mouseup', this.updateMouseButtonsUp.bind(this));
+    document.addEventListener('mousedown', this.addPaintStroke.bind(this));
+    document.addEventListener('mouseup', this.update.bind(this, true));
+    document.addEventListener('mousemove', this.updateMousePosition.bind(this));
+    document.addEventListener('mousemove', this.addPaintStroke.bind(this));
     if (typeof this.onInit === 'function') this.onInit.call(null);
   }
 
   updateCanvasSize() {
-    this.scaleFactor = this.el.offsetWidth / this.config.input.canvas.resolution.width;
+    const scaleFactorX = this.el.offsetWidth / this.config.input.canvas.resolution.width;
+    const scaleFactorY = this.el.offsetHeight / this.config.input.canvas.resolution.height;
+    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
     this.canvas.style.height = (this.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
-    this.canvas.style.width = this.el.offsetWidth + 'px';
+    this.canvas.style.width = (this.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
     this.update();
   }
 
   updateMousePosition(event) {
-    this.mouse.x = Math.round((event.pageX - this.el.offsetLeft) / this.scaleFactor);
-    this.mouse.y = Math.round((event.pageY - this.el.offsetTop) / this.scaleFactor);
+    const position = this.canvas.getBoundingClientRect();
+    this.mouse.x = Math.round((event.clientX - position.left) / this.scaleFactor);
+    this.mouse.y = Math.round((event.clientY - position.top) / this.scaleFactor);
     this.update();
   }
 

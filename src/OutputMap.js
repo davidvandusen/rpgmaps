@@ -2,9 +2,6 @@ import {detectAreas, addNoise} from './common/imageDataCommon';
 import {intToCssHex} from './common/colorCommon';
 import * as terrainClasses from './terrains';
 
-const READY = 0;
-const PROCESSING = 1;
-
 export default class OutputMap {
   constructor(el, config) {
     this.el = el;
@@ -14,7 +11,7 @@ export default class OutputMap {
     this.canvas.height = this.config.output.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
     this.areas = [];
-    this.status = READY;
+    this.status = OutputMap.READY;
   }
 
   drawGrid() {
@@ -116,9 +113,11 @@ export default class OutputMap {
   }
 
   updateCanvasSize() {
-    this.scaleFactor = this.el.offsetWidth / this.config.output.canvas.resolution.width;
-    this.canvas.style.height = (this.config.output.canvas.resolution.height * this.scaleFactor) + 'px';
-    this.canvas.style.width = this.el.offsetWidth + 'px';
+    const scaleFactorX = this.el.offsetWidth / this.config.input.canvas.resolution.width;
+    const scaleFactorY = this.el.offsetHeight / this.config.input.canvas.resolution.height;
+    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
+    this.canvas.style.height = (this.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
+    this.canvas.style.width = (this.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
     this.draw();
   }
 
@@ -154,16 +153,26 @@ export default class OutputMap {
     });
   }
 
+  setStatus(newStatus) {
+    this.status = newStatus;
+    if (typeof this.onStatusChanged === 'function') {
+      this.onStatusChanged.call(null, this.status);
+    }
+  }
+
   processInput() {
-    if (this.status !== READY) return;
-    this.status = PROCESSING;
+    if (this.status !== OutputMap.READY) return;
+    this.setStatus(OutputMap.PROCESSING);
     this.input = this.nextInput;
     this.nextInput = undefined;
     this.updateAreas()
       .then(this.draw.bind(this))
       .then(() => {
-        this.status = READY;
+        this.setStatus(OutputMap.READY);
         if (this.nextInput) setTimeout(this.processInput.bind(this), 0);
       });
   }
 }
+
+OutputMap.READY = 0;
+OutputMap.PROCESSING = 1;

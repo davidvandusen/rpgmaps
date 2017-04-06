@@ -1,43 +1,67 @@
+import {pointInCircle, distance} from '../common/geometryCommon';
 import {rgbaToCss} from '../common/colorCommon';
-import {distance, getOffsetMask, outlineMask} from '../common/geometryCommon';
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpForest extends BaseTerrain {
   constructor(mask, ctx) {
     super(mask, ctx);
+    this.baseColor = 'rgba(27,45,15,1)';
+  }
+
+  base() {
+    this.ctx.shadowBlur = 25;
+    this.ctx.shadowOffsetX = 10;
+    this.ctx.shadowOffsetY = 5;
+    this.ctx.shadowColor = 'rgba(0,0,0,1)';
+    BaseTerrain.prototype.base.call(this);
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
+    this.ctx.shadowColor = 'rgba(0,0,0,0)';
   }
 
   drawTree(x, y, r) {
-    this.ctx.beginPath();
-    this.ctx.arc(x * this.scaleFactorX, y * this.scaleFactorY, r * this.scaleFactorX, 0, 2 * Math.PI);
-    this.ctx.closePath();
-    const colorJitter = 16;
-    const red = Math.floor(57 + this.rng() * colorJitter - colorJitter / 2);
-    const green = Math.floor(75 + this.rng() * colorJitter - colorJitter / 2);
-    const blue = Math.floor(45 + this.rng() * colorJitter - colorJitter / 2);
-    this.ctx.fillStyle = rgbaToCss(red, green, blue, 255);
-    this.ctx.fill();
-    this.ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
-  }
-
-  getUnderbrush(edgeTrees) {
-    const underbrush = [];
-    const numToAvg = 2;
-    for (let i = 0, len = edgeTrees.length; i < len; i++) {
-      let sx = 0;
-      let sy = 0;
-      let sr = 0;
-      for (let t = Math.floor(i - numToAvg / 2); t < Math.floor(i + numToAvg / 2); t++) {
-        const index = t < 0 ? edgeTrees.length + t : t >= edgeTrees.length ? t - edgeTrees.length : t;
-        sx += edgeTrees[index][0];
-        sy += edgeTrees[index][1];
-        sr += edgeTrees[index][2];
+    (() => {
+      this.ctx.beginPath();
+      let theta = 0;
+      while (theta < 2 * Math.PI) {
+        const spiralX = (x + (this.rng() * r * 0.3 + r * 0.7) * Math.cos(theta)) * this.scaleFactorX;
+        const spiralY = (y + (this.rng() * r * 0.3 + r * 0.7) * Math.sin(theta)) * this.scaleFactorY;
+        this.ctx[theta === 0 ? 'moveTo' : 'lineTo'](spiralX, spiralY);
+        theta += 0.4;
       }
-      underbrush.push([sx / numToAvg, sy / numToAvg, sr / numToAvg]);
-    }
-    return underbrush;
+      this.ctx.closePath();
+      const colorJitter = 16;
+      const red = Math.floor(47 + this.rng() * colorJitter - colorJitter / 2);
+      const green = Math.floor(65 + this.rng() * colorJitter - colorJitter / 2);
+      const blue = Math.floor(35 + this.rng() * colorJitter - colorJitter / 2);
+      const gradient = this.ctx.createRadialGradient(x * this.scaleFactorX, y * this.scaleFactorY, 0, x * this.scaleFactorX, y * this.scaleFactorY, r * this.scaleFactorX);
+      gradient.addColorStop(0, rgbaToCss(red, green, blue, 255));
+      gradient.addColorStop(0.5, rgbaToCss(red, green, blue, 255));
+      gradient.addColorStop(0.7, rgbaToCss(red - 10, green - 10, blue - 10, 225));
+      gradient.addColorStop(0.9, rgbaToCss(0, 0, 0, 0));
+      this.ctx.fillStyle = gradient;
+      this.ctx.fill();
+    })();
+
+    (() => {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x * this.scaleFactorX, y * this.scaleFactorY);
+      let spiralRadius = 0;
+      let theta = 0;
+      let spiralRate = 0.05;
+      while (spiralRadius < r * 0.85) {
+        const spiralX = (x + spiralRadius * Math.cos(theta)) * this.scaleFactorX + (this.rng() - 0.5) * 0.5 * this.scaleFactorX;
+        const spiralY = (y + spiralRadius * Math.sin(theta)) * this.scaleFactorY + (this.rng() - 0.5) * 0.5 * this.scaleFactorY;
+        this.ctx.lineTo(spiralX, spiralY);
+        theta += 0.5;
+        spiralRadius += spiralRate;
+        spiralRate = Math.max(spiralRate - 0.0002, 0.01);
+      }
+      this.ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      this.ctx.lineWidth = 2;
+      this.ctx.stroke();
+    })();
   }
 
   getEdgeTrees(outline) {
@@ -55,24 +79,14 @@ class CloseUpForest extends BaseTerrain {
     return edgeTrees;
   }
 
-  fillWithTrees(mask) {
-    getOffsetMask(mask, mask.n > 360 ? -2 : -1).forEach(offsetMask => {
-      const offsetOutline = outlineMask(offsetMask);
-      if (offsetOutline.length) {
-        const innerTrees = this.getEdgeTrees(offsetOutline);
-        for (let i = 0; i < innerTrees.length; i++) this.drawTree(...innerTrees[i]);
-        this.fillWithTrees(offsetMask);
-      }
-    });
-  }
-
   overlay() {
-    const outline = this.getOutline();
-    const edgeTrees = this.getEdgeTrees(outline);
-    const underbrush = this.getUnderbrush(edgeTrees);
-    for (let i = 0; i < underbrush.length; i++) this.drawTree(...underbrush[i]);
-    for (let i = 0; i < edgeTrees.length; i++) this.drawTree(...edgeTrees[i]);
-    this.fillWithTrees(this.mask);
+    this.getEdgeTrees(this.outline).forEach(tree => this.drawTree(...tree));
+    const trees = [];
+    this.mask.forEach((x, y) => {
+      if (this.rng() < 0.001) trees.push([x, y, this.rng() * 2.5 + 5]);
+      if (this.rng() < 0.17) trees.push([x, y, this.rng() * 2.5 + 1.25]);
+    });
+    trees.sort((treeA, treeB) => treeA[2] - treeB[2]).forEach(tree => this.drawTree(...tree));
   }
 }
 
