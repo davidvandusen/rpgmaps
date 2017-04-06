@@ -1,3 +1,5 @@
+import AreaMask from '../AreaMask';
+
 function pointInCircle(x, y, cx, cy, r) {
   return distance(x, y, cx, cy) <= r;
 }
@@ -16,6 +18,7 @@ function outlineMask(mask) {
     }
   }
   const points = [];
+  if (!pos) return points;
   do {
     const last = points[points.length - 1];
     points.push(pos);
@@ -48,6 +51,36 @@ function outlineMask(mask) {
   return points;
 }
 
+function getOffsetMask(mask, amount) {
+  const width = mask.width;
+  let oldMask = mask;
+  let newMask;
+  for (let n = 0; n < Math.abs(amount); n++) {
+    newMask = new AreaMask(oldMask.size, width);
+    for (let i = 0; i < oldMask.size; i++) {
+      const points = [
+        oldMask.get(i - width - 1), oldMask.get(i - width), oldMask.get(i - width + 1),
+        oldMask.get(i - 1),         oldMask.get(i),         oldMask.get(i + 1),
+        oldMask.get(i + width - 1), oldMask.get(i + width), oldMask.get(i + width + 1),
+      ];
+      if (points.includes(true)) {
+        if (points.includes(false)) {
+          newMask.set(i, amount > 0);
+        } else {
+          newMask.set(i, true);
+        }
+      } else {
+        newMask.set(i, false);
+      }
+    }
+    if (newMask.empty() && amount < 0 || newMask.full() && amount > 0) return [newMask];
+    else oldMask = newMask;
+  }
+  // FIXME the dog bone problem can split the mask into multiple contiguous areas
+  // so it needs to be separated into multiple masks
+  return [newMask];
+}
+
 function smoothPolygon(points, amount) {
   const amt = Math.floor(amount);
   const n = amt * 2;
@@ -65,14 +98,10 @@ function smoothPolygon(points, amount) {
   return out;
 }
 
-function offsetPolygon(points, amount) {
-  // TODO Compute new polygon offset from input polygon
-}
-
 export {
   pointInCircle,
   distance,
   smoothPolygon,
   outlineMask,
-  offsetPolygon
+  getOffsetMask
 };

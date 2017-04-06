@@ -1,5 +1,5 @@
 import {rgbaToCss} from '../common/colorCommon';
-import {distance} from '../common/geometryCommon';
+import {distance, getOffsetMask, outlineMask} from '../common/geometryCommon';
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpForest extends BaseTerrain {
@@ -22,20 +22,8 @@ class CloseUpForest extends BaseTerrain {
     this.ctx.stroke();
   }
 
-  overlay() {
-    const outline = this.getOutline();
-    let i = 0;
-    let rNext = 2;
-    let rLast;
-    const edgeTrees = [];
-    while (i < outline.length) {
-      const [x, y] = outline[i];
-      edgeTrees.push([x, y, rNext]);
-      rLast = rNext;
-      do i += Math.floor(this.rng() * 4);
-      while (outline[i] && (rNext = distance(x, y, ...outline[i]) - rLast) < 1);
-    }
-    const innerTrees = [];
+  getUnderbrush(edgeTrees) {
+    const underbrush = [];
     const numToAvg = 2;
     for (let i = 0, len = edgeTrees.length; i < len; i++) {
       let sx = 0;
@@ -47,10 +35,44 @@ class CloseUpForest extends BaseTerrain {
         sy += edgeTrees[index][1];
         sr += edgeTrees[index][2];
       }
-      innerTrees.push([sx / numToAvg, sy / numToAvg, sr / numToAvg]);
+      underbrush.push([sx / numToAvg, sy / numToAvg, sr / numToAvg]);
     }
-    for (let i = 0; i < innerTrees.length; i++) this.drawTree(...innerTrees[i]);
+    return underbrush;
+  }
+
+  getEdgeTrees(outline) {
+    const edgeTrees = [];
+    let i = 0;
+    let rNext = 2;
+    let rLast;
+    while (i < outline.length) {
+      const [x, y] = outline[i];
+      edgeTrees.push([x, y, rNext]);
+      rLast = rNext;
+      do i += Math.floor(this.rng() * 4);
+      while (outline[i] && (rNext = distance(x, y, ...outline[i]) - rLast) < 1);
+    }
+    return edgeTrees;
+  }
+
+  fillWithTrees(mask) {
+    getOffsetMask(mask, mask.n > 360 ? -2 : -1).forEach(offsetMask => {
+      const offsetOutline = outlineMask(offsetMask);
+      if (offsetOutline.length) {
+        const innerTrees = this.getEdgeTrees(offsetOutline);
+        for (let i = 0; i < innerTrees.length; i++) this.drawTree(...innerTrees[i]);
+        this.fillWithTrees(offsetMask);
+      }
+    });
+  }
+
+  overlay() {
+    const outline = this.getOutline();
+    const edgeTrees = this.getEdgeTrees(outline);
+    const underbrush = this.getUnderbrush(edgeTrees);
+    for (let i = 0; i < underbrush.length; i++) this.drawTree(...underbrush[i]);
     for (let i = 0; i < edgeTrees.length; i++) this.drawTree(...edgeTrees[i]);
+    this.fillWithTrees(this.mask);
   }
 }
 

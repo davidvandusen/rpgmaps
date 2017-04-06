@@ -4,6 +4,7 @@ export default class AreaMask {
     this.width = width;
     this.height = Math.floor(this.size / this.width);
     this.data = new Uint8Array(Math.ceil(size / 8));
+    this.n = 0;
   }
 
   coords(i) {
@@ -30,10 +31,23 @@ export default class AreaMask {
     return this.get(this.index(x, y));
   }
 
+  empty() {
+    return this.n === 0;
+  }
+
+  full() {
+    return this.n === this.size;
+  }
+
   set(i, val) {
     const word = Math.floor(i / 8);
     const bit = i % 8;
-    if (val) this.data[word] |= 1 << bit;
-    else this.data[word] &= ~(1 << bit);
+    if (val) {
+      if (!this.get(i)) this.n++;
+      this.data[word] |= 1 << bit;
+    } else {
+      if (this.get(i)) this.n--;
+      this.data[word] &= ~(1 << bit);
+    }
   }
 }
