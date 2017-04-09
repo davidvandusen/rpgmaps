@@ -3,8 +3,8 @@ import {rgbaToCss} from '../lib/colorCommon';
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpForest extends BaseTerrain {
-  constructor(mask, ctx) {
-    super(mask, ctx);
+  constructor(mask, ctx, rng) {
+    super(mask, ctx, rng);
     this.baseColor = 'rgba(27,45,15,1)';
   }
 

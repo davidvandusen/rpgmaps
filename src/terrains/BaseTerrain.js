@@ -1,11 +1,10 @@
-import seedrandom from 'seedrandom';
 import {outlineMask, smoothPolygon} from '../lib/geometryCommon';
 
 class BaseTerrain {
-  constructor(mask, ctx) {
+  constructor(mask, ctx, rng) {
     this.mask = mask;
     this.ctx = ctx;
-    this.rng = seedrandom('');
+    this.rng = rng;
     this.scaleFactorX = ctx.canvas.width / mask.width;
     this.scaleFactorY = ctx.canvas.height / mask.height;
     this.baseColor = 'rgba(0,0,0,1)';

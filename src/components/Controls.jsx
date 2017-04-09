@@ -45,6 +45,10 @@ export default class Controls extends Component {
             </div>
           ))}
         </div>
+        <div className="control-list">
+          <div className="control-list-heading">Start Over?</div>
+          <div className="control-list-item interactable danger" onClick={this.props.reset}>Reset map!</div>
+        </div>
         <div className="processing">
           {this.props.status === 'processing' ? (
             <div>

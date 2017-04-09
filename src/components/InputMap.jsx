@@ -38,7 +38,9 @@ export default class InputMap extends Component {
   draw() {
     requestAnimationFrame(() => {
       this.ctx.putImageData(this.paintLayer, 0, 0);
-      this.drawBrush();
+      if (this.mouse.x >= 0 && this.mouse.x < this.canvas.width && this.mouse.y >= 0 && this.mouse.y < this.canvas.height) {
+        this.drawBrush();
+      }
     });
   }
 
@@ -81,12 +83,16 @@ export default class InputMap extends Component {
     }
   }
 
+  reset() {
+    fillImageData(this.paintLayer, ...cssToRgba(this.props.config.terrains[0].color));
+  }
+
   componentDidMount() {
     this.canvas.width = this.props.config.input.canvas.resolution.width;
     this.canvas.height = this.props.config.input.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
     this.paintLayer = this.ctx.createImageData(this.canvas.width, this.canvas.height);
-    fillImageData(this.paintLayer, ...cssToRgba(this.props.config.terrains[0].color));
+    this.reset();
     this.props.setImageData(this.paintLayer);
     this.updateCanvasSize();
     window.addEventListener('resize', this.updateCanvasSize);

@@ -20,6 +20,12 @@ export default class App extends Component {
     this.setStatus = this.setStatus.bind(this);
     this.setBrushSize = this.setBrushSize.bind(this);
     this.handleKeypress = this.handleKeypress.bind(this);
+    this.reset = this.reset.bind(this);
+  }
+
+  reset() {
+    this.inputMap && this.inputMap.reset();
+    this.updateImageData();
   }
 
   setBrushSize(newBrushSize) {
@@ -72,12 +78,14 @@ export default class App extends Component {
         <Controls
           setTerrain={this.setTerrain}
           setBrushSize={this.setBrushSize}
+          reset={this.reset}
           config={this.props.config}
           terrain={this.state.terrain}
           brushSize={this.state.brushSize}
           status={this.state.status} />
         <div className="container">
           <InputMap
+            ref={c => this.inputMap = c}
             setImageData={this.setImageData}
             updateImageData={this.updateImageData}
             config={this.props.config}

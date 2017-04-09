@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import seedrandom from 'seedrandom';
 import {detectAreas, addNoise, areSamePixels} from '../lib/imageDataCommon';
 import {intToCssHex} from '../lib/colorCommon';
 import * as terrainClasses from '../terrains';
@@ -97,7 +98,10 @@ export default class OutputMap extends Component {
   draw() {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
-        const mapComponents = this.areas.map(area => new area.class(area.mask, this.ctx));
+        this.ctx.fillStyle = 'rgb(127,127,127)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        const rng = seedrandom('');
+        const mapComponents = this.areas.map(area => new area.class(area.mask, this.ctx, rng));
         mapComponents.forEach(component => component.base());
         mapComponents.forEach(component => component.overlay());
         this.drawGrid();
@@ -133,27 +137,22 @@ export default class OutputMap extends Component {
       return;
     }
     this.props.setStatus('processing');
-    return this.updateAreas()
+    this.updateAreas()
       .then(this.draw)
       .then(() => {
         this.props.setStatus('ready');
-        if (this.hasUnprocessedImageData) setTimeout(() => {
-          this.processImageData().then(() => {
-            this.hasUnprocessedImageData = false;
-          });
-        }, 0);
+        if (this.hasUnprocessedImageData) {
+          this.hasUnprocessedImageData = false;
+          setTimeout(this.processImageData, 0);
+        }
       });
   }
 
   componentDidUpdate() {
-    if (this.props.imageData) {
+    if (this.props.imageData && !this.pixels || !areSamePixels(this.pixels, this.props.imageData.data)) {
       this.pixels = this.props.imageData.data.slice(0);
       this.processImageData();
     }
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return !this.pixels || !!nextProps.imageData && !areSamePixels(this.pixels, nextProps.imageData.data);
   }
 
   updateCanvasSize() {

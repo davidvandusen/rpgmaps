@@ -1,8 +1,8 @@
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpRoad extends BaseTerrain {
-  constructor(mask, ctx) {
-    super(mask, ctx);
+  constructor(mask, ctx, rng) {
+    super(mask, ctx, rng);
     this.baseColor = 'rgba(217,200,179,1)';
   }
 

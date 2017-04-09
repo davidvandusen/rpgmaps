@@ -69,18 +69,29 @@ body {
 .control-list-heading {
   font-weight: $font-weight-normal;
   padding: $spacing-unit;
+  text-shadow: 1px 1px 0 rgb(0,0,0);
 }
 
 .control-list-item {
   padding: $spacing-unit;
 
+  &.interactable {
+    cursor: pointer;
+  }
+
   &.interactable:hover {
     background: rgb(75,75,75);
   }
 
+  &.interactable.danger:hover {
+    background: rgb(125,0,0);
+  }
+
   &.current,
   &.current.interactable {
-    background: rgb(85,85,85);
+    background: rgb(225,225,225);
+    color: rgb(45,45,45);
+    font-weight: $font-weight-normal;
   }
 }
 
