@@ -14,6 +14,16 @@ export default class App extends Component {
       terrain: 1,
       brushSize: this.props.config.input.brush.size.default
     };
+    this.keymap = {
+      // [
+      38: () => this.setTerrain(this.state.terrain - 1),
+      // ]
+      40: () => this.setTerrain(this.state.terrain + 1),
+      // UP
+      219: () => this.setBrushSize(this.state.brushSize - 1),
+      // DOWN
+      221: () => this.setBrushSize(this.state.brushSize + 1)
+    };
     this.updateImageData = this.updateImageData.bind(this);
     this.setImageData = this.setImageData.bind(this);
     this.setTerrain = this.setTerrain.bind(this);
@@ -43,7 +53,14 @@ export default class App extends Component {
     this.setState({status});
   }
 
-  setTerrain(terrain) {
+  setTerrain(newTerrain) {
+    let terrain = newTerrain;
+    if (terrain < 0) {
+      terrain = this.props.config.terrains.length - 1;
+    }
+    if (terrain >= this.props.config.terrains.length) {
+      terrain = 0;
+    }
     this.setState({terrain});
   }
 
@@ -56,20 +73,16 @@ export default class App extends Component {
   }
 
   handleKeypress(event) {
-    if (event.key === '[') {
-      this.setBrushSize(this.state.brushSize - 1);
-    }
-    if (event.key === ']') {
-      this.setBrushSize(this.state.brushSize + 1);
-    }
+    const fn = this.keymap[event.keyCode];
+    if (typeof fn === 'function') fn();
   }
 
   componentDidMount() {
-    document.addEventListener('keypress', this.handleKeypress);
+    document.addEventListener('keydown', this.handleKeypress);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keypress', this.handleKeypress);
+    document.removeEventListener('keydown', this.handleKeypress);
   }
 
   render() {
