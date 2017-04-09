@@ -21,7 +21,12 @@ body {
   user-select: none;
 }
 
-.container {
+a {
+  color: $body-font-color;
+  text-decoration: none;
+}
+
+.maps-container {
   bottom: $spacing-unit;
   left: $controls-width;
   position: absolute;
@@ -67,12 +72,13 @@ body {
 }
 
 .control-list-heading {
-  font-weight: $font-weight-normal;
+  font-weight: $font-weight-bold;
   padding: $spacing-unit;
   text-shadow: 1px 1px 0 rgb(0,0,0);
 }
 
 .control-list-item {
+  display: block;
   padding: $spacing-unit;
 
   &.interactable {

@@ -14,6 +14,15 @@ export default class Controls extends Component {
     return (
       <div className="controls">
         <div className="control-list">
+          <div className="control-list-heading">Publication</div>
+          <div className="control-list-item interactable" onClick={this.props.publishMap}>
+            <div className="control-list-item-heading">Publish Current Map</div>
+          </div>
+          <a className="control-list-item interactable" href={location.href.substring(0, location.href.indexOf('/edit'))} target="_blank">
+            <div className="control-list-item-heading">Play Map &#x2197;</div>
+          </a>
+        </div>
+        <div className="control-list">
           <div className="control-list-heading">Brush Settings</div>
           <div className="control-list-item">
             <span className="control-list-item-heading">Size</span>
@@ -47,7 +56,7 @@ export default class Controls extends Component {
         </div>
         <div className="control-list">
           <div className="control-list-heading">Start Over?</div>
-          <div className="control-list-item interactable danger" onClick={this.props.reset}>Reset map!</div>
+          <div className="control-list-item interactable danger" onClick={this.props.reset}>Reset Map!</div>
         </div>
         <div className="processing">
           {this.props.status === 'processing' ? (

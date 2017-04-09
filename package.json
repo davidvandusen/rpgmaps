@@ -1,11 +1,11 @@
 {
-  "name": "dmaps",
+  "name": "rpgmaps",
   "version": "1.0.0",
   "description": "Tabletop roleplaying game map creation tool",
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server",
-    "build:dev": "./node_modules/.bin/webpack",
-    "build:prod": "./node_modules/.bin/webpack -p"
+    "install": "./install.sh",
+    "postinstall": "./postinstall.sh",
+    "start": "./start.sh"
   },
   "author": "David VanDusen <github@davidvandusen.com>",
   "repository": {
@@ -13,21 +13,5 @@
     "url": "https://dvandusen@bitbucket.org/dvandusen/rpgmaps.git"
   },
   "license": "UNLICENSED",
-  "private": true,
-  "devDependencies": {
-    "babel-core": "^6.24.0",
-    "babel-loader": "^6.4.1",
-    "babel-preset-env": "^1.2.2",
-    "babel-preset-react": "^6.23.0",
-    "base64-js": "^1.2.0",
-    "css-loader": "^0.28.0",
-    "node-sass": "^4.5.2",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "sass-loader": "^6.0.3",
-    "seedrandom": "^2.4.2",
-    "style-loader": "^0.16.1",
-    "webpack": "^2.3.2",
-    "webpack-dev-server": "^2.4.2"
-  }
+  "private": true
 }

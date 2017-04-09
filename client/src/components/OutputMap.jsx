@@ -101,7 +101,7 @@ export default class OutputMap extends Component {
         this.ctx.fillStyle = 'rgb(127,127,127)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         const rng = seedrandom('');
-        const mapComponents = this.areas.map(area => new area.class(area.mask, this.ctx, rng));
+        const mapComponents = this.areas.map(area => new terrainClasses[area.ctor](area.mask, this.ctx, rng));
         mapComponents.forEach(component => component.base());
         mapComponents.forEach(component => component.overlay());
         this.drawGrid();
@@ -125,7 +125,7 @@ export default class OutputMap extends Component {
         return {
           layer: terrain.layer,
           mask: area.mask,
-          class: terrainClasses[terrain.className]
+          ctor: terrain.className
         };
       }).sort((areaA, areaB) => areaA.layer - areaB.layer);
     });
