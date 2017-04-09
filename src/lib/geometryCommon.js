@@ -1,4 +1,4 @@
-import AreaMask from '../AreaMask';
+import AreaMask from './AreaMask';
 
 function pointInCircle(x, y, cx, cy, r) {
   return distance(x, y, cx, cy) <= r;

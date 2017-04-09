@@ -1,5 +1,5 @@
 import seedrandom from 'seedrandom';
-import {outlineMask, smoothPolygon} from '../common/geometryCommon';
+import {outlineMask, smoothPolygon} from '../lib/geometryCommon';
 
 class BaseTerrain {
   constructor(mask, ctx) {

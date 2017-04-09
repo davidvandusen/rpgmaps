@@ -22,37 +22,30 @@
       }
     }
   },
-  "mapTypes": [
+  "terrains": [
     {
-      "name": "Road Encounter",
-      "grid": 20,
-      "baseColor": "#d4d6a4",
-      "terrains": [
-        {
-          "name": "Grass",
-          "color": "#d3e5b5",
-          "className": "CloseUpGrass",
-          "layer": 1
-        },
-        {
-          "name": "Road",
-          "color": "#797470",
-          "className": "CloseUpRoad",
-          "layer": 2
-        },
-        {
-          "name": "Forest",
-          "color": "#394b2d",
-          "className": "CloseUpForest",
-          "layer": 4
-        },
-        {
-          "name": "River",
-          "color": "#8ec2d6",
-          "className": "CloseUpRiver",
-          "layer": 3
-        }
-      ]
+      "name": "Grass",
+      "color": "#d3e5b5",
+      "className": "CloseUpGrass",
+      "layer": 1
+    },
+    {
+      "name": "Road",
+      "color": "#797470",
+      "className": "CloseUpRoad",
+      "layer": 2
+    },
+    {
+      "name": "Forest",
+      "color": "#394b2d",
+      "className": "CloseUpForest",
+      "layer": 4
+    },
+    {
+      "name": "River",
+      "color": "#8ec2d6",
+      "className": "CloseUpRiver",
+      "layer": 3
     }
   ]
 }

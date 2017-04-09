@@ -1,88 +1,161 @@
+$body-background-color: rgb(35,35,35);
+$body-font-color: rgb(255,255,255);
+$base-font-size: 12px;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
 $controls-width: 150px;
+$control-border-color: rgb(45,45,45);
+$spacing-unit: 5px;
 
 body {
-  font-family: sans-serif;
-  font-size: 1.2vw;
-  font-weight: 300;
+  background: $body-background-color;
+  color: $body-font-color;
+  cursor: default;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: $base-font-size;
+  font-weight: $font-weight-light;
+  line-height: 1;
   margin: 0;
   overflow: hidden;
+  user-select: none;
 }
 
-#container {
-  bottom: 0;
+.container {
+  bottom: $spacing-unit;
   left: $controls-width;
   position: absolute;
   right: 0;
-  top: 0;
+  top: $spacing-unit;
 }
 
-#controls {
-  background: rgb(60,60,60);
-  border-right: 1px solid rgba(0,0,0,0.25);
+.controls {
+  background: rgb(65,65,65);
+  border: $spacing-unit solid $control-border-color;
   bottom: 0;
   box-sizing: border-box;
   left: 0;
   position: absolute;
   top: 0;
   width: $controls-width;
+
+  .processing {
+    background: rgb(55,55,55);
+    bottom: 0;
+    border-top: $spacing-unit solid $control-border-color;
+    box-sizing: border-box;
+    color: rgb(127,127,127);
+    left: 0;
+    padding: 0.4vw;
+    position: absolute;
+    right: 0;
+
+    .dot {
+      background: rgb(225,0,0);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.4em;
+      height: 0.8em;
+      width: 0.8em;
+    }
+  }
 }
 
-#input-map {
+.control-list {
+  border-bottom: 1px solid $control-border-color;
+  padding: $spacing-unit;
+}
+
+.control-list-heading {
+  font-weight: $font-weight-normal;
+  padding: $spacing-unit;
+}
+
+.control-list-item {
+  padding: $spacing-unit;
+
+  &.interactable:hover {
+    background: rgb(75,75,75);
+  }
+
+  &.current,
+  &.current.interactable {
+    background: rgb(85,85,85);
+  }
+}
+
+.control-list-item-input {
+  padding: 0 $spacing-unit;
+}
+
+.search-input {
+  background: rgb(40,40,40);
+  border: 0 none transparent;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: rgb(200,200,200);
+  height: $base-font-size + (2 * $spacing-unit);
+  padding: $spacing-unit (2 * $spacing-unit);
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.value-input {
+  background: rgb(40,40,40);
+  border: 1px solid rgb(120,120,120);
+  box-sizing: border-box;
+  color: rgb(200,200,200);
+  padding: 2px;
+  width: 40px;
+}
+
+.control-list-item-swatch {
+  border: 1px solid rgb(35,35,35);
+  box-sizing: border-box;
+  display: inline-block;
+  height: $base-font-size - 3px;
+  margin-right: $spacing-unit;
+  width: $base-font-size - 3px;
+}
+
+%map {
   align-items: center;
-  background: rgb(100,100,100);
-  box-shadow: inset 0 0 10vw rgba(0,0,0,0.5);
+  box-sizing: border-box;
   display: flex;
-  height: 49.5vh;
   justify-content: center;
-  left: 0;
   position: absolute;
+}
+
+.input-map {
+  @extend %map;
+  height: 49.5%;
+  left: 0;
   right: 0;
   top: 0;
+
+  canvas {
+    cursor: none;
+    image-rendering: pixelated;
+  }
 }
 
-#map-height-slider {
+.output-map {
+  @extend %map;
+  bottom: 0;
+  height: 49.5%;
+  left: 0;
+  right: 0;
+}
+
+.vertical-resize-handle {
   background: rgb(120,120,120);
   cursor: ns-resize;
   left: 0;
-  height: 1vh;
+  height: 1%;
   position: absolute;
   right: 0;
-  top: 49.5vh;
-}
-
-#output-map {
-  align-items: center;
-  background: rgb(25,25,25);
-  bottom: 0;
-  box-shadow: inset 0 0 10vw rgba(0,0,0,0.5);
-  display: flex;
-  height: 49.5vh;
-  justify-content: center;
-  left: 0;
-  position: absolute;
-  right: 0;
-}
-
-#processing {
-  background: rgba(0,0,0,0.125);
-  bottom: 0;
-  border-top: 1px solid rgba(0,0,0,0.25);
-  box-sizing: border-box;
-  color: rgba(255,255,255,0.5);
-  left: 0;
-  padding: 0.4vw;
-  position: absolute;
-  right: 0;
-
-  &.contents-hidden .dot {
-    display: none;
-  }
-
-  .dot {
-    background: rgb(225,0,0);
-    border-radius: 50%;
-    display: inline-block;
-    height: 0.8em;
-    width: 0.8em;
-  }
+  top: 49.5%;
 }

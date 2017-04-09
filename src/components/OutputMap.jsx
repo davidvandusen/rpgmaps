@@ -1,17 +1,14 @@
-import {detectAreas, addNoise} from './common/imageDataCommon';
-import {intToCssHex} from './common/colorCommon';
-import * as terrainClasses from './terrains';
+import React, {Component} from 'react';
+import {detectAreas, addNoise, areSamePixels} from '../lib/imageDataCommon';
+import {intToCssHex} from '../lib/colorCommon';
+import * as terrainClasses from '../terrains';
 
-export default class OutputMap {
-  constructor(el, config) {
-    this.el = el;
-    this.config = config;
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = this.config.output.canvas.resolution.width;
-    this.canvas.height = this.config.output.canvas.resolution.height;
-    this.ctx = this.canvas.getContext('2d');
-    this.areas = [];
-    this.status = OutputMap.READY;
+export default class OutputMap extends Component {
+  constructor(props) {
+    super(props);
+    this.draw = this.draw.bind(this);
+    this.processImageData = this.processImageData.bind(this);
+    this.updateCanvasSize = this.updateCanvasSize.bind(this);
   }
 
   drawGrid() {
@@ -78,6 +75,8 @@ export default class OutputMap {
   }
 
   applyGlobalLight() {
+    let gradient;
+
     gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, Math.sqrt(Math.pow(this.canvas.width, 2) + Math.pow(this.canvas.height, 2)));
     gradient.addColorStop(1, 'rgba(0,0,0,0.5)');
     gradient.addColorStop(0, 'rgba(0,0,0,0)');
@@ -85,7 +84,7 @@ export default class OutputMap {
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    let gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, Math.sqrt(Math.pow(this.canvas.width, 2) + Math.pow(this.canvas.height, 2)));
+    gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, Math.sqrt(Math.pow(this.canvas.width, 2) + Math.pow(this.canvas.height, 2)));
     gradient.addColorStop(0, 'rgba(255,255,255,0.125)');
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
     this.ctx.globalCompositeOperation = 'overlay';
@@ -98,8 +97,6 @@ export default class OutputMap {
   draw() {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
-        this.ctx.fillStyle = this.config.mapTypes[0].baseColor;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         const mapComponents = this.areas.map(area => new area.class(area.mask, this.ctx));
         mapComponents.forEach(component => component.base());
         mapComponents.forEach(component => component.overlay());
@@ -112,36 +109,13 @@ export default class OutputMap {
     });
   }
 
-  updateCanvasSize() {
-    const scaleFactorX = this.el.offsetWidth / this.config.input.canvas.resolution.width;
-    const scaleFactorY = this.el.offsetHeight / this.config.input.canvas.resolution.height;
-    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
-    this.canvas.style.height = (this.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
-    this.canvas.style.width = (this.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
-    this.draw();
-  }
-
-  init() {
-    window.addEventListener('resize', this.updateCanvasSize.bind(this));
-    this.updateCanvasSize();
-    this.el.appendChild(this.canvas);
-    this.draw();
-    if (typeof this.onInit === 'function') this.onInit();
-  }
-
-  setInput(imageData) {
-    this.nextInput = imageData;
-    this.processInput();
-  }
-
   getTerrainFromArea(area) {
-    const configTerrains = this.config.mapTypes[0].terrains;
     const cssHex = intToCssHex(area.color);
-    return configTerrains.find(terrain => terrain.color === cssHex);
+    return this.props.config.terrains.find(terrain => terrain.color === cssHex);
   }
 
   updateAreas() {
-    return detectAreas(this.input).then(areas => {
+    return detectAreas(this.props.imageData).then(areas => {
       return this.areas = areas.map(area => {
         const terrain = this.getTerrainFromArea(area);
         return {
@@ -153,26 +127,61 @@ export default class OutputMap {
     });
   }
 
-  setStatus(newStatus) {
-    this.status = newStatus;
-    if (typeof this.onStatusChanged === 'function') {
-      this.onStatusChanged.call(null, this.status);
+  processImageData() {
+    if (this.props.status !== 'ready') {
+      this.hasUnprocessedImageData = true;
+      return;
+    }
+    this.props.setStatus('processing');
+    return this.updateAreas()
+      .then(this.draw)
+      .then(() => {
+        this.props.setStatus('ready');
+        if (this.hasUnprocessedImageData) setTimeout(() => {
+          this.processImageData().then(() => {
+            this.hasUnprocessedImageData = false;
+          });
+        }, 0);
+      });
+  }
+
+  componentDidUpdate() {
+    if (this.props.imageData) {
+      this.pixels = this.props.imageData.data.slice(0);
+      this.processImageData();
     }
   }
 
-  processInput() {
-    if (this.status !== OutputMap.READY) return;
-    this.setStatus(OutputMap.PROCESSING);
-    this.input = this.nextInput;
-    this.nextInput = undefined;
-    this.updateAreas()
-      .then(this.draw.bind(this))
-      .then(() => {
-        this.setStatus(OutputMap.READY);
-        if (this.nextInput) setTimeout(this.processInput.bind(this), 0);
-      });
+  shouldComponentUpdate(nextProps, nextState) {
+    return !this.pixels || !!nextProps.imageData && !areSamePixels(this.pixels, nextProps.imageData.data);
+  }
+
+  updateCanvasSize() {
+    const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
+    const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
+    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
+    this.canvas.style.height = (this.props.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
+    this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
+  }
+
+  componentDidMount() {
+    this.canvas.width = this.props.config.output.canvas.resolution.width;
+    this.canvas.height = this.props.config.output.canvas.resolution.height;
+    this.ctx = this.canvas.getContext('2d');
+    this.updateCanvasSize();
+    this.props.setStatus('ready');
+    window.addEventListener('resize', this.updateCanvasSize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateCanvasSize);
+  }
+
+  render() {
+    return (
+      <div className="output-map" ref={el => this.el = el}>
+        <canvas ref={(el) => this.canvas = el} />
+      </div>
+    )
   }
 }
-
-OutputMap.READY = 0;
-OutputMap.PROCESSING = 1;

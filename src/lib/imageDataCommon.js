@@ -1,5 +1,13 @@
 import seedrandom from 'seedrandom';
-import AreaMask from '../AreaMask';
+import AreaMask from './AreaMask';
+
+function areSamePixels(dataA, dataB) {
+  if (dataA.length !== dataB.length) return false;
+  for (let i = 0; i < dataA.length; ++i) {
+    if (dataA[i] !== dataB[i]) return false;
+  }
+  return true;
+}
 
 function fillImageData(imageData, red, green, blue, alpha) {
   const data = imageData.data;
@@ -69,5 +77,6 @@ function addNoise(ctx, amount) {
 export {
   fillImageData,
   detectAreas,
-  addNoise
+  addNoise,
+  areSamePixels
 };
