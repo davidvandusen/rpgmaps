@@ -1,0 +1,30 @@
+@import 'variables';
+
+body {
+  background: $body-background-color;
+  color: $body-font-color;
+  cursor: default;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: $base-font-size;
+  font-weight: $font-weight-light;
+  line-height: 1;
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+a {
+  color: $body-font-color;
+  text-decoration: none;
+}
+
+.full-screen-container {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}

@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import base64 from 'base64-js';
 import '../../styles/edit-app.scss';
 import Controls from './Controls.jsx';
 import InputMap from './InputMap.jsx';
 import VerticalResizeHandle from './VerticalResizeHandle.jsx';
 import OutputMap from './OutputMap.jsx';
+import {detectAreas} from '../lib/imageDataCommon';
+import {intToCssHex} from '../lib/colorCommon';
 
 export default class EditApp extends Component {
   constructor(props) {
@@ -13,6 +14,7 @@ export default class EditApp extends Component {
     this.state = {
       imageData: undefined,
       status: 'init',
+      areas: undefined,
       terrain: 1,
       brushSize: this.props.config.input.brush.size.default,
       title: `Edit ${this.roomName} - RPG Maps`
@@ -29,17 +31,24 @@ export default class EditApp extends Component {
     };
     this.updateImageData = this.updateImageData.bind(this);
     this.publishMap = this.publishMap.bind(this);
-    this.setImageData = this.setImageData.bind(this);
     this.setTerrain = this.setTerrain.bind(this);
-    this.setStatus = this.setStatus.bind(this);
     this.setBrushSize = this.setBrushSize.bind(this);
     this.handleKeypress = this.handleKeypress.bind(this);
     this.reset = this.reset.bind(this);
   }
 
+  handleKeypress(event) {
+    const fn = this.keymap[event.keyCode];
+    if (typeof fn === 'function') fn();
+  }
+
+  publishMap() {
+    if (!this.state.areas || !this.state.areas.length) return;
+    this.socket.emit('publishMap', {areas: this.state.areas});
+  }
+
   reset() {
     this.inputMap && this.inputMap.reset();
-    this.updateImageData();
   }
 
   setBrushSize(newBrushSize) {
@@ -53,10 +62,6 @@ export default class EditApp extends Component {
     this.setState({brushSize});
   }
 
-  setStatus(status) {
-    this.setState({status});
-  }
-
   setTerrain(newTerrain) {
     let terrain = newTerrain;
     if (terrain < 0) {
@@ -68,30 +73,43 @@ export default class EditApp extends Component {
     this.setState({terrain});
   }
 
-  setImageData(imageData) {
-    this.setState({imageData});
-  }
-
-  updateImageData() {
-    this.outputMap && this.outputMap.forceUpdate();
-  }
-
-  handleKeypress(event) {
-    const fn = this.keymap[event.keyCode];
-    if (typeof fn === 'function') fn();
-  }
-
-  publishMap() {
-    if (!this.outputMap.areas) return;
-    this.socket.emit('publishMap', {
-      areas: this.outputMap.areas.map(area => ({
-        ctor: area.ctor,
-        maskData: base64.fromByteArray(area.mask.data)
-      }))
+  updateImageData(imageData) {
+    if (this.state.status !== 'ready') {
+      this.unprocessedImageData = imageData;
+      return;
+    }
+    this.setState({status: 'processing'}, () => {
+      this.updateAreas(imageData).then(() => {
+        this.setState({status: 'ready'}, () => {
+          if (this.unprocessedImageData) {
+            setTimeout(this.updateImageData.bind(this, this.unprocessedImageData), 0);
+            this.unprocessedImageData = undefined;
+          }
+        });
+      });
     });
   }
 
+  getTerrainFromArea(area) {
+    const cssHex = intToCssHex(area.color);
+    return this.props.config.terrains.find(terrain => terrain.color === cssHex);
+  }
+
+  updateAreas(imageData) {
+    return detectAreas(imageData).then(areas => new Promise((resolve, reject) => this.setState({
+      areas: areas.map(area => {
+        const terrain = this.getTerrainFromArea(area);
+        return {
+          layer: terrain.layer,
+          mask: area.mask,
+          ctor: terrain.className
+        };
+      }).sort((areaA, areaB) => areaA.layer - areaB.layer)
+    }, resolve)));
+  }
+
   componentDidMount() {
+    this.setState({status: 'ready'});
     this.socket = io();
     this.socket.emit('joinRoom', {
       roomName: this.roomName,
@@ -121,7 +139,6 @@ export default class EditApp extends Component {
         <div className="maps-container">
           <InputMap
             ref={c => this.inputMap = c}
-            setImageData={this.setImageData}
             updateImageData={this.updateImageData}
             config={this.props.config}
             terrain={this.state.terrain}
@@ -129,10 +146,10 @@ export default class EditApp extends Component {
           <VerticalResizeHandle />
           <OutputMap
             ref={c => this.outputMap = c}
-            setStatus={this.setStatus}
             config={this.props.config}
-            status={this.state.status}
-            imageData={this.state.imageData} />
+            areas={this.state.areas}>
+            <p>Sketch a map and it will be rendered here</p>
+          </OutputMap>
         </div>
       </div>
     );

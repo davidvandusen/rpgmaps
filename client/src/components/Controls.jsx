@@ -59,7 +59,11 @@ export default class Controls extends Component {
           <div className="control-list-item interactable danger" onClick={this.props.reset}>Reset Map!</div>
         </div>
         <div className="processing">
-          {this.props.status === 'processing' ? (
+          {this.props.status === 'init' ? (
+            <div>
+              Initializing...
+            </div>
+          ) : this.props.status === 'processing' ? (
             <div>
               <span className="dot" />
               Processing...

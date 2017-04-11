@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
+import '../../styles/edit-app.scss';
+import OutputMap from './OutputMap.jsx';
+import AreaMask from "../lib/AreaMask";
 
 export default class PlayApp extends Component {
   constructor(props) {
     super(props);
     this.roomName = location.pathname.substring(1);
     this.state = {
-      mapData: undefined,
+      areas: undefined,
       title: `Play ${this.roomName} - RPG Maps`
     };
   }
@@ -17,7 +20,8 @@ export default class PlayApp extends Component {
       to: 'play'
     });
     this.socket.on('publishMap', mapData => {
-      console.log(mapData);
+      mapData.areas.forEach(area => area.mask = AreaMask.fromJSON(area.mask));
+      this.setState({areas: mapData.areas});
     });
   }
 
@@ -27,16 +31,15 @@ export default class PlayApp extends Component {
 
   render() {
     document.title = this.state.title;
-    return (<div>
-      {this.state.mapData ? (
-        <div>
-          Here's comes the map!
-        </div>
-      ) : (
-        <div>
+    return (
+      <div className="full-screen-container">
+        <OutputMap
+          ref={c => this.outputMap = c}
+          config={this.props.config}
+          areas={this.state.areas}>
           <p>No map published yet. To publish a map to this page, go to <a href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
-        </div>
-      )}
-    </div>);
+        </OutputMap>
+      </div>
+    );
   }
 }

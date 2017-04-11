@@ -1,38 +1,4 @@
-$body-background-color: rgb(35,35,35);
-$body-font-color: rgb(255,255,255);
-$base-font-size: 12px;
-$font-weight-light: 300;
-$font-weight-normal: 400;
-$font-weight-bold: 700;
-$controls-width: 150px;
-$control-border-color: rgb(45,45,45);
-$spacing-unit: 5px;
-
-body {
-  background: $body-background-color;
-  color: $body-font-color;
-  cursor: default;
-  font-family: 'Roboto Condensed', sans-serif;
-  font-size: $base-font-size;
-  font-weight: $font-weight-light;
-  line-height: 1;
-  margin: 0;
-  overflow: hidden;
-  user-select: none;
-}
-
-a {
-  color: $body-font-color;
-  text-decoration: none;
-}
-
-.maps-container {
-  bottom: $spacing-unit;
-  left: $controls-width;
-  position: absolute;
-  right: 0;
-  top: $spacing-unit;
-}
+@import 'variables';
 
 .controls {
   background: rgb(65,65,65);
@@ -136,43 +102,4 @@ a {
   height: $base-font-size - 3px;
   margin-right: $spacing-unit;
   width: $base-font-size - 3px;
-}
-
-%map {
-  align-items: center;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  position: absolute;
-}
-
-.input-map {
-  @extend %map;
-  height: 49.5%;
-  left: 0;
-  right: 0;
-  top: 0;
-
-  canvas {
-    cursor: none;
-    image-rendering: pixelated;
-  }
-}
-
-.output-map {
-  @extend %map;
-  bottom: 0;
-  height: 49.5%;
-  left: 0;
-  right: 0;
-}
-
-.vertical-resize-handle {
-  background: rgb(120,120,120);
-  cursor: ns-resize;
-  left: 0;
-  height: 1%;
-  position: absolute;
-  right: 0;
-  top: 49.5%;
 }

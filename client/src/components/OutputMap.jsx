@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
 import seedrandom from 'seedrandom';
-import {detectAreas, addNoise, areSamePixels} from '../lib/imageDataCommon';
-import {intToCssHex} from '../lib/colorCommon';
+import {addNoise} from '../lib/imageDataCommon';
 import * as terrainClasses from '../terrains';
 
 export default class OutputMap extends Component {
   constructor(props) {
     super(props);
     this.draw = this.draw.bind(this);
-    this.processImageData = this.processImageData.bind(this);
     this.updateCanvasSize = this.updateCanvasSize.bind(this);
   }
 
@@ -101,7 +99,7 @@ export default class OutputMap extends Component {
         this.ctx.fillStyle = 'rgb(127,127,127)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         const rng = seedrandom('');
-        const mapComponents = this.areas.map(area => new terrainClasses[area.ctor](area.mask, this.ctx, rng));
+        const mapComponents = this.props.areas.map(area => new terrainClasses[area.ctor](area.mask, this.ctx, rng));
         mapComponents.forEach(component => component.base());
         mapComponents.forEach(component => component.overlay());
         this.drawGrid();
@@ -113,48 +111,6 @@ export default class OutputMap extends Component {
     });
   }
 
-  getTerrainFromArea(area) {
-    const cssHex = intToCssHex(area.color);
-    return this.props.config.terrains.find(terrain => terrain.color === cssHex);
-  }
-
-  updateAreas() {
-    return detectAreas(this.props.imageData).then(areas => {
-      return this.areas = areas.map(area => {
-        const terrain = this.getTerrainFromArea(area);
-        return {
-          layer: terrain.layer,
-          mask: area.mask,
-          ctor: terrain.className
-        };
-      }).sort((areaA, areaB) => areaA.layer - areaB.layer);
-    });
-  }
-
-  processImageData() {
-    if (this.props.status !== 'ready') {
-      this.hasUnprocessedImageData = true;
-      return;
-    }
-    this.props.setStatus('processing');
-    this.updateAreas()
-      .then(this.draw)
-      .then(() => {
-        this.props.setStatus('ready');
-        if (this.hasUnprocessedImageData) {
-          this.hasUnprocessedImageData = false;
-          setTimeout(this.processImageData, 0);
-        }
-      });
-  }
-
-  componentDidUpdate() {
-    if (this.props.imageData && !this.pixels || !areSamePixels(this.pixels, this.props.imageData.data)) {
-      this.pixels = this.props.imageData.data.slice(0);
-      this.processImageData();
-    }
-  }
-
   updateCanvasSize() {
     const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
     const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
@@ -163,12 +119,38 @@ export default class OutputMap extends Component {
     this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.areas === this.props.areas) {
+      // areas are same object
+      return false;
+    }
+    if (!nextProps.areas || !nextProps.areas.length) {
+      // no nextProps areas
+      return false;
+    }
+    if (!this.props.areas || nextProps.areas.length !== this.props.areas.length) {
+      // new areas diff from old areas
+      return true;
+    }
+    for (let i = 0; i < this.props.areas.length; i++) {
+      if (nextProps.areas[i].ctor !== this.props.areas[i].ctor || !nextProps.areas[i].mask.equals(this.props.areas[i].mask)) {
+        // found a non-matching area
+        return true;
+      }
+    }
+    // areas are identical
+    return false;
+  }
+
+  componentDidUpdate() {
+    this.draw();
+  }
+
   componentDidMount() {
     this.canvas.width = this.props.config.output.canvas.resolution.width;
     this.canvas.height = this.props.config.output.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
     this.updateCanvasSize();
-    this.props.setStatus('ready');
     window.addEventListener('resize', this.updateCanvasSize);
   }
 
@@ -179,7 +161,8 @@ export default class OutputMap extends Component {
   render() {
     return (
       <div className="output-map" ref={el => this.el = el}>
-        <canvas ref={(el) => this.canvas = el} />
+        <canvas ref={(el) => this.canvas = el} style={{display: this.props.areas ? 'block' : 'none'}} />
+        {!this.props.areas && this.props.children}
       </div>
     )
   }

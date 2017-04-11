@@ -14,6 +14,7 @@ export default class InputMap extends Component {
     this.brushColor = cssToRgba(this.props.config.terrains[this.props.terrain].color);
     this.addPaintStroke = this.addPaintStroke.bind(this);
     this.draw = this.draw.bind(this);
+    this.updateImageData = this.updateImageData.bind(this);
     this.updateCanvasSize = this.updateCanvasSize.bind(this);
     this.updateMousePosition = this.updateMousePosition.bind(this);
     this.updateMouseButtonsDown = this.updateMouseButtonsDown.bind(this);
@@ -67,7 +68,8 @@ export default class InputMap extends Component {
   }
 
   addPaintStroke() {
-    if (this.mouse.buttons[0]) {
+    if (this.mouse.buttons[0] && this.mouse.x >= 0 && this.mouse.x < this.canvas.width && this.mouse.y >= 0 && this.mouse.y < this.canvas.height) {
+      this.paintStrokesAdded = true;
       const data = this.paintLayer.data;
       for (let index = 0; index < data.length; index += 4) {
         const n = Math.floor(index / 4);
@@ -83,18 +85,25 @@ export default class InputMap extends Component {
     }
   }
 
+  updateImageData() {
+    if (this.paintStrokesAdded) {
+      this.paintStrokesAdded = false;
+      this.props.updateImageData(this.paintLayer);
+    }
+  }
+
   reset() {
     fillImageData(this.paintLayer, ...cssToRgba(this.props.config.terrains[0].color));
+    this.props.updateImageData(this.paintLayer);
   }
 
   componentDidMount() {
     this.canvas.width = this.props.config.input.canvas.resolution.width;
     this.canvas.height = this.props.config.input.canvas.resolution.height;
+    this.updateCanvasSize();
     this.ctx = this.canvas.getContext('2d');
     this.paintLayer = this.ctx.createImageData(this.canvas.width, this.canvas.height);
     this.reset();
-    this.props.setImageData(this.paintLayer);
-    this.updateCanvasSize();
     window.addEventListener('resize', this.updateCanvasSize);
     document.addEventListener('mousemove', this.updateMousePosition, true);
     document.addEventListener('mousedown', this.updateMouseButtonsDown, true);
@@ -103,7 +112,7 @@ export default class InputMap extends Component {
     this.canvas.addEventListener('mousemove', this.addPaintStroke);
     this.canvas.addEventListener('mousedown', this.draw);
     document.addEventListener('mousemove', this.draw);
-    document.addEventListener('mouseup', this.props.updateImageData);
+    document.addEventListener('mouseup', this.updateImageData);
   }
 
   componentWillUnmount() {
@@ -115,7 +124,7 @@ export default class InputMap extends Component {
     this.canvas.removeEventListener('mousemove', this.addPaintStroke);
     this.canvas.removeEventListener('mousedown', this.draw);
     document.removeEventListener('mousemove', this.draw);
-    document.removeEventListener('mouseup', this.props.updateImageData);
+    document.removeEventListener('mouseup', this.updateImageData);
   }
 
   render() {
