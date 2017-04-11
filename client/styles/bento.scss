@@ -1,0 +1,60 @@
+@import 'variables';
+
+.bento {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  & > .bento-compartment {
+    position: absolute;
+  }
+
+  &.bento-horizontal > .bento-compartment {
+    left: 0;
+    right: 0;
+  }
+
+  &.bento-vertical > .bento-compartment {
+    bottom: 0;
+    top: 0;
+  }
+
+  &.bento-horizontal > .bento-compartment-a {
+    top: 0;
+  }
+
+  &.bento-vertical > .bento-compartment-a {
+    left: 0;
+  }
+
+  &.bento-horizontal > .bento-compartment-b {
+    bottom: 0;
+  }
+
+  &.bento-vertical > .bento-compartment-b {
+    right: 0;
+  }
+
+  & > .bento-divider {
+    background: rgb(120,120,120);
+    border: 0 none transparent;
+    display: block;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+  }
+
+  &.bento-horizontal > .bento-divider {
+    cursor: ns-resize;
+    left: 0;
+    right: 0;
+  }
+
+  &.bento-vertical > .bento-divider{
+    bottom: 0;
+    cursor: ew-resize;
+    top: 0;
+  }
+}

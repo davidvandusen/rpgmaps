@@ -2,13 +2,12 @@
 
 .controls {
   background: rgb(65,65,65);
-  border: $spacing-unit solid $control-border-color;
   bottom: 0;
   box-sizing: border-box;
   left: 0;
   position: absolute;
+  right: 0;
   top: 0;
-  width: $controls-width;
 
   .processing {
     background: rgb(55,55,55);

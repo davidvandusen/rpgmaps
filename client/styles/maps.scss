@@ -1,27 +1,19 @@
 @import 'variables';
 
-.maps-container {
-  bottom: $spacing-unit;
-  left: $controls-width;
-  position: absolute;
-  right: 0;
-  top: $spacing-unit;
-}
-
 %map {
   align-items: center;
   box-sizing: border-box;
+  bottom: 0;
   display: flex;
   justify-content: center;
+  left: 0;
   position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .input-map {
   @extend %map;
-  height: 49.5%;
-  left: 0;
-  right: 0;
-  top: 0;
 
   canvas {
     cursor: none;
@@ -31,23 +23,4 @@
 
 .output-map {
   @extend %map;
-  bottom: 0;
-  height: 49.5%;
-  left: 0;
-  right: 0;
-
-  .full-screen-container & {
-    height: auto;
-    top: 0;
-  }
-}
-
-.vertical-resize-handle {
-  background: rgb(120,120,120);
-  cursor: ns-resize;
-  left: 0;
-  height: 1%;
-  position: absolute;
-  right: 0;
-  top: 49.5%;
 }

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../styles/edit-app.scss';
 import Controls from './Controls.jsx';
 import InputMap from './InputMap.jsx';
-import VerticalResizeHandle from './VerticalResizeHandle.jsx';
+import Bento from './Bento.jsx';
 import OutputMap from './OutputMap.jsx';
 import {detectAreas} from '../lib/imageDataCommon';
 import {intToCssHex} from '../lib/colorCommon';
@@ -35,6 +35,7 @@ export default class EditApp extends Component {
     this.setBrushSize = this.setBrushSize.bind(this);
     this.handleKeypress = this.handleKeypress.bind(this);
     this.reset = this.reset.bind(this);
+    this.forceUpdate = this.forceUpdate.bind(this, undefined);
   }
 
   handleKeypress(event) {
@@ -116,17 +117,23 @@ export default class EditApp extends Component {
       to: 'edit'
     });
     document.addEventListener('keydown', this.handleKeypress);
+    window.addEventListener('resize', this.forceUpdate)
   }
 
   componentWillUnmount() {
     this.socket.disconnect();
     document.removeEventListener('keydown', this.handleKeypress);
+    window.removeEventListener('resize', this.forceUpdate)
   }
 
   render() {
     document.title = this.state.title;
     return (
-      <div className="app">
+      <Bento
+        orientation="vertical"
+        defaultOffsetPixels={150}
+        minOffsetPixels={130}
+        maxOffsetPixels={300}>
         <Controls
           setTerrain={this.setTerrain}
           setBrushSize={this.setBrushSize}
@@ -136,22 +143,24 @@ export default class EditApp extends Component {
           terrain={this.state.terrain}
           brushSize={this.state.brushSize}
           status={this.state.status} />
-        <div className="maps-container">
+        <Bento
+          orientation="horizontal"
+          minOffsetPercent={10}
+          maxOffsetPercent={90}>
           <InputMap
             ref={c => this.inputMap = c}
             updateImageData={this.updateImageData}
             config={this.props.config}
             terrain={this.state.terrain}
             brushSize={this.state.brushSize} />
-          <VerticalResizeHandle />
           <OutputMap
             ref={c => this.outputMap = c}
             config={this.props.config}
             areas={this.state.areas}>
             <p>Sketch a map and it will be rendered here</p>
           </OutputMap>
-        </div>
-      </div>
+        </Bento>
+      </Bento>
     );
   }
 }

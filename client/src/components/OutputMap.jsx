@@ -7,7 +7,6 @@ export default class OutputMap extends Component {
   constructor(props) {
     super(props);
     this.draw = this.draw.bind(this);
-    this.updateCanvasSize = this.updateCanvasSize.bind(this);
   }
 
   drawGrid() {
@@ -111,29 +110,21 @@ export default class OutputMap extends Component {
     });
   }
 
-  updateCanvasSize() {
-    const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
-    const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
-    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
-    this.canvas.style.height = (this.props.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
-    this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.areas === this.props.areas) {
+  shouldCanvasRedraw() {
+    if (this.areas === this.props.areas) {
       // areas are same object
       return false;
     }
-    if (!nextProps.areas || !nextProps.areas.length) {
-      // no nextProps areas
+    if (!this.props.areas || !this.props.areas.length) {
+      // no areas
       return false;
     }
-    if (!this.props.areas || nextProps.areas.length !== this.props.areas.length) {
+    if (!this.areas || this.areas.length !== this.props.areas.length) {
       // new areas diff from old areas
       return true;
     }
     for (let i = 0; i < this.props.areas.length; i++) {
-      if (nextProps.areas[i].ctor !== this.props.areas[i].ctor || !nextProps.areas[i].mask.equals(this.props.areas[i].mask)) {
+      if (this.areas[i].ctor !== this.props.areas[i].ctor || !this.areas[i].mask.equals(this.props.areas[i].mask)) {
         // found a non-matching area
         return true;
       }
@@ -143,19 +134,14 @@ export default class OutputMap extends Component {
   }
 
   componentDidUpdate() {
-    this.draw();
+    if (this.shouldCanvasRedraw()) this.draw();
+    this.areas = this.props.areas;
   }
 
   componentDidMount() {
     this.canvas.width = this.props.config.output.canvas.resolution.width;
     this.canvas.height = this.props.config.output.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
-    this.updateCanvasSize();
-    window.addEventListener('resize', this.updateCanvasSize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateCanvasSize);
   }
 
   render() {

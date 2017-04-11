@@ -15,7 +15,6 @@ export default class InputMap extends Component {
     this.addPaintStroke = this.addPaintStroke.bind(this);
     this.draw = this.draw.bind(this);
     this.updateImageData = this.updateImageData.bind(this);
-    this.updateCanvasSize = this.updateCanvasSize.bind(this);
     this.updateMousePosition = this.updateMousePosition.bind(this);
     this.updateMouseButtonsDown = this.updateMouseButtonsDown.bind(this);
     this.updateMouseButtonsUp = this.updateMouseButtonsUp.bind(this);
@@ -43,14 +42,6 @@ export default class InputMap extends Component {
         this.drawBrush();
       }
     });
-  }
-
-  updateCanvasSize() {
-    const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
-    const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
-    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
-    this.canvas.style.height = (this.props.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
-    this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
   }
 
   updateMousePosition(event) {
@@ -100,11 +91,9 @@ export default class InputMap extends Component {
   componentDidMount() {
     this.canvas.width = this.props.config.input.canvas.resolution.width;
     this.canvas.height = this.props.config.input.canvas.resolution.height;
-    this.updateCanvasSize();
     this.ctx = this.canvas.getContext('2d');
     this.paintLayer = this.ctx.createImageData(this.canvas.width, this.canvas.height);
     this.reset();
-    window.addEventListener('resize', this.updateCanvasSize);
     document.addEventListener('mousemove', this.updateMousePosition, true);
     document.addEventListener('mousedown', this.updateMouseButtonsDown, true);
     document.addEventListener('mouseup', this.updateMouseButtonsUp, true);
@@ -116,7 +105,6 @@ export default class InputMap extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.updateCanvasSize);
     document.removeEventListener('mousemove', this.updateMousePosition, true);
     document.removeEventListener('mousedown', this.updateMouseButtonsDown, true);
     document.removeEventListener('mouseup', this.updateMouseButtonsUp, true);
