@@ -9,6 +9,14 @@ export default class OutputMap extends Component {
     this.draw = this.draw.bind(this);
   }
 
+  resizeCanvas() {
+    const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
+    const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
+    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
+    this.canvas.style.height = (this.props.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
+    this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
+  }
+
   drawGrid() {
     const gridSpacing = this.canvas.width / 32;
     this.ctx.strokeStyle = 'rgba(0,0,0,0.125)';
@@ -133,9 +141,17 @@ export default class OutputMap extends Component {
     return false;
   }
 
+  shouldCanvasResize() {
+    if (!this.elBounds) return true;
+    const elBounds = this.el.getBoundingClientRect();
+    return elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height;
+  }
+
   componentDidUpdate() {
     if (this.shouldCanvasRedraw()) this.draw();
     this.areas = this.props.areas;
+    if (this.shouldCanvasResize()) this.resizeCanvas();
+    this.elBounds = this.el.getBoundingClientRect();
   }
 
   componentDidMount() {

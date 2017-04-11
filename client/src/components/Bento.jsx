@@ -98,6 +98,18 @@ export default class Bento extends Component {
     this.defaultDividerPosition();
   }
 
+  shouldGeometryByRecalculated() {
+    if (!this.elBounds) return true;
+    const elBounds = this.el.getBoundingClientRect();
+    return elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height;
+  }
+
+  componentDidUpdate() {
+    if (this.shouldGeometryByRecalculated()) this.repositionDivider(this.state.dividerOffset, this.state.dividerOffset);
+    this.elBounds = this.el.getBoundingClientRect();
+    if (typeof this.props.geometryChanged === 'function') this.props.geometryChanged();
+  }
+
   render() {
     const classNames = [
       'bento',

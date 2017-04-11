@@ -35,6 +35,7 @@ export default class EditApp extends Component {
     this.setBrushSize = this.setBrushSize.bind(this);
     this.handleKeypress = this.handleKeypress.bind(this);
     this.reset = this.reset.bind(this);
+    this.mapGeometryChanged = this.mapGeometryChanged.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this, undefined);
   }
 
@@ -117,19 +118,25 @@ export default class EditApp extends Component {
       to: 'edit'
     });
     document.addEventListener('keydown', this.handleKeypress);
-    window.addEventListener('resize', this.forceUpdate)
+    window.addEventListener('resize', this.forceUpdate);
   }
 
   componentWillUnmount() {
     this.socket.disconnect();
     document.removeEventListener('keydown', this.handleKeypress);
-    window.removeEventListener('resize', this.forceUpdate)
+    window.removeEventListener('resize', this.forceUpdate);
+  }
+
+  mapGeometryChanged() {
+    this.inputMap.forceUpdate();
+    this.outputMap.forceUpdate();
   }
 
   render() {
     document.title = this.state.title;
     return (
       <Bento
+        geometryChanged={this.mapGeometryChanged}
         orientation="vertical"
         defaultOffsetPixels={150}
         minOffsetPixels={130}
@@ -144,9 +151,10 @@ export default class EditApp extends Component {
           brushSize={this.state.brushSize}
           status={this.state.status} />
         <Bento
+          geometryChanged={this.mapGeometryChanged}
           orientation="horizontal"
-          minOffsetPercent={10}
-          maxOffsetPercent={90}>
+          minOffsetPercent={15}
+          maxOffsetPercent={85}>
           <InputMap
             ref={c => this.inputMap = c}
             updateImageData={this.updateImageData}

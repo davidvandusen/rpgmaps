@@ -20,7 +20,23 @@ export default class InputMap extends Component {
     this.updateMouseButtonsUp = this.updateMouseButtonsUp.bind(this);
   }
 
+  resizeCanvas() {
+    const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
+    const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
+    this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
+    this.canvas.style.height = (this.props.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
+    this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
+  }
+
+  shouldCanvasResize() {
+    if (!this.elBounds) return true;
+    const elBounds = this.el.getBoundingClientRect();
+    return elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height;
+  }
+
   componentDidUpdate() {
+    if (this.shouldCanvasResize()) this.resizeCanvas();
+    this.elBounds = this.el.getBoundingClientRect();
     this.brushColor = cssToRgba(this.props.config.terrains[this.props.terrain].color);
     this.draw();
   }
@@ -95,7 +111,7 @@ export default class InputMap extends Component {
     this.paintLayer = this.ctx.createImageData(this.canvas.width, this.canvas.height);
     this.reset();
     document.addEventListener('mousemove', this.updateMousePosition, true);
-    document.addEventListener('mousedown', this.updateMouseButtonsDown, true);
+    this.canvas.addEventListener('mousedown', this.updateMouseButtonsDown, true);
     document.addEventListener('mouseup', this.updateMouseButtonsUp, true);
     this.canvas.addEventListener('mousedown', this.addPaintStroke);
     this.canvas.addEventListener('mousemove', this.addPaintStroke);
@@ -106,7 +122,7 @@ export default class InputMap extends Component {
 
   componentWillUnmount() {
     document.removeEventListener('mousemove', this.updateMousePosition, true);
-    document.removeEventListener('mousedown', this.updateMouseButtonsDown, true);
+    this.canvas.removeEventListener('mousedown', this.updateMouseButtonsDown, true);
     document.removeEventListener('mouseup', this.updateMouseButtonsUp, true);
     this.canvas.removeEventListener('mousedown', this.addPaintStroke);
     this.canvas.removeEventListener('mousemove', this.addPaintStroke);
