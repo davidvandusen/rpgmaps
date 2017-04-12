@@ -23,6 +23,17 @@ export default class Controls extends Component {
           </a>
         </div>
         <div className="control-list">
+          <div className="control-list-heading">Edit Mode</div>
+          {this.props.modes.map(mode => (
+            <div
+              key={mode.id}
+              className={`control-list-item interactable ${this.props.mode === mode.id ? 'current' : ''}`}
+              onClick={this.props.changeMode.bind(null, mode.id)}>
+              <div className="control-list-item-heading">{mode.name}</div>
+            </div>
+          ))}
+        </div>
+        <div className="control-list">
           <div className="control-list-heading">Brush Settings</div>
           <div className="control-list-item">
             <span className="control-list-item-heading">Size</span>

@@ -17,8 +17,19 @@ export default class EditApp extends Component {
       areas: undefined,
       terrain: 1,
       brushSize: this.props.config.input.brush.size.default,
-      title: `Edit ${this.roomName} - RPG Maps`
+      title: `Edit ${this.roomName} - RPG Maps`,
+      mode: 'horizontal-split'
     };
+    this.modes = [{
+      id: 'overlay',
+      name: 'Overlay'
+    }, {
+      id: 'horizontal-split',
+      name: 'Horizontal Split'
+    }, {
+      id: 'vertical-split',
+      name: 'Vertical Split'
+    }];
     this.keymap = {
       // [
       38: () => this.setTerrain(this.state.terrain - 1),
@@ -35,6 +46,7 @@ export default class EditApp extends Component {
     this.setBrushSize = this.setBrushSize.bind(this);
     this.handleKeypress = this.handleKeypress.bind(this);
     this.reset = this.reset.bind(this);
+    this.changeMode = this.changeMode.bind(this);
     this.processImageData = this.processImageData.bind(this);
     this.mapGeometryChanged = this.mapGeometryChanged.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this, undefined);
@@ -43,6 +55,10 @@ export default class EditApp extends Component {
   handleKeypress(event) {
     const fn = this.keymap[event.keyCode];
     if (typeof fn === 'function') fn();
+  }
+
+  changeMode(mode) {
+    this.setState({mode});
   }
 
   publishMap() {
@@ -141,6 +157,58 @@ export default class EditApp extends Component {
 
   render() {
     document.title = this.state.title;
+    let maps;
+    // XXX Give key props to maps so they don't rerender
+    let inputMap = (
+      <InputMap
+        ref={c => this.inputMap = c}
+        updateImageData={this.updateImageData}
+        config={this.props.config}
+        terrain={this.state.terrain}
+        brushSize={this.state.brushSize} />
+    );
+    let outputMap = (
+      <OutputMap
+        ref={c => this.outputMap = c}
+        config={this.props.config}
+        areas={this.state.areas}>
+        <p className="content-placeholder">Sketch a map and it will be rendered here</p>
+      </OutputMap>
+    );
+    if (this.state.mode === 'horizontal-split') {
+      maps = (
+        <Bento
+          geometryChanged={this.mapGeometryChanged}
+          orientation="horizontal"
+          minOffsetPercent={15}
+          maxOffsetPercent={85}>
+          {inputMap}
+          {outputMap}
+        </Bento>
+      );
+    }
+    if (this.state.mode === 'vertical-split') {
+      maps = (
+        <Bento
+          geometryChanged={this.mapGeometryChanged}
+          orientation="vertical"
+          minOffsetPercent={15}
+          maxOffsetPercent={85}>
+          {inputMap}
+          {outputMap}
+        </Bento>
+      );
+    }
+    if (this.state.mode === 'overlay') {
+      maps = (
+        <div>
+          {outputMap}
+          <div className="overlay">
+            {inputMap}
+          </div>
+        </div>
+      );
+    }
     return (
       <Bento
         geometryChanged={this.mapGeometryChanged}
@@ -152,29 +220,15 @@ export default class EditApp extends Component {
           setTerrain={this.setTerrain}
           setBrushSize={this.setBrushSize}
           publishMap={this.publishMap}
+          changeMode={this.changeMode}
           reset={this.reset}
           config={this.props.config}
           terrain={this.state.terrain}
+          mode={this.state.mode}
+          modes={this.modes}
           brushSize={this.state.brushSize}
           status={this.state.status} />
-        <Bento
-          geometryChanged={this.mapGeometryChanged}
-          orientation="horizontal"
-          minOffsetPercent={15}
-          maxOffsetPercent={85}>
-          <InputMap
-            ref={c => this.inputMap = c}
-            updateImageData={this.updateImageData}
-            config={this.props.config}
-            terrain={this.state.terrain}
-            brushSize={this.state.brushSize} />
-          <OutputMap
-            ref={c => this.outputMap = c}
-            config={this.props.config}
-            areas={this.state.areas}>
-            <p className="content-placeholder">Sketch a map and it will be rendered here</p>
-          </OutputMap>
-        </Bento>
+        {maps}
       </Bento>
     );
   }

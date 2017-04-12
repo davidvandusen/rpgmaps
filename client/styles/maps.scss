@@ -15,6 +15,10 @@
 .input-map {
   @extend %map;
 
+  .overlay & {
+    opacity: 0.2;
+  }
+
   canvas {
     cursor: none;
     image-rendering: pixelated;
