@@ -59,8 +59,10 @@ export default class Bento extends Component {
     if (this.props.maxOffsetPixels && this.props.maxOffsetPixels < dividerOffset) {
       dividerOffset = this.props.maxOffsetPixels;
     }
-    if (dividerOffset) {
-      this.setState({dividerOffset});
+    if (dividerOffset !== this.state.dividerOffset) {
+      this.setState({dividerOffset}, () => {
+        if (typeof this.props.geometryChanged === 'function') this.props.geometryChanged();
+      });
     }
   }
 
@@ -75,17 +77,17 @@ export default class Bento extends Component {
 
   defaultDividerPosition() {
     const elBounds = this.el.getBoundingClientRect();
-    let x;
-    let y;
+    let x = elBounds.left;
+    let y = elBounds.top;
     if (this.props.defaultOffsetPercent) {
-      x = elBounds.width * this.props.defaultOffsetPercent / 100;
-      y = elBounds.height * this.props.defaultOffsetPercent / 100;
+      x += elBounds.width * this.props.defaultOffsetPercent / 100;
+      y += elBounds.height * this.props.defaultOffsetPercent / 100;
     } else if (this.props.defaultOffsetPixels) {
-      x = this.props.defaultOffsetPixels;
-      y = this.props.defaultOffsetPixels;
+      x += this.props.defaultOffsetPixels;
+      y += this.props.defaultOffsetPixels;
     } else {
-      x = elBounds.width * 0.5;
-      y = elBounds.height * 0.5;
+      x += elBounds.width * 0.5;
+      y += elBounds.height * 0.5;
     }
     this.repositionDivider(x, y);
   }
@@ -107,7 +109,8 @@ export default class Bento extends Component {
   componentDidUpdate() {
     if (this.shouldGeometryByRecalculated()) this.repositionDivider(this.state.dividerOffset, this.state.dividerOffset);
     this.elBounds = this.el.getBoundingClientRect();
-    if (typeof this.props.geometryChanged === 'function') this.props.geometryChanged();
+    if (this.orientation !== this.props.orientation) this.defaultDividerPosition();
+    this.orientation = this.props.orientation;
   }
 
   render() {

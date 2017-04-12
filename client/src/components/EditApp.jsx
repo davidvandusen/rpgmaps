@@ -21,14 +21,11 @@ export default class EditApp extends Component {
       mode: 'horizontal-split'
     };
     this.modes = [{
-      id: 'overlay',
-      name: 'Overlay'
-    }, {
       id: 'horizontal-split',
       name: 'Horizontal Split'
     }, {
-      id: 'vertical-split',
-      name: 'Vertical Split'
+      id: 'overlay',
+      name: 'Overlay'
     }];
     this.keymap = {
       // [
@@ -105,8 +102,8 @@ export default class EditApp extends Component {
       this.unprocessedImageData = imageData;
       return;
     }
-    this.setState({status: 'processing'}, () => {
-      this.updateAreas(imageData).then(() => {
+    this.setState({imageData, status: 'processing'}, () => {
+      this.updateAreas().then(() => {
         this.setState({status: 'ready'}, this.processImageData);
       });
     });
@@ -117,8 +114,8 @@ export default class EditApp extends Component {
     return this.props.config.terrains.find(terrain => terrain.color === cssHex);
   }
 
-  updateAreas(imageData) {
-    return detectAreas(imageData).then(areas => new Promise((resolve, reject) => this.setState({
+  updateAreas() {
+    return detectAreas(this.state.imageData).then(areas => new Promise((resolve, reject) => this.setState({
       areas: areas.map(area => {
         const terrain = this.getTerrainFromArea(area);
         return {
@@ -158,11 +155,11 @@ export default class EditApp extends Component {
   render() {
     document.title = this.state.title;
     let maps;
-    // XXX Give key props to maps so they don't rerender
     let inputMap = (
       <InputMap
         ref={c => this.inputMap = c}
         updateImageData={this.updateImageData}
+        imageData={this.state.imageData}
         config={this.props.config}
         terrain={this.state.terrain}
         brushSize={this.state.brushSize} />
@@ -178,20 +175,9 @@ export default class EditApp extends Component {
     if (this.state.mode === 'horizontal-split') {
       maps = (
         <Bento
+          ref={el => this.mapBento = el}
           geometryChanged={this.mapGeometryChanged}
           orientation="horizontal"
-          minOffsetPercent={15}
-          maxOffsetPercent={85}>
-          {inputMap}
-          {outputMap}
-        </Bento>
-      );
-    }
-    if (this.state.mode === 'vertical-split') {
-      maps = (
-        <Bento
-          geometryChanged={this.mapGeometryChanged}
-          orientation="vertical"
           minOffsetPercent={15}
           maxOffsetPercent={85}>
           {inputMap}
@@ -211,6 +197,7 @@ export default class EditApp extends Component {
     }
     return (
       <Bento
+        ref={el => this.controlsBento = el}
         geometryChanged={this.mapGeometryChanged}
         orientation="vertical"
         defaultOffsetPixels={150}

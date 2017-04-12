@@ -108,8 +108,13 @@ export default class InputMap extends Component {
     this.canvas.width = this.props.config.input.canvas.resolution.width;
     this.canvas.height = this.props.config.input.canvas.resolution.height;
     this.ctx = this.canvas.getContext('2d');
-    this.paintLayer = this.ctx.createImageData(this.canvas.width, this.canvas.height);
-    this.reset();
+    if (this.props.imageData) {
+      this.paintLayer = this.props.imageData;
+      this.props.updateImageData(this.paintLayer);
+    } else {
+      this.paintLayer = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+      this.reset();
+    }
     document.addEventListener('mousemove', this.updateMousePosition, true);
     this.canvas.addEventListener('mousedown', this.updateMouseButtonsDown, true);
     document.addEventListener('mouseup', this.updateMouseButtonsUp, true);

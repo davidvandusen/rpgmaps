@@ -18,12 +18,16 @@ export default class Controls extends Component {
           <div className="control-list-item interactable" onClick={this.props.publishMap}>
             <div className="control-list-item-heading">Publish Current Map</div>
           </div>
-          <a className="control-list-item interactable" href={location.href.substring(0, location.href.indexOf('/edit'))} target="_blank">
+          <a
+            className="control-list-item interactable"
+            onClick={this.props.publishMap}
+            href={location.href.substring(0, location.href.indexOf('/edit'))}
+            target="_blank">
             <div className="control-list-item-heading">Play Map &#x2197;</div>
           </a>
         </div>
         <div className="control-list">
-          <div className="control-list-heading">Edit Mode</div>
+          <div className="control-list-heading">Editor Mode</div>
           {this.props.modes.map(mode => (
             <div
               key={mode.id}
