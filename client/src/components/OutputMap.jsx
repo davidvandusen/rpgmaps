@@ -119,25 +119,11 @@ export default class OutputMap extends Component {
   }
 
   shouldCanvasRedraw() {
-    if (this.areas === this.props.areas) {
-      // areas are same object
-      return false;
-    }
-    if (!this.props.areas || !this.props.areas.length) {
-      // no areas
-      return false;
-    }
-    if (!this.areas || this.areas.length !== this.props.areas.length) {
-      // new areas diff from old areas
-      return true;
-    }
+    if (this.areas === this.props.areas || !this.props.areas || !this.props.areas.length) return false;
+    if (!this.areas || this.areas.length !== this.props.areas.length) return true;
     for (let i = 0; i < this.props.areas.length; i++) {
-      if (this.areas[i].ctor !== this.props.areas[i].ctor || !this.areas[i].mask.equals(this.props.areas[i].mask)) {
-        // found a non-matching area
-        return true;
-      }
+      if (this.areas[i].ctor !== this.props.areas[i].ctor || !this.areas[i].mask.equals(this.props.areas[i].mask)) return true;
     }
-    // areas are identical
     return false;
   }
 

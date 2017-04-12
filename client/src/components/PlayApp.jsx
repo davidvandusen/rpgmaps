@@ -37,7 +37,7 @@ export default class PlayApp extends Component {
           ref={c => this.outputMap = c}
           config={this.props.config}
           areas={this.state.areas}>
-          <p>No map published yet. To publish a map to this page, go to <a href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
+          <p className="content-placeholder">No map published yet. To publish a map to this page, go to <a href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
         </OutputMap>
       </div>
     );

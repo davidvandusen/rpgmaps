@@ -12,15 +12,6 @@ export default class Bento extends Component {
     this.defaultDividerPosition = this.defaultDividerPosition.bind(this);
   }
 
-  handleGrabbed() {
-    this.handleBeingDragged = true;
-  }
-
-  handleMoved(event) {
-    if (!this.handleBeingDragged) return;
-    this.repositionDivider(event.clientX, event.clientY);
-  }
-
   repositionDivider(x, y) {
     const elBounds = this.el.getBoundingClientRect();
     let dividerOffset;
@@ -71,6 +62,15 @@ export default class Bento extends Component {
     if (dividerOffset) {
       this.setState({dividerOffset});
     }
+  }
+
+  handleGrabbed() {
+    this.handleBeingDragged = true;
+  }
+
+  handleMoved(event) {
+    if (!this.handleBeingDragged) return;
+    this.repositionDivider(event.clientX, event.clientY);
   }
 
   defaultDividerPosition() {

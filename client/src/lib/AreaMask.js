@@ -9,9 +9,16 @@ function countSetBits(n) {
 export default class AreaMask {
   static fromJSON(obj) {
     const mask = new AreaMask(obj.size, obj.width);
-    mask.data = base64.toByteArray(obj.data);
+    const byteWidth = Math.ceil(obj.width / 8);
+    const compressedWidth = obj.maxX - obj.minX + 1;
+    const compressedData = base64.toByteArray(obj.data);
+    for (let y = obj.minY; y <= obj.maxY; y++) {
+      for (let x = obj.minX; x <= obj.maxX; x++) {
+        mask.data[y * byteWidth + x] = compressedData[(y - obj.minY) * compressedWidth + (x - obj.minX)];
+      }
+    }
     let n = 0;
-    for (let i = 0; i < mask.data.length; i++) {
+    for (let i = 0; i < compressedData.length; i++) {
       n += countSetBits(mask.data[i]);
     }
     mask.n = n;
@@ -21,16 +28,48 @@ export default class AreaMask {
   constructor(size, width) {
     this.size = size;
     this.width = width;
-    this.height = Math.floor(this.size / this.width);
+    this.height = Math.ceil(this.size / this.width);
     this.data = new Uint8Array(Math.ceil(size / 8));
     this.n = 0;
   }
 
   toJSON() {
+    let minX;
+    let maxX;
+    let minY;
+    let maxY;
+    const byteWidth = Math.ceil(this.width / 8);
+    for (let i = 0; i < this.data.length; i++) {
+      if (this.data[i] !== 0) {
+        const x = i % byteWidth;
+        const y = Math.floor(i / byteWidth);
+        if (minX === undefined || minX > x) minX = x;
+        if (minY === undefined || minY > y) minY = y;
+        if (maxX === undefined || maxX < x) maxX = x;
+        if (maxY === undefined || maxY < y) maxY = y;
+      }
+    }
+    let compressedData;
+    if (minX === 0 && maxX === byteWidth - 1 && minY === 0 && maxY === this.height - 1) {
+      compressedData = this.data;
+    } else {
+      const compressedWidth = maxX - minX + 1;
+      const compressedHeight = maxY - minY + 1;
+      compressedData = new Uint8Array(compressedWidth * compressedHeight);
+      for (let y = minY; y <= maxY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+          compressedData[(y - minY) * compressedWidth + (x - minX)] = this.data[y * byteWidth + x];
+        }
+      }
+    }
     return {
       size: this.size,
       width: this.width,
-      data: base64.fromByteArray(this.data)
+      minX,
+      maxX,
+      minY,
+      maxY,
+      data: base64.fromByteArray(compressedData)
     };
   }
 

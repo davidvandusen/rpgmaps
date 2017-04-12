@@ -35,6 +35,7 @@ export default class EditApp extends Component {
     this.setBrushSize = this.setBrushSize.bind(this);
     this.handleKeypress = this.handleKeypress.bind(this);
     this.reset = this.reset.bind(this);
+    this.processImageData = this.processImageData.bind(this);
     this.mapGeometryChanged = this.mapGeometryChanged.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this, undefined);
   }
@@ -46,7 +47,8 @@ export default class EditApp extends Component {
 
   publishMap() {
     if (!this.state.areas || !this.state.areas.length) return;
-    this.socket.emit('publishMap', {areas: this.state.areas});
+    this.publishedMap = {areas: this.state.areas};
+    this.socket.emit('publishMap', this.publishedMap);
   }
 
   reset() {
@@ -75,6 +77,13 @@ export default class EditApp extends Component {
     this.setState({terrain});
   }
 
+  processImageData() {
+    if (this.unprocessedImageData) {
+      setTimeout(this.updateImageData.bind(this, this.unprocessedImageData), 0);
+      this.unprocessedImageData = undefined;
+    }
+  }
+
   updateImageData(imageData) {
     if (this.state.status !== 'ready') {
       this.unprocessedImageData = imageData;
@@ -82,12 +91,7 @@ export default class EditApp extends Component {
     }
     this.setState({status: 'processing'}, () => {
       this.updateAreas(imageData).then(() => {
-        this.setState({status: 'ready'}, () => {
-          if (this.unprocessedImageData) {
-            setTimeout(this.updateImageData.bind(this, this.unprocessedImageData), 0);
-            this.unprocessedImageData = undefined;
-          }
-        });
+        this.setState({status: 'ready'}, this.processImageData);
       });
     });
   }
@@ -102,20 +106,23 @@ export default class EditApp extends Component {
       areas: areas.map(area => {
         const terrain = this.getTerrainFromArea(area);
         return {
+          ctor: terrain.className,
           layer: terrain.layer,
-          mask: area.mask,
-          ctor: terrain.className
+          mask: area.mask
         };
       }).sort((areaA, areaB) => areaA.layer - areaB.layer)
     }, resolve)));
   }
 
   componentDidMount() {
-    this.setState({status: 'ready'});
+    this.setState({status: 'ready'}, this.processImageData);
     this.socket = io();
     this.socket.emit('joinRoom', {
       roomName: this.roomName,
       to: 'edit'
+    });
+    this.socket.on('joinedRoom', message => {
+      if (message.to === 'play' && this.publishedMap) this.publishMap();
     });
     document.addEventListener('keydown', this.handleKeypress);
     window.addEventListener('resize', this.forceUpdate);
@@ -165,7 +172,7 @@ export default class EditApp extends Component {
             ref={c => this.outputMap = c}
             config={this.props.config}
             areas={this.state.areas}>
-            <p>Sketch a map and it will be rendered here</p>
+            <p className="content-placeholder">Sketch a map and it will be rendered here</p>
           </OutputMap>
         </Bento>
       </Bento>

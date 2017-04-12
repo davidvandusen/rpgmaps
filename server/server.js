@@ -31,6 +31,7 @@ app.get('/:room/edit', (req, res) => {
 io.on('connection', socket => {
   socket.on('joinRoom', message => {
     socket.join(message.roomName);
+    socket.broadcast.in(message.roomName).emit('joinedRoom', {to: message.to});
     socket.in(message.roomName).on('publishMap', mapData => {
       socket.broadcast.in(message.roomName).emit('publishMap', mapData);
     });
