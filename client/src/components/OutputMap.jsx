@@ -10,11 +10,11 @@ export default class OutputMap extends Component {
   }
 
   resizeCanvas() {
-    const scaleFactorX = this.el.offsetWidth / this.props.config.input.canvas.resolution.width;
-    const scaleFactorY = this.el.offsetHeight / this.props.config.input.canvas.resolution.height;
+    const scaleFactorX = this.el.offsetWidth / this.props.config.output.canvas.resolution.width;
+    const scaleFactorY = this.el.offsetHeight / this.props.config.output.canvas.resolution.height;
     this.scaleFactor = scaleFactorX < scaleFactorY ? scaleFactorX : scaleFactorY;
-    this.canvas.style.height = (this.props.config.input.canvas.resolution.height * this.scaleFactor) + 'px';
-    this.canvas.style.width = (this.props.config.input.canvas.resolution.width * this.scaleFactor) + 'px';
+    this.canvas.style.height = (this.props.config.output.canvas.resolution.height * this.scaleFactor) + 'px';
+    this.canvas.style.width = (this.props.config.output.canvas.resolution.width * this.scaleFactor) + 'px';
   }
 
   drawGrid() {

@@ -10,6 +10,7 @@ server.listen(process.env.PORT || 3000);
 app.set('view engine', 'ejs');
 
 app.use(express.static('build'));
+app.use(express.static('public'));
 
 app.use((req, res, next) => {
   res.locals.version = packageJson.version;
