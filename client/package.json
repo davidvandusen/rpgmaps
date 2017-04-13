@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Tabletop roleplaying game map creation tool",
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server",
+    "start": "./node_modules/.bin/webpack-dev-server --port 8080",
     "build:dev": "./node_modules/.bin/webpack",
-    "build:prod": "./node_modules/.bin/webpack -p"
+    "build:prod": "./node_modules/.bin/webpack --config webpack.production.config.js"
   },
   "author": "David VanDusen <github@davidvandusen.com>",
   "repository": {
