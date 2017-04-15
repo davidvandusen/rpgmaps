@@ -4,8 +4,8 @@ import Controls from './Controls.jsx';
 import InputMap from './InputMap.jsx';
 import Bento from './Bento.jsx';
 import OutputMap from './OutputMap.jsx';
-import {detectAreas} from '../lib/imageDataCommon';
-import {intToCssHex} from '../lib/colorCommon';
+import {detectAreas} from '../common/imageData';
+import {intToCssHex} from '../common/color';
 
 export default class EditApp extends Component {
   constructor(props) {

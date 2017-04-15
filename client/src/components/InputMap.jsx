@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {rgbaToCss, cssToRgba} from '../lib/colorCommon';
-import {fillImageData} from '../lib/imageDataCommon';
-import {pointInCircle} from '../lib/geometryCommon';
+import {rgbaToCss, cssToRgba} from '../common/color';
+import {fillImageData} from '../common/imageData';
+import {pointInCircle} from '../common/geometry';
 
 export default class InputMap extends Component {
   constructor(props) {

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import seedrandom from 'seedrandom';
-import {addNoise} from '../lib/imageDataCommon';
+import {addNoise} from '../common/imageData';
 import * as terrainClasses from '../terrains';
 
 export default class OutputMap extends Component {

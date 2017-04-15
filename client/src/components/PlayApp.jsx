@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../styles/edit-app.scss';
 import OutputMap from './OutputMap.jsx';
-import AreaMask from "../lib/AreaMask";
+import AreaMask from "../common/AreaMask";
 
 export default class PlayApp extends Component {
   constructor(props) {

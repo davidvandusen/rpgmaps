@@ -35,31 +35,45 @@ function firstUnmaskedPixel(length, areas) {
 function detectAreasRecursive(pixels, width, areas) {
   const startIndex = firstUnmaskedPixel(pixels.length, areas);
   if (startIndex === -1) return Promise.resolve(areas);
-  return describeContiguousArea(pixels, width, startIndex)
-    .then(area => detectAreasRecursive(pixels, width, areas.concat([area])));
+  return new Promise((resolve, reject) =>
+    setTimeout(() =>
+      resolve(describeContiguousArea(pixels, width, startIndex)), 0))
+    .then(area =>
+      detectAreasRecursive(pixels, width, areas.concat([area])));
 }
 
 function describeContiguousArea(pixels, width, startIndex) {
-  return new Promise((resolve, reject) => {
-    const mask = new AreaMask(pixels.length, width);
-    const color = pixels[startIndex];
-    const floodFillFromStartIndex = (function floodFill(index) {
-      if (mask.get(index)) return Promise.resolve();
-      if (pixels[index] !== color) return Promise.resolve();
+  const mask = new AreaMask(pixels.length, width);
+  const color = pixels[startIndex];
+  const stack = [startIndex];
+  let index;
+  while ((index = stack.pop()) !== undefined) {
+    do index--; while (index % width !== width - 1 && pixels[index] === color);
+    index++;
+    let spanAbove = false;
+    let spanBelow = false;
+    do {
       mask.set(index, true);
-      const nextIndices = [];
-      if (index >= width) nextIndices.push(index - width);
-      if (index % width !== width - 1) nextIndices.push(index + 1);
-      if (pixels.length >= index + width) nextIndices.push(index + width);
-      if (index > 0 && index % width > 0) nextIndices.push(index - 1);
-      return Promise.all(
-        nextIndices.map(index =>
-          new Promise((resolve, reject) =>
-            setTimeout(() =>
-              resolve(floodFill(index)), 0))));
-    }(startIndex));
-    floodFillFromStartIndex.then(() => resolve({color, mask}));
-  });
+      const indexAbove = index - width;
+      const indexAboveValid = indexAbove >= 0;
+      if (!spanAbove && indexAboveValid && pixels[indexAbove] === color && !mask.get(indexAbove)) {
+        stack.push(indexAbove);
+        spanAbove = true;
+      } else if (spanAbove && indexAboveValid && pixels[indexAbove] !== color) {
+        spanAbove = false;
+      }
+      const indexBelow = index + width;
+      const indexBelowValid = indexBelow < pixels.length;
+      if (!spanBelow && indexBelowValid && pixels[indexBelow] === color && !mask.get(indexBelow)) {
+        stack.push(indexBelow);
+        spanBelow = true;
+      } else if (spanBelow && indexBelowValid && pixels[indexBelow] !== color) {
+        spanBelow = false;
+      }
+      index++;
+    } while (index % width !== 0 && pixels[index] === color);
+  }
+  return {color, mask};
 }
 
 function addNoise(ctx, amount) {
@@ -75,6 +89,7 @@ function addNoise(ctx, amount) {
 }
 
 export {
+  describeContiguousArea,
   fillImageData,
   detectAreas,
   addNoise,

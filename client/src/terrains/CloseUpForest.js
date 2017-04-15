@@ -1,5 +1,5 @@
-import {pointInCircle, distance} from '../lib/geometryCommon';
-import {rgbaToCss} from '../lib/colorCommon';
+import {pointInCircle, distance} from '../common/geometry';
+import {rgbaToCss} from '../common/color';
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpForest extends BaseTerrain {

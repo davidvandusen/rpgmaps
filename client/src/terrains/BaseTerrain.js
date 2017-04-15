@@ -1,4 +1,4 @@
-import {outlineMask, smoothPolygon} from '../lib/geometryCommon';
+import {outlineMask, smoothPolygon} from '../common/geometry';
 
 class BaseTerrain {
   constructor(mask, ctx, rng) {
