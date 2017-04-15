@@ -4,7 +4,8 @@ export default class Bento extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dividerOffset: 0
+      dividerOffset: 0,
+      dividerFraction: 0
     };
     this.handleGrabbed = this.handleGrabbed.bind(this);
     this.handleMoved = this.handleMoved.bind(this);
@@ -13,43 +14,41 @@ export default class Bento extends Component {
   }
 
   repositionDivider(x, y) {
-    const elBounds = this.el.getBoundingClientRect();
     let dividerOffset;
     if (this.props.orientation === 'vertical') {
-      dividerOffset = x - elBounds.left;
+      dividerOffset = x - this.elBounds.left;
       if (this.props.minOffsetPercent) {
-        const minPercentWidth = this.props.minOffsetPercent / 100 * elBounds.width;
+        const minPercentWidth = this.props.minOffsetPercent / 100 * this.elBounds.width;
         if (minPercentWidth > dividerOffset) dividerOffset = minPercentWidth;
       }
       if (this.props.maxOffsetPercent) {
-        const maxPercentWidth = this.props.maxOffsetPercent / 100 * elBounds.width;
+        const maxPercentWidth = this.props.maxOffsetPercent / 100 * this.elBounds.width;
         if (maxPercentWidth < dividerOffset) dividerOffset = maxPercentWidth;
       }
       if (this.props.minOffsetDeltaPixels) {
-        const minOffsetDelta = elBounds.width - this.props.minOffsetDeltaPixels;
+        const minOffsetDelta = this.elBounds.width - this.props.minOffsetDeltaPixels;
         if (minOffsetDelta < dividerOffset) dividerOffset = minOffsetDelta;
       }
       if (this.props.maxOffsetDeltaPixels) {
-        const maxOffsetDelta = elBounds.width - this.props.maxOffsetDeltaPixels;
+        const maxOffsetDelta = this.elBounds.width - this.props.maxOffsetDeltaPixels;
         if (maxOffsetDelta > dividerOffset) dividerOffset = maxOffsetDelta;
       }
-    }
-    if (this.props.orientation === 'horizontal') {
-      dividerOffset = y - elBounds.top;
+    } else if (this.props.orientation === 'horizontal') {
+      dividerOffset = y - this.elBounds.top;
       if (this.props.minOffsetPercent) {
-        const minPercentHeight = this.props.minOffsetPercent / 100 * elBounds.height;
+        const minPercentHeight = this.props.minOffsetPercent / 100 * this.elBounds.height;
         if (minPercentHeight > dividerOffset) dividerOffset = minPercentHeight;
       }
       if (this.props.maxOffsetPercent) {
-        const maxPercentHeight = this.props.maxOffsetPercent / 100 * elBounds.height;
+        const maxPercentHeight = this.props.maxOffsetPercent / 100 * this.elBounds.height;
         if (maxPercentHeight < dividerOffset) dividerOffset = maxPercentHeight;
       }
       if (this.props.minOffsetDeltaPixels) {
-        const minOffsetDelta = elBounds.height - this.props.minOffsetDeltaPixels;
+        const minOffsetDelta = this.elBounds.height - this.props.minOffsetDeltaPixels;
         if (minOffsetDelta < dividerOffset) dividerOffset = minOffsetDelta;
       }
       if (this.props.maxOffsetDeltaPixels) {
-        const maxOffsetDelta = elBounds.height - this.props.maxOffsetDeltaPixels;
+        const maxOffsetDelta = this.elBounds.height - this.props.maxOffsetDeltaPixels;
         if (maxOffsetDelta > dividerOffset) dividerOffset = maxOffsetDelta;
       }
     }
@@ -60,7 +59,13 @@ export default class Bento extends Component {
       dividerOffset = this.props.maxOffsetPixels;
     }
     if (dividerOffset !== this.state.dividerOffset) {
-      this.setState({dividerOffset}, () => {
+      let dividerFraction;
+      if (this.props.orientation === 'horizontal') dividerFraction = dividerOffset / this.elBounds.height;
+      else if (this.props.orientation === 'vertical') dividerFraction = dividerOffset / this.elBounds.width;
+      this.setState({
+        dividerFraction,
+        dividerOffset
+      }, () => {
         if (typeof this.props.geometryChanged === 'function') this.props.geometryChanged();
       });
     }
@@ -97,20 +102,20 @@ export default class Bento extends Component {
   }
 
   componentDidMount() {
+    this.elBounds = this.el.getBoundingClientRect();
     this.defaultDividerPosition();
   }
 
-  shouldGeometryByRecalculated() {
-    if (!this.elBounds) return true;
-    const elBounds = this.el.getBoundingClientRect();
-    return elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height;
-  }
-
   componentDidUpdate() {
-    if (this.shouldGeometryByRecalculated()) this.repositionDivider(this.state.dividerOffset, this.state.dividerOffset);
-    this.elBounds = this.el.getBoundingClientRect();
-    if (this.orientation !== this.props.orientation) this.defaultDividerPosition();
-    this.orientation = this.props.orientation;
+    const elBounds = this.el.getBoundingClientRect();
+    if (elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height) {
+      this.elBounds = elBounds;
+      this.repositionDivider(this.state.dividerFraction * this.elBounds.width, this.state.dividerFraction * this.elBounds.height);
+    }
+    if (this.orientation !== this.props.orientation) {
+      this.orientation = this.props.orientation;
+      this.defaultDividerPosition();
+    }
   }
 
   render() {
@@ -127,8 +132,7 @@ export default class Bento extends Component {
         styleB.width = this.el.offsetWidth - this.state.dividerOffset - this.props.dividerSize / 2 + 'px';
         styleDivider.left = styleA.width;
         styleDivider.width = this.props.dividerSize + 'px';
-      }
-      if (this.props.orientation === 'horizontal') {
+      } else if (this.props.orientation === 'horizontal') {
         styleA.height = this.state.dividerOffset - this.props.dividerSize / 2 + 'px';
         styleB.height = this.el.offsetHeight - this.state.dividerOffset - this.props.dividerSize / 2 + 'px';
         styleDivider.top = styleA.height;
