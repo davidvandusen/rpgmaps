@@ -1,19 +1,19 @@
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpRoad extends BaseTerrain {
-  constructor(mask, ctx, rng) {
-    super(mask, ctx, rng);
-    this.baseColor = 'rgba(217,200,179,1)';
+  base() {
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.drawPolyPath(this.smoothOutlineShape);
+    this.ctx.clip('evenodd');
+    this.ctx.beginPath();
+    this.ctx.rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.fillStyle = 'rgba(217,200,179,1)';
+    this.ctx.fill();
+    this.ctx.restore();
   }
 
   overlay() {
-    this.ctx.beginPath();
-    this.drawPath(this.getSmoothOutline());
-    this.ctx.strokeStyle = 'rgba(0,0,0,0.125)';
-    this.ctx.lineWidth = 1;
-    this.ctx.globalCompositeOperation = 'multiply';
-    this.ctx.stroke();
-    this.ctx.globalCompositeOperation = 'source-over';
   }
 }
 

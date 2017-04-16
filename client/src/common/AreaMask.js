@@ -78,7 +78,7 @@ class AreaMask {
   }
 
   index(x, y) {
-    if (x >= this.width || y >= this.height) return -1;
+    if (x < 0 || y < 0 || x >= this.width || y >= this.height) return -1;
     return y * this.width + x;
   }
 

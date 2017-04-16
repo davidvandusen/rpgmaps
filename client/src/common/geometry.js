@@ -81,7 +81,7 @@ function getOffsetMask(mask, amount) {
   return [newMask];
 }
 
-function smoothPolygon(points, amount) {
+function smoothPolygon(points, amount = 1) {
   const amt = Math.floor(amount);
   const n = amt * 2;
   const out = [];
@@ -109,21 +109,63 @@ function west(point1, point2, x, y) {
   return (y - point1[1]) / (x - point1[0]) > (point2[1] - point1[1]) / (point2[0] - point1[0]);
 }
 
-function contains(points, x, y) {
+/**
+ * Takes a two-dimensional array of points describing a polygon and returns whether the point x, y is strictly inside
+ * the polygon. This uses a ray tracing algorithm and therefore the result is inconsistent if the point is on the edge
+ * of the polygon.
+ *
+ * @param polygon a two-dimensional array of points representing a polygon
+ * @param x the X coordinate of the point to test
+ * @param y the Y coordinate of the point to test
+ * @returns {boolean} whether the test point is strictly inside the polygon described by points
+ */
+function containsPoint(polygon, x, y) {
   let count = 0;
-  for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
-    const point1 = points[pointIndex];
-    const point2 = points[(pointIndex + 1) % points.length];
+  for (let pointIndex = 0; pointIndex < polygon.length; pointIndex++) {
+    const point1 = polygon[pointIndex];
+    const point2 = polygon[(pointIndex + 1) % polygon.length];
     if (west(point1, point2, x, y)) count++;
   }
   return !!(count % 2);
 }
 
+function containsPolygon(outerPolygon, innerPolygon) {
+  // TODO consider short-circuiting if the min x or y of one is greater than the max x or y of the other
+  for (let innerPointIndex = 0; innerPointIndex < innerPolygon.length; innerPointIndex++) {
+    if (!containsPoint(outerPolygon, ...innerPolygon[innerPointIndex])) return false;
+  }
+  return true;
+}
+
+function removeRedundantIndices(containedIndices) {
+  // FIXME unimplemented
+  // if 1 contains 2, and 3 contains 1, then 3 doesn't need to contain 2
+}
+
+function containmentGraph(polygons) {
+  const containedIndices = new Array(polygons.length);
+  for (let polygonIndex = 0; polygonIndex < polygons.length; polygonIndex++) {
+    const contains = [];
+    for (let testPolygonIndex = 0; testPolygonIndex < polygons.length; testPolygonIndex++) {
+      if (testPolygonIndex === polygonIndex) continue;
+      // TODO consider if the one being checked already contains the first and continue
+      if (containsPolygon(polygons[polygonIndex], polygons[testPolygonIndex])) {
+        contains.push(testPolygonIndex);
+      }
+    }
+    containedIndices[polygonIndex] = contains;
+  }
+  removeRedundantIndices(containedIndices);
+  return containedIndices;
+}
+
 module.exports = {
-  contains,
-  pointInCircle,
+  containmentGraph,
+  containsPoint,
+  containsPolygon,
   distance,
-  smoothPolygon,
+  getOffsetMask,
   outlineMask,
-  getOffsetMask
+  pointInCircle,
+  smoothPolygon
 };

@@ -8,7 +8,7 @@ export default class PlayApp extends Component {
     super(props);
     this.roomName = location.pathname.substring(1);
     this.state = {
-      areas: undefined,
+      mapData: undefined,
       title: `Play ${this.roomName} - RPG Maps`
     };
   }
@@ -21,7 +21,7 @@ export default class PlayApp extends Component {
     });
     this.socket.on('publishMap', mapData => {
       mapData.areas.forEach(area => area.mask = AreaMask.fromJSON(area.mask));
-      this.setState({areas: mapData.areas});
+      this.setState({mapData});
     });
   }
 
@@ -36,7 +36,7 @@ export default class PlayApp extends Component {
         <OutputMap
           ref={c => this.outputMap = c}
           config={this.props.config}
-          areas={this.state.areas}>
+          mapData={this.state.mapData}>
           <p className="content-placeholder">No map published yet. To publish a map to this page, go to <a href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
         </OutputMap>
       </div>

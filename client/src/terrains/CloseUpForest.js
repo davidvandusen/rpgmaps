@@ -1,19 +1,19 @@
-import {pointInCircle, distance} from '../common/geometry';
+import {distance} from '../common/geometry';
 import {rgbaToCss} from '../common/color';
 import BaseTerrain from './BaseTerrain';
 
 class CloseUpForest extends BaseTerrain {
-  constructor(mask, ctx, rng) {
-    super(mask, ctx, rng);
-    this.baseColor = 'rgba(27,45,15,1)';
-  }
-
   base() {
     this.ctx.shadowBlur = 25;
     this.ctx.shadowOffsetX = 10;
     this.ctx.shadowOffsetY = 5;
     this.ctx.shadowColor = 'rgba(0,0,0,1)';
-    BaseTerrain.prototype.base.call(this);
+
+    this.ctx.beginPath();
+    this.drawPolyPath(this.smoothOutlineShape);
+    this.ctx.fillStyle = 'rgba(27,45,15,1)';
+    this.ctx.fill();
+
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;

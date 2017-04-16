@@ -4,8 +4,7 @@ import Controls from './Controls.jsx';
 import InputMap from './InputMap.jsx';
 import Bento from './Bento.jsx';
 import OutputMap from './OutputMap.jsx';
-import {detectAreas} from '../common/imageData';
-import {intToCssHex} from '../common/color';
+import mapDataFactory from '../common/mapDataFactory';
 
 export default class EditApp extends Component {
   constructor(props) {
@@ -14,7 +13,7 @@ export default class EditApp extends Component {
     this.state = {
       imageData: undefined,
       status: 'init',
-      areas: undefined,
+      mapData: undefined,
       terrain: 1,
       brushSize: this.props.config.input.brush.size.default,
       title: `Edit ${this.roomName} - RPG Maps`,
@@ -37,6 +36,7 @@ export default class EditApp extends Component {
       // DOWN
       221: () => this.setBrushSize(this.state.brushSize + 1)
     };
+    this.mapDataFactory = mapDataFactory(this.props.config.terrains);
     this.updateImageData = this.updateImageData.bind(this);
     this.publishMap = this.publishMap.bind(this);
     this.setTerrain = this.setTerrain.bind(this);
@@ -59,8 +59,8 @@ export default class EditApp extends Component {
   }
 
   publishMap() {
-    if (!this.state.areas || !this.state.areas.length) return;
-    this.publishedMap = {areas: this.state.areas};
+    if (!this.state.mapData) return;
+    this.publishedMap = this.state.mapData;
     this.socket.emit('publishMap', this.publishedMap);
   }
 
@@ -102,29 +102,9 @@ export default class EditApp extends Component {
       this.unprocessedImageData = imageData;
       return;
     }
-    this.setState({imageData, status: 'processing'}, () => {
-      this.updateAreas().then(() => {
-        this.setState({status: 'ready'}, this.processImageData);
-      });
-    });
-  }
-
-  getTerrainFromArea(area) {
-    const cssHex = intToCssHex(area.color);
-    return this.props.config.terrains.find(terrain => terrain.color === cssHex);
-  }
-
-  updateAreas() {
-    return detectAreas(this.state.imageData).then(areas => new Promise((resolve, reject) => this.setState({
-      areas: areas.map(area => {
-        const terrain = this.getTerrainFromArea(area);
-        return {
-          ctor: terrain.className,
-          layer: terrain.layer,
-          mask: area.mask
-        };
-      }).sort((areaA, areaB) => areaA.layer - areaB.layer)
-    }, resolve)));
+    this.setState({imageData, status: 'processing'}, () =>
+      this.mapDataFactory.fromImageData(this.state.imageData).then(mapData =>
+        this.setState({mapData, status: 'ready'}, this.processImageData)));
   }
 
   componentDidMount() {
@@ -168,7 +148,7 @@ export default class EditApp extends Component {
       <OutputMap
         ref={c => this.outputMap = c}
         config={this.props.config}
-        areas={this.state.areas}>
+        mapData={this.state.mapData}>
         <p className="content-placeholder">Sketch a map and it will be rendered here</p>
       </OutputMap>
     );

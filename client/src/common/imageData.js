@@ -19,7 +19,7 @@ function fillImageData(imageData, red, green, blue, alpha) {
   }
 }
 
-function detectAreas(imageData) {
+function imageDataToAreaDescriptors(imageData) {
   let pixels = new Uint32Array(imageData.data.buffer);
   return new Promise((resolve, reject) =>
     setTimeout(() =>
@@ -91,7 +91,7 @@ function addNoise(ctx, amount) {
 export {
   describeContiguousArea,
   fillImageData,
-  detectAreas,
+  imageDataToAreaDescriptors,
   addNoise,
   areSamePixels
 };

@@ -106,7 +106,8 @@ export default class OutputMap extends Component {
         this.ctx.fillStyle = 'rgb(127,127,127)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         const rng = seedrandom('');
-        const mapComponents = this.props.areas.map(area => new terrainClasses[area.ctor](area.mask, this.ctx, rng));
+        const mapComponents = this.props.mapData.areas.map((area, areaIndex) =>
+          new terrainClasses[area.ctor](this.props.mapData, areaIndex, this.ctx, rng));
         mapComponents.forEach(component => component.base());
         mapComponents.forEach(component => component.overlay());
         this.drawGrid();
@@ -119,20 +120,26 @@ export default class OutputMap extends Component {
   }
 
   shouldCanvasRedraw() {
-    if (this.areas === this.props.areas || !this.props.areas || !this.props.areas.length) return false;
-    if (!this.areas || this.areas.length !== this.props.areas.length) return true;
-    for (let i = 0; i < this.props.areas.length; i++) {
-      if (this.areas[i].ctor !== this.props.areas[i].ctor || !this.areas[i].mask.equals(this.props.areas[i].mask)) return true;
+    if (!this.props.mapData || this.props.mapData === this.mapData) return false;
+    if (!this.mapData || this.props.mapData.areas.length !== this.mapData.areas.length) return true;
+    for (let i = 0; i < this.props.mapData.areas.length; i++) {
+      if (this.mapData.areas[i].ctor !== this.props.mapData.areas[i].ctor || !this.mapData.areas[i].mask.equals(this.props.mapData.areas[i].mask)) return true;
     }
     return false;
   }
 
+  shouldCanvasResize(elBounds) {
+    return !this.elBounds || elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height;
+  }
+
   componentDidUpdate() {
-    if (this.shouldCanvasRedraw()) this.draw();
-    this.areas = this.props.areas;
+    if (this.shouldCanvasRedraw()) {
+      this.mapData = this.props.mapData;
+      this.draw();
+    }
 
     const elBounds = this.el.getBoundingClientRect();
-    if (elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height) {
+    if (this.shouldCanvasResize(elBounds)) {
       this.elBounds = elBounds;
       this.resizeCanvas();
     }
@@ -147,8 +154,8 @@ export default class OutputMap extends Component {
   render() {
     return (
       <div className="output-map" ref={el => this.el = el}>
-        <canvas ref={(el) => this.canvas = el} style={{display: this.props.areas ? 'block' : 'none'}} />
-        {!this.props.areas && this.props.children}
+        <canvas ref={(el) => this.canvas = el} style={{display: this.props.mapData ? 'block' : 'none'}} />
+        {!this.props.mapData && this.props.children}
       </div>
     )
   }
