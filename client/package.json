@@ -6,7 +6,8 @@
     "start": "./node_modules/.bin/webpack-dev-server --port 8080",
     "demo": "./node_modules/.bin/webpack-dev-server --port 8080 --config webpack.demo.config.js",
     "build:dev": "./node_modules/.bin/webpack",
-    "build:prod": "./node_modules/.bin/webpack --config webpack.production.config.js"
+    "build:prod": "./node_modules/.bin/webpack --config webpack.production.config.js",
+    "test": "./node_modules/.bin/mocha"
   },
   "author": "David VanDusen <github@davidvandusen.com>",
   "repository": {
@@ -31,6 +32,7 @@
     "webpack": "^2.3.2"
   },
   "devDependencies": {
+    "mocha": "^3.2.0",
     "webpack-dev-server": "^2.4.2"
   }
 }

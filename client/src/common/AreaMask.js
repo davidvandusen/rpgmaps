@@ -1,4 +1,4 @@
-import base64 from 'base64-js';
+const base64 = require('base64-js');
 
 function countSetBits(n) {
   let c;
@@ -6,7 +6,7 @@ function countSetBits(n) {
   return c;
 }
 
-export default class AreaMask {
+class AreaMask {
   static fromJSON(obj) {
     const mask = new AreaMask(obj.size, obj.width);
     const byteWidth = Math.ceil(obj.width / 8);
@@ -129,3 +129,5 @@ export default class AreaMask {
     for (let i = 0; i < this.size; i++) if (this.get(i)) fn(...this.coords(i), i, this);
   }
 }
+
+module.exports = AreaMask;

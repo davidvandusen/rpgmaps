@@ -1,4 +1,4 @@
-import AreaMask from './AreaMask';
+const AreaMask = require('./AreaMask');
 
 function pointInCircle(x, y, cx, cy, r) {
   return distance(x, y, cx, cy) <= r;
@@ -60,7 +60,7 @@ function getOffsetMask(mask, amount) {
     for (let i = 0; i < oldMask.size; i++) {
       const points = [
         oldMask.get(i - width - 1), oldMask.get(i - width), oldMask.get(i - width + 1),
-        oldMask.get(i - 1),         oldMask.get(i),         oldMask.get(i + 1),
+        oldMask.get(i - 1), oldMask.get(i), oldMask.get(i + 1),
         oldMask.get(i + width - 1), oldMask.get(i + width), oldMask.get(i + width + 1),
       ];
       if (points.includes(true)) {
@@ -98,7 +98,29 @@ function smoothPolygon(points, amount) {
   return out;
 }
 
-export {
+function west(point1, point2, x, y) {
+  if (point1[1] > point2[1]) {
+    let tmp = point1;
+    point1 = point2;
+    point2 = tmp;
+  }
+  if (y <= point1[1] || y > point2[1] || x >= point1[0] && x >= point2[0]) return false;
+  if (x < point1[0] && x < point2[0]) return true;
+  return (y - point1[1]) / (x - point1[0]) > (point2[1] - point1[1]) / (point2[0] - point1[0]);
+}
+
+function contains(points, x, y) {
+  let count = 0;
+  for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
+    const point1 = points[pointIndex];
+    const point2 = points[(pointIndex + 1) % points.length];
+    if (west(point1, point2, x, y)) count++;
+  }
+  return !!(count % 2);
+}
+
+module.exports = {
+  contains,
   pointInCircle,
   distance,
   smoothPolygon,

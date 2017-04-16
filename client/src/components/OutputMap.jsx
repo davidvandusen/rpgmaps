@@ -127,17 +127,15 @@ export default class OutputMap extends Component {
     return false;
   }
 
-  shouldCanvasResize() {
-    if (!this.elBounds) return true;
-    const elBounds = this.el.getBoundingClientRect();
-    return elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height;
-  }
-
   componentDidUpdate() {
     if (this.shouldCanvasRedraw()) this.draw();
     this.areas = this.props.areas;
-    if (this.shouldCanvasResize()) this.resizeCanvas();
-    this.elBounds = this.el.getBoundingClientRect();
+
+    const elBounds = this.el.getBoundingClientRect();
+    if (elBounds.width !== this.elBounds.width || elBounds.height !== this.elBounds.height) {
+      this.elBounds = elBounds;
+      this.resizeCanvas();
+    }
   }
 
   componentDidMount() {
