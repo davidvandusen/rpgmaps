@@ -4,20 +4,9 @@ import BaseTerrain from './BaseTerrain';
 
 class CloseUpForest extends BaseTerrain {
   base() {
-    this.ctx.shadowBlur = 25;
-    this.ctx.shadowOffsetX = 10;
-    this.ctx.shadowOffsetY = 5;
-    this.ctx.shadowColor = 'rgba(0,0,0,1)';
-
-    this.ctx.beginPath();
-    this.drawPolyPath(this.smoothOutlineShape);
-    this.ctx.fillStyle = 'rgba(27,45,15,1)';
-    this.ctx.fill();
-
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
-    this.ctx.shadowColor = 'rgba(0,0,0,0)';
+    this.ctx.save();
+    this.fillShape(this.smoothOutlineShape, 'rgba(27,45,15,1)');
+    this.ctx.restore();
   }
 
   drawTree(x, y, r) {

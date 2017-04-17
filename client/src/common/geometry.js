@@ -138,25 +138,27 @@ function containsPolygon(outerPolygon, innerPolygon) {
 }
 
 function removeRedundantIndices(containedIndices) {
-  // FIXME unimplemented
-  // if 1 contains 2, and 3 contains 1, then 3 doesn't need to contain 2
+  return containedIndices.map(set =>
+    set.filter(i =>
+      !set.some(j =>
+        i !== j && containedIndices[j].includes(i))));
 }
 
 function containmentGraph(polygons) {
-  const containedIndices = new Array(polygons.length);
+  let containedIndices = new Array(polygons.length);
   for (let polygonIndex = 0; polygonIndex < polygons.length; polygonIndex++) {
     const contains = [];
     for (let testPolygonIndex = 0; testPolygonIndex < polygons.length; testPolygonIndex++) {
       if (testPolygonIndex === polygonIndex) continue;
       // TODO consider if the one being checked already contains the first and continue
+      // Redundant indices are removed later, but it wouldn't help to check here as well
       if (containsPolygon(polygons[polygonIndex], polygons[testPolygonIndex])) {
         contains.push(testPolygonIndex);
       }
     }
     containedIndices[polygonIndex] = contains;
   }
-  removeRedundantIndices(containedIndices);
-  return containedIndices;
+  return removeRedundantIndices(containedIndices);
 }
 
 module.exports = {

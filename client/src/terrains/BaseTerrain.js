@@ -26,6 +26,20 @@ class BaseTerrain {
     }
   }
 
+  drawShape(shape) {
+    this.ctx.beginPath();
+    this.drawPolyPath(shape);
+    this.ctx.clip('evenodd');
+  }
+
+  fillShape(shape, color) {
+    this.drawShape(shape);
+    this.ctx.beginPath();
+    this.ctx.rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.fillStyle = color;
+    this.ctx.fill();
+  }
+
   base() {}
 
   overlay() {}
