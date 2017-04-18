@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {rgbaToCss, cssToRgba} from '../common/color';
-import {fillImageData} from '../common/imageData';
-import {pointInCircle} from '../common/geometry';
+const React = require('react');
+const {rgbaToCss, cssToRgba} = require('../common/color');
+const {fillImageData} = require('../common/imageData');
+const {pointInCircle} = require('../common/geometry');
 
-export default class InputMap extends Component {
+class InputMap extends React.Component {
   constructor(props) {
     super(props);
     this.mouse = {
@@ -144,3 +144,5 @@ export default class InputMap extends Component {
     )
   }
 }
+
+module.exports = InputMap;

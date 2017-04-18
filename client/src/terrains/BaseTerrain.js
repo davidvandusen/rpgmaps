@@ -46,4 +46,4 @@ class BaseTerrain {
 
 }
 
-export default BaseTerrain;
+module.exports = BaseTerrain;

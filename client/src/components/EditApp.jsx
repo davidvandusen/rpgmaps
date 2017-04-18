@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import '../../styles/edit-app.scss';
-import Controls from './Controls.jsx';
-import InputMap from './InputMap.jsx';
-import Bento from './Bento.jsx';
-import OutputMap from './OutputMap.jsx';
-import mapDataFactory from '../common/mapDataFactory';
+require('../../styles/edit-app.scss');
+const React = require('react');
+const Controls = require('./Controls.jsx');
+const InputMap = require('./InputMap.jsx');
+const Bento = require('./Bento.jsx');
+const OutputMap = require('./OutputMap.jsx');
+const mapDataFactory = require('../common/mapDataFactory');
 
-export default class EditApp extends Component {
+class EditApp extends React.Component {
   constructor(props) {
     super(props);
     this.roomName = location.pathname.substring(1, location.pathname.indexOf('/', 1));
@@ -200,3 +200,5 @@ export default class EditApp extends Component {
     );
   }
 }
+
+module.exports = EditApp;

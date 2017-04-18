@@ -1,9 +1,9 @@
-import CloseUpGrass from './CloseUpGrass';
-import CloseUpRoad from './CloseUpRoad';
-import CloseUpForest from './CloseUpForest';
-import CloseUpRiver from './CloseUpRiver';
+const CloseUpGrass = require('./CloseUpGrass');
+const CloseUpRoad = require('./CloseUpRoad');
+const CloseUpForest = require('./CloseUpForest');
+const CloseUpRiver = require('./CloseUpRiver');
 
-export {
+module.exports = {
   CloseUpGrass,
   CloseUpRoad,
   CloseUpForest,

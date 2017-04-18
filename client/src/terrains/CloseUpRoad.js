@@ -1,4 +1,4 @@
-import BaseTerrain from './BaseTerrain';
+const BaseTerrain = require('./BaseTerrain');
 
 class CloseUpRoad extends BaseTerrain {
   base() {
@@ -11,4 +11,4 @@ class CloseUpRoad extends BaseTerrain {
   }
 }
 
-export default CloseUpRoad;
+module.exports = CloseUpRoad;

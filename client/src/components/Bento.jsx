@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+const React = require('react');
 
-export default class Bento extends Component {
+class Bento extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -170,3 +170,5 @@ export default class Bento extends Component {
 Bento.defaultProps = {
   dividerSize: 6
 };
+
+module.exports = Bento;

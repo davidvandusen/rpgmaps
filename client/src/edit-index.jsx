@@ -1,7 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import config from './config.json';
-import EditApp from './components/EditApp.jsx';
+const React = require('react');
+const ReactDOM = require('react-dom');
+const config = require('./config.json');
+const EditApp = require('./components/EditApp.jsx');
 
 const appRoot = document.createElement('div');
 document.body.appendChild(appRoot);

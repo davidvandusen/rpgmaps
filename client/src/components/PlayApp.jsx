@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import '../../styles/edit-app.scss';
-import OutputMap from './OutputMap.jsx';
-import AreaMask from "../common/AreaMask";
+require('../../styles/edit-app.scss');
+const React = require('react');
+const OutputMap = require('./OutputMap.jsx');
+const AreaMask = require('../common/AreaMask');
 
-export default class PlayApp extends Component {
+class PlayApp extends React.Component {
   constructor(props) {
     super(props);
     this.roomName = location.pathname.substring(1);
@@ -43,3 +43,5 @@ export default class PlayApp extends Component {
     );
   }
 }
+
+module.exports = PlayApp;

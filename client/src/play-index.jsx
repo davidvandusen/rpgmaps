@@ -1,7 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import config from './config.json';
-import PlayApp from './components/PlayApp.jsx';
+const React = require('react');
+const ReactDOM = require('react-dom');
+const config = require('./config.json');
+const PlayApp = require('./components/PlayApp.jsx');
 
 const appRoot = document.createElement('div');
 document.body.appendChild(appRoot);

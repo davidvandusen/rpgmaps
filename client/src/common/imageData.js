@@ -1,5 +1,5 @@
-import seedrandom from 'seedrandom';
-import AreaMask from './AreaMask';
+const seedrandom = require('seedrandom');
+const AreaMask = require('./AreaMask');
 
 function areSamePixels(dataA, dataB) {
   if (dataA.length !== dataB.length) return false;
@@ -88,7 +88,7 @@ function addNoise(ctx, amount) {
   ctx.putImageData(imageData, 0, 0);
 }
 
-export {
+module.exports = {
   describeContiguousArea,
   fillImageData,
   imageDataToAreaDescriptors,

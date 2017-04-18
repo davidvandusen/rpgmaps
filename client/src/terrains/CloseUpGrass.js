@@ -1,14 +1,16 @@
-import BaseTerrain from './BaseTerrain';
+const BaseTerrain = require('./BaseTerrain');
 
 class CloseUpGrass extends BaseTerrain {
   base() {
     this.ctx.save();
-    this.fillShape(this.smoothOutlineShape, 'rgba(212,214,164,1)');
+    this.fillShape(this.outlineShape, '#ccbd9f');
     this.ctx.restore();
   }
 
   overlay() {
+    const imageData = this.ctx.getImageData(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
   }
 }
 
-export default CloseUpGrass;
+module.exports = CloseUpGrass;

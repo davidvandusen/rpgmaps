@@ -73,11 +73,11 @@ function cssToRgba(css) {
   return [0, 0, 0, 0];
 }
 
-export {
+module.exports = {
   intToRgba,
   rgbaToCss,
   rgbaToCssHex,
   intToCss,
   intToCssHex,
   cssToRgba
-}
+};

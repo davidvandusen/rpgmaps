@@ -1,6 +1,6 @@
-import {distance} from '../common/geometry';
-import {rgbaToCss} from '../common/color';
-import BaseTerrain from './BaseTerrain';
+const {distance} = require('../common/geometry');
+const {rgbaToCss} = require('../common/color');
+const BaseTerrain = require('./BaseTerrain');
 
 class CloseUpForest extends BaseTerrain {
   base() {
@@ -79,4 +79,4 @@ class CloseUpForest extends BaseTerrain {
   }
 }
 
-export default CloseUpForest;
+module.exports = CloseUpForest;

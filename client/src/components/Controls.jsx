@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+const React = require('react');
 
-export default class Controls extends Component {
+class Controls extends React.Component {
   constructor(props) {
     super(props);
     this.onBrushSizeChange = this.onBrushSizeChange.bind(this);
@@ -91,3 +91,5 @@ export default class Controls extends Component {
     )
   }
 }
+
+module.exports = Controls;

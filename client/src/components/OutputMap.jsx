@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import seedrandom from 'seedrandom';
-import {addNoise} from '../common/imageData';
-import * as terrainClasses from '../terrains';
+const React = require('react');
+const seedrandom = require('seedrandom');
+const {addNoise} = require('../common/imageData');
+const terrainClasses = require('../terrains');
 
-export default class OutputMap extends Component {
+class OutputMap extends React.Component {
   constructor(props) {
     super(props);
     this.draw = this.draw.bind(this);
@@ -160,3 +160,5 @@ export default class OutputMap extends Component {
     )
   }
 }
+
+module.exports = OutputMap;

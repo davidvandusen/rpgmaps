@@ -1,8 +1,8 @@
-import {imageDataToAreaDescriptors} from '../common/imageData';
-import {outlineMask, smoothPolygon, containmentGraph} from '../common/geometry';
-import {intToCssHex} from '../common/color';
+const {imageDataToAreaDescriptors} = require('../common/imageData');
+const {outlineMask, smoothPolygon, containmentGraph} = require('../common/geometry');
+const {intToCssHex} = require('../common/color');
 
-module.exports = function (configTerrains) {
+function mapDataFactory(configTerrains) {
   const terrainsIndex = configTerrains.reduce((obj, terrain) => {
     obj[terrain.color] = terrain;
     return obj;
@@ -15,6 +15,7 @@ module.exports = function (configTerrains) {
   function fromImageData(imageData) {
     return imageDataToAreaDescriptors(imageData).then(areaDescriptors => {
       areaDescriptors.forEach(ad => ad.terrain = getTerrain(ad.color));
+      areaDescriptors = areaDescriptors.filter(ad => ad.terrain);
       areaDescriptors.sort((ad1, ad2) => ad1.terrain.layer - ad2.terrain.layer);
       const mapData = {};
       mapData.outlines = new Array(areaDescriptors.length);
@@ -40,4 +41,6 @@ module.exports = function (configTerrains) {
   return {
     fromImageData
   };
-};
+}
+
+module.exports = mapDataFactory;
