@@ -128,6 +128,10 @@ class AreaMask {
   forEach(fn) {
     for (let i = 0; i < this.size; i++) if (this.get(i)) fn(...this.coords(i), i, this);
   }
+
+  first(val = true) {
+    for (let i = 0; i < this.size; i++) if (this.get(i) === val) return i;
+  }
 }
 
 module.exports = AreaMask;

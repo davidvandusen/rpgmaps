@@ -88,7 +88,24 @@ function addNoise(ctx, amount) {
   ctx.putImageData(imageData, 0, 0);
 }
 
+function blendOnto(dst, src) {
+  const srcData = src.data;
+  const dstData = dst.data;
+  for (let i = 0; i < srcData.length; i += 4) {
+    const srcAlpha = srcData[i + 3];
+    if (srcAlpha === 0) continue;
+    const dstAlpha = dstData[i + 3];
+    const srcOpacity = srcAlpha / 0xff;
+    const dstOpacity = dstAlpha / 0xff - srcOpacity;
+    dstData[i] = Math.floor(srcData[i] * srcOpacity) + Math.ceil(dstData[i] * dstOpacity);
+    dstData[i + 1] = Math.floor(srcData[i + 1] * srcOpacity) + Math.ceil(dstData[i + 1] * dstOpacity);
+    dstData[i + 2] = Math.floor(srcData[i + 2] * srcOpacity) + Math.ceil(dstData[i + 2] * dstOpacity);
+  }
+  return dst;
+}
+
 module.exports = {
+  blendOnto,
   describeContiguousArea,
   fillImageData,
   imageDataToAreaDescriptors,

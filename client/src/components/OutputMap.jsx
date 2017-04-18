@@ -103,7 +103,7 @@ class OutputMap extends React.Component {
   draw() {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
-        this.ctx.fillStyle = 'rgb(127,127,127)';
+        this.ctx.fillStyle = '#c4b191';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         const rng = seedrandom('');
         const mapComponents = this.props.mapData.areas.map((area, areaIndex) =>
