@@ -17,8 +17,8 @@
   "output": {
     "canvas": {
       "resolution": {
-        "width": 1280,
-        "height": 720
+        "width": 1920,
+        "height": 1080
       }
     }
   },
@@ -28,6 +28,12 @@
       "color": "#d3e5b5",
       "className": "CloseUpGrass",
       "layer": 1
+    },
+    {
+      "name": "Path",
+      "color": "#a9a4a0",
+      "className": "CloseUpPath",
+      "layer": 2
     },
     {
       "name": "Road",

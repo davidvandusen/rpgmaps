@@ -129,6 +129,12 @@ class AreaMask {
     for (let i = 0; i < this.size; i++) if (this.get(i)) fn(...this.coords(i), i, this);
   }
 
+  map(fn) {
+    const arr = new Array(this.size);
+    for (let i = 0; i < this.size; i++) if (this.get(i)) arr[i] = fn(...this.coords(i), i, this);
+    return arr;
+  }
+
   first(val = true) {
     for (let i = 0; i < this.size; i++) if (this.get(i) === val) return i;
   }

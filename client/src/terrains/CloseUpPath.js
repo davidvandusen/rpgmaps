@@ -1,11 +1,8 @@
 const BaseTerrain = require('./BaseTerrain');
 
-class CloseUpRiver extends BaseTerrain {
+class CloseUpRoad extends BaseTerrain {
   base() {
     return new Promise((resolve, reject) => {
-      this.ctx.save();
-      this.fillShape(this.smoothOutlineShape, 'rgba(142,194,214,1)');
-      this.ctx.restore();
       resolve();
     });
   }
@@ -17,4 +14,4 @@ class CloseUpRiver extends BaseTerrain {
   }
 }
 
-module.exports = CloseUpRiver;
+module.exports = CloseUpRoad;

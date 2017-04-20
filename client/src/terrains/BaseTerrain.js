@@ -40,9 +40,13 @@ class BaseTerrain {
     this.ctx.fill();
   }
 
-  base() {}
+  base() {
+    return Promise.resolve();
+  }
 
-  overlay() {}
+  overlay() {
+    return Promise.resolve();
+  }
 
 }
 

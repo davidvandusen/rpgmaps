@@ -4,9 +4,12 @@ const BaseTerrain = require('./BaseTerrain');
 
 class CloseUpForest extends BaseTerrain {
   base() {
-    this.ctx.save();
-    this.fillShape(this.smoothOutlineShape, 'rgba(27,45,15,1)');
-    this.ctx.restore();
+    return new Promise((resolve, reject) => {
+      this.ctx.save();
+      this.fillShape(this.smoothOutlineShape, 'rgba(27,45,15,1)');
+      this.ctx.restore();
+      resolve();
+    });
   }
 
   drawTree(x, y, r) {
@@ -69,13 +72,16 @@ class CloseUpForest extends BaseTerrain {
   }
 
   overlay() {
-    this.getEdgeTrees(this.outline).forEach(tree => this.drawTree(...tree));
-    const trees = [];
-    this.mask.forEach((x, y) => {
-      if (this.rng() < 0.001) trees.push([x, y, this.rng() * 2.5 + 5]);
-      if (this.rng() < 0.17) trees.push([x, y, this.rng() * 2.5 + 1.25]);
+    return new Promise((resolve, reject) => {
+      this.getEdgeTrees(this.outline).forEach(tree => this.drawTree(...tree));
+      const trees = [];
+      this.mask.forEach((x, y) => {
+        if (this.rng() < 0.001) trees.push([x, y, this.rng() * 2.5 + 5]);
+        if (this.rng() < 0.17) trees.push([x, y, this.rng() * 2.5 + 1.25]);
+      });
+      trees.sort((treeA, treeB) => treeA[2] - treeB[2]).forEach(tree => this.drawTree(...tree));
+      resolve();
     });
-    trees.sort((treeA, treeB) => treeA[2] - treeB[2]).forEach(tree => this.drawTree(...tree));
   }
 }
 

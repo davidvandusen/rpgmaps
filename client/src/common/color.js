@@ -8,7 +8,7 @@ function intToRgba(int) {
 }
 
 function rgbaToCss(red, green, blue, alpha) {
-  return `rgba(${Math.floor(red)},${Math.floor(green)},${Math.floor(blue)},${Math.floor(alpha / 255)})`;
+  return `rgba(${Math.floor(red)},${Math.floor(green)},${Math.floor(blue)},${alpha / 255})`;
 }
 
 function intToCss(int) {

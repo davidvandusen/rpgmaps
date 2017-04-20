@@ -4,7 +4,7 @@
   "description": "Tabletop roleplaying game map creation tool",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --port 8080",
-    "demo": "./node_modules/.bin/webpack-dev-server --port 8080 --config webpack.demo.config.js",
+    "demo": "./node_modules/.bin/webpack-dev-server --port 8081 --config webpack.demo.config.js",
     "build:dev": "./node_modules/.bin/webpack",
     "build:prod": "./node_modules/.bin/webpack --config webpack.production.config.js",
     "test": "./node_modules/.bin/mocha"

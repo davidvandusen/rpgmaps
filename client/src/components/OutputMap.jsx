@@ -19,7 +19,7 @@ class OutputMap extends React.Component {
 
   drawGrid() {
     const gridSpacing = this.canvas.width / 32;
-    this.ctx.strokeStyle = 'rgba(0,0,0,0.125)';
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     this.ctx.lineWidth = 1;
     this.ctx.lineJoin = 'miter';
     this.ctx.lineCap = 'butt';
@@ -101,21 +101,37 @@ class OutputMap extends React.Component {
   }
 
   draw() {
-    return new Promise((resolve, reject) => {
-      requestAnimationFrame(() => {
-        this.ctx.fillStyle = '#c4b191';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        const rng = seedrandom('');
-        const mapComponents = this.props.mapData.areas.map((area, areaIndex) =>
-          new terrainClasses[area.ctor](this.props.mapData, areaIndex, this.ctx, rng));
-        mapComponents.forEach(component => component.base());
-        mapComponents.forEach(component => component.overlay());
-        this.drawGrid();
-        this.drawBorder();
-        this.applyGlobalLight();
-        addNoise(this.ctx, 8);
-        resolve();
+    if (this.drawing) {
+      this.pendingDraw = true;
+    }
+    this.drawing = true;
+    this.ctx.fillStyle = '#c4b191';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    const rng = seedrandom('');
+    const mapComponents = this.props.mapData.areas.map((area, areaIndex) =>
+      new terrainClasses[area.ctor](this.props.mapData, areaIndex, this.ctx, rng));
+    new Promise((resolve, reject) => {
+      (function next(index) {
+        if (mapComponents[index]) requestAnimationFrame(() => mapComponents[index].base().then(() => next(index + 1)));
+        else resolve();
+      })(0);
+    }).then(() => {
+      return new Promise((resolve, reject) => {
+        (function next(index) {
+          if (mapComponents[index]) requestAnimationFrame(() => mapComponents[index].overlay().then(() => next(index + 1)));
+          else resolve();
+        })(0);
       });
+    }).then(() => {
+      this.drawGrid();
+      this.drawBorder();
+      this.applyGlobalLight();
+      addNoise(this.ctx, 8);
+      this.drawing = false;
+      if (this.pendingDraw) {
+        this.pendingDraw = false;
+        setTimeout(this.draw, 0);
+      }
     });
   }
 
