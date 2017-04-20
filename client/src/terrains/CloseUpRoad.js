@@ -22,39 +22,40 @@ class CloseUpRoad extends BaseTerrain {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       });
       this.ctx.restore();
+
       this.mask.map((x, y, i) => {
         const x0 = x;
         const y0 = y;
         const stoneNumRand = this.rng();
         if (stoneNumRand < 0.5) {
           return [
-            this.makeScaledStone(x0 + 0.5, y0 + 0.5, 0.35, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.1, y0 + 0.1, 0.125, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.9, y0 + 0.9, 0.125, 0.1, 0.1)
+            this.makeScaledStone(x0 + 0.5, y0 + 0.5, 0.4, 0.3, 0.2),
+            this.makeScaledStone(x0, y0, 0.2, 0.1, 0.1),
+            this.makeScaledStone(x0 + 1, y0 + 1, 0.2, 0.1, 0.1)
           ];
         } else if (stoneNumRand < 0.7) {
           return [
-            this.makeScaledStone(x0 + 0.2, y0 + 0.2, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.8, y0 + 0.8, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.8, y0 + 0.2, 0.15, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.2, y0 + 0.8, 0.15, 0.1, 0.1)
+            this.makeScaledStone(x0 + 0.2, y0 + 0.2, 0.3, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.8, y0 + 0.8, 0.3, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.8, y0 + 0.2, 0.2, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.2, y0 + 0.8, 0.2, 0.25, 0.2)
           ];
         } else if (stoneNumRand < 0.9) {
           return [
-            this.makeScaledStone(x0 + 0.8, y0 + 0.2, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.2, y0 + 0.8, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.2, y0 + 0.2, 0.15, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.8, y0 + 0.8, 0.15, 0.1, 0.1)
+            this.makeScaledStone(x0 + 0.8, y0 + 0.2, 0.3, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.2, y0 + 0.8, 0.3, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.2, y0 + 0.2, 0.2, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.8, y0 + 0.8, 0.2, 0.25, 0.2)
           ];
         } else {
           return [
-            this.makeScaledStone(x0 + 0.25, y0 + 0.25, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.25, y0 + 0.75, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.75, y0 + 0.25, 0.25, 0.1, 0.1),
-            this.makeScaledStone(x0 + 0.75, y0 + 0.75, 0.25, 0.1, 0.1)
+            this.makeScaledStone(x0 + 0.25, y0 + 0.25, 0.25, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.25, y0 + 0.75, 0.25, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.75, y0 + 0.25, 0.25, 0.25, 0.2),
+            this.makeScaledStone(x0 + 0.75, y0 + 0.75, 0.25, 0.25, 0.2)
           ];
         }
-      }).forEach(stones => stones.forEach(stone => this.drawStone(...stone)));
+      }).sort(this.rng).forEach(stones => stones.sort(this.rng).forEach(stone => this.drawStone(...stone)));
       resolve();
     });
   }
