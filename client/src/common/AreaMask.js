@@ -130,8 +130,8 @@ class AreaMask {
   }
 
   map(fn) {
-    const arr = new Array(this.size);
-    for (let i = 0; i < this.size; i++) if (this.get(i)) arr[i] = fn(...this.coords(i), i, this);
+    const arr = [];
+    for (let i = 0; i < this.size; i++) if (this.get(i)) arr.push(fn(...this.coords(i), i, this));
     return arr;
   }
 

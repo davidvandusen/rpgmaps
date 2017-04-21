@@ -51,7 +51,7 @@ function outlineMask(mask) {
   return points;
 }
 
-function getOffsetMask(mask, amount) {
+function offsetMask(mask, amount) {
   const width = mask.width;
   let oldMask = mask;
   let newMask;
@@ -166,7 +166,7 @@ module.exports = {
   containsPoint,
   containsPolygon,
   distance,
-  getOffsetMask,
+  offsetMask,
   outlineMask,
   pointInCircle,
   smoothPolygon

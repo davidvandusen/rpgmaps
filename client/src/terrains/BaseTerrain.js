@@ -40,6 +40,20 @@ class BaseTerrain {
     this.ctx.fill();
   }
 
+  drawIrregularCircle(x, y, r, jitterAmount, segments) {
+    let theta = 0;
+    const t = 2 * Math.PI;
+    const segmentAngle = t / segments;
+    do {
+      const l = r * (1 - jitterAmount) + this.rng() * r * 2 * jitterAmount;
+      const x1 = x + l * Math.cos(theta);
+      const y1 = y + l * Math.sin(theta);
+      if (theta === 0) this.ctx.moveTo(x1, y1);
+      else this.ctx.lineTo(x1, y1);
+      theta += segmentAngle;
+    } while (theta < t);
+  }
+
   base() {
     return Promise.resolve();
   }
