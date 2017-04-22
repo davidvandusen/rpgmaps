@@ -39,7 +39,7 @@
       "name": "Road",
       "color": "#c7bfac",
       "className": "CloseUpRoad",
-      "layer": 3
+      "layer": 4
     },
     {
       "name": "Forest",
@@ -51,7 +51,7 @@
       "name": "River",
       "color": "#8ec2d6",
       "className": "CloseUpRiver",
-      "layer": 4
+      "layer": 3
     }
   ]
 }

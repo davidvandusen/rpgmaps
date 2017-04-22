@@ -92,14 +92,18 @@ class CloseUpGrass extends BaseTerrain {
       this.ctx.lineJoin = 'round';
       this.ctx.lineWidth = this.scaleFactorX * 0.1;
 
-      this.ctx.strokeStyle = '#45512c';
       // TODO only draw around the portions of the path that are next to grass
-      this.smoothOutlineShape.forEach(path => drawJitterPath(path, 5, Math.PI));
+      this.ctx.beginPath();
+      this.smoothOutlineShape.forEach(path => this.drawJitterPath(path, 5, Math.PI));
+      this.ctx.strokeStyle = '#45512c';
+      this.ctx.stroke();
 
       this.ctx.save();
-      this.drawShape(this.smoothOutlineShape);
+      this.clipShape(this.smoothOutlineShape);
+      this.ctx.beginPath();
+      overlayGrass.forEach(path => this.drawJitterPath(path, 10, 1.1));
       this.ctx.strokeStyle = '#45512c';
-      overlayGrass.forEach(path => drawJitterPath(path, 10, 1.1));
+      this.ctx.stroke();
       grassBlades.forEach(path => drawVerticalStrips(path, 6, 0.7, this.scaleFactorY * 0.75, 0.95, 0.5));
       this.ctx.restore();
 

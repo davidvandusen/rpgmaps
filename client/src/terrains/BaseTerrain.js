@@ -1,3 +1,5 @@
+const {distance} = require('../common/geometry');
+
 class BaseTerrain {
   constructor(mapData, areaIndex, ctx, rng) {
     this.mapData = mapData;
@@ -26,14 +28,14 @@ class BaseTerrain {
     }
   }
 
-  drawShape(shape) {
+  clipShape(shape) {
     this.ctx.beginPath();
     this.drawPolyPath(shape);
     this.ctx.clip('evenodd');
   }
 
   fillShape(shape, color) {
-    this.drawShape(shape);
+    this.clipShape(shape);
     this.ctx.beginPath();
     this.ctx.rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.fillStyle = color;
@@ -52,6 +54,33 @@ class BaseTerrain {
       else this.ctx.lineTo(x1, y1);
       theta += segmentAngle;
     } while (theta < t);
+  }
+
+  drawJitterPath(points, segmentation, angleJitter, connected = false) {
+    for (let p = 0; p < points.length; p++) {
+      const toX = points[p][0] * this.scaleFactorX;
+      const toY = points[p][1] * this.scaleFactorY;
+      if (p === 0) {
+        this.ctx.moveTo(toX, toY);
+      } else {
+        const from = points[p - 1];
+        let fromX = from[0] * this.scaleFactorX;
+        let fromY = from[1] * this.scaleFactorY;
+        const theta = Math.atan2(fromY - toY, fromX - toX);
+        let segments = Math.ceil(this.rng() * segmentation + segmentation / 2);
+        const segmentLength = distance(fromX, fromY, toX, toY) / segments;
+        while (segments--) {
+          const newTheta = theta + (this.rng() - 0.5) * angleJitter;
+          const newX = fromX + Math.cos(newTheta) * segmentLength;
+          const newY = fromY + Math.sin(newTheta) * segmentLength;
+          this.ctx.lineTo(newX, newY);
+          fromX = newX;
+          fromY = newY;
+        }
+        if (connected) this.ctx.lineTo(toX, toY);
+        else this.ctx.moveTo(toX, toY);
+      }
+    }
   }
 
   base() {
