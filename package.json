@@ -1,6 +1,6 @@
 {
   "name": "rpgmaps",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tabletop roleplaying game map creation tool",
   "scripts": {
     "install": "./install.sh",
