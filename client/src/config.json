@@ -24,31 +24,31 @@
   },
   "terrains": [
     {
-      "name": "Grass",
+      "name": "Grass Field",
       "color": "#b0bc94",
       "className": "CloseUpGrass",
       "layer": 1
     },
     {
-      "name": "Path",
+      "name": "Smooth Path",
       "color": "#c8bb99",
       "className": "CloseUpPath",
       "layer": 2
     },
     {
-      "name": "Road",
+      "name": "Cobblestone",
       "color": "#c7bfac",
       "className": "CloseUpRoad",
       "layer": 4
     },
     {
-      "name": "Forest",
+      "name": "Dense Trees",
       "color": "#394b2d",
       "className": "CloseUpForest",
       "layer": 5
     },
     {
-      "name": "River",
+      "name": "Still Water",
       "color": "#8ec2d6",
       "className": "CloseUpRiver",
       "layer": 3

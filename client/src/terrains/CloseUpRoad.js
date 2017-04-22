@@ -1,6 +1,4 @@
 const BaseTerrain = require('./BaseTerrain');
-const {rgbaToCss} = require('../common/color');
-const {offsetMask} = require('../common/geometry');
 
 class CloseUpRoad extends BaseTerrain {
   drawStone(x, y, r) {

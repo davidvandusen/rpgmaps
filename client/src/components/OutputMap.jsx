@@ -20,7 +20,7 @@ class OutputMap extends React.Component {
   drawGrid() {
     const gridSpacing = this.canvas.width / 32;
     this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = this.canvas.width / 1280;
     this.ctx.lineJoin = 'miter';
     this.ctx.lineCap = 'butt';
     this.ctx.setLineDash([]);
@@ -52,16 +52,16 @@ class OutputMap extends React.Component {
     this.ctx.shadowColor = 'rgba(0,0,0,0)';
 
     this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-    this.ctx.lineWidth = 4;
+    this.ctx.lineWidth = this.canvas.width / 320;
     this.ctx.strokeRect(borderWidth - 2, borderWidth - 2, this.canvas.width - 2 * borderWidth + 4, this.canvas.height - 2 * borderWidth + 4);
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = this.canvas.width / 640;
     this.ctx.strokeRect(borderWidth - 8, borderWidth - 8, this.canvas.width - 2 * borderWidth + 16, this.canvas.height - 2 * borderWidth + 16);
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = this.canvas.width / 640;
     this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.ctx.fillStyle = '#e0d088';
     this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = this.canvas.width / 1280;
     this.ctx.beginPath();
     this.ctx.rect(0, 0, borderWidth, borderWidth);
     this.ctx.fill();

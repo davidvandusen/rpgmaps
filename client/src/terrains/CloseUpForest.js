@@ -51,7 +51,7 @@ class CloseUpForest extends BaseTerrain {
         spiralRate = Math.max(spiralRate - 0.0002, 0.01);
       }
       this.ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-      this.ctx.lineWidth = 2;
+      this.ctx.lineWidth = 1;
       this.ctx.stroke();
     })();
   }
