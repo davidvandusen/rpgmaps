@@ -1,4 +1,6 @@
 const path = require('path');
+const webpack = require('webpack');
+const packageJson = require('./package.json');
 
 module.exports = {
   devtool: 'source-map',
@@ -20,5 +22,10 @@ module.exports = {
       include: [path.resolve(__dirname, 'src')],
       loader: 'babel-loader'
     }]
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      APP_VERSION: JSON.stringify(packageJson.version)
+    })
+  ]
 };

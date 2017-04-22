@@ -70,6 +70,15 @@
   padding: 0 $spacing-unit;
 }
 
+.control-meta {
+  padding: $spacing-unit;
+}
+
+.control-meta-key {
+  font-weight: $font-weight-bold;
+  margin-right: $spacing-unit;
+}
+
 .search-input {
   background: rgb(40,40,40);
   border: 0 none transparent;

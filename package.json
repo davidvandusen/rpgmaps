@@ -1,11 +1,12 @@
 {
   "name": "rpgmaps",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Tabletop roleplaying game map creation tool",
   "scripts": {
     "install": "./install.sh",
     "postinstall": "./postinstall.sh",
-    "start": "./start.sh"
+    "start": "./start.sh",
+    "release": "./release.sh"
   },
   "author": "David VanDusen <github@davidvandusen.com>",
   "repository": {

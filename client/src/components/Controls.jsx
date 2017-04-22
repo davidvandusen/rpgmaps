@@ -14,6 +14,12 @@ class Controls extends React.Component {
     return (
       <div className="controls">
         <div className="control-list">
+          <div className="control-meta">
+            <span className="control-meta-key">RPG Maps</span>
+            <span className="control-meta-value">v{APP_VERSION}</span>
+          </div>
+        </div>
+        <div className="control-list">
           <div className="control-list-heading">Publication</div>
           <div className="control-list-item interactable" onClick={this.props.publishMap}>
             <div className="control-list-item-heading">Publish Current Map</div>
