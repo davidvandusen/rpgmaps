@@ -3,7 +3,8 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const bundlePrefix = process.env.NODE_ENV !== 'production' ? 'http://localhost:8080' : '';
+const bundlePrefix = process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:8080/';
+const bundleSuffix = process.env.NODE_ENV === 'production' ? `-${packageJson.version}.min.js` : `-${packageJson.version}.js`;
 
 server.listen(process.env.PORT || 3000);
 
@@ -22,11 +23,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/:room', (req, res) => {
-  res.render('index', {bundleSrc: bundlePrefix + '/play.js'});
+  res.render('index', {bundleSrc: bundlePrefix + 'play' + bundleSuffix});
 });
 
 app.get('/:room/edit', (req, res) => {
-  res.render('index', {bundleSrc: bundlePrefix + '/edit.js'});
+  res.render('index', {bundleSrc: bundlePrefix + 'edit' + bundleSuffix});
 });
 
 io.on('connection', socket => {

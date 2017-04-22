@@ -8,7 +8,7 @@ module.exports = {
     play: path.resolve(__dirname, 'src/play-index.jsx')
   },
   output: {
-    filename: '[name].js',
+    filename: `[name]-${packageJson.version}.min.js`,
     path: path.resolve(__dirname, 'dist')
   },
   module: {
