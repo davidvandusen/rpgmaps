@@ -37,12 +37,12 @@
     },
     {
       "name": "Cobblestone",
-      "color": "#c7bfac",
+      "color": "#d7cfbc",
       "className": "CloseUpRoad",
       "layer": 4
     },
     {
-      "name": "Dense Trees",
+      "name": "Dense Foliage",
       "color": "#394b2d",
       "className": "CloseUpForest",
       "layer": 5

@@ -1,85 +1,106 @@
-const {distance} = require('../common/geometry');
-const {rgbaToCss} = require('../common/color');
 const BaseTerrain = require('./BaseTerrain');
+const {distance} = require('../common/geometry');
 
 class CloseUpForest extends BaseTerrain {
+  makeLeafyOutlineShape(shape, boughJitter, segmentation) {
+    return shape.map((path, pathIndex) => {
+      let src = path[path.length - 1];
+      return path.reduce((newPath, dst) => {
+        const outlineSegment = [];
+        const diameter = distance(src[0], src[1], dst[0], dst[1]);
+        const radius = diameter / 2;
+        const numSegments = segmentation * radius;
+        const thetaSrcDst = Math.atan2(dst[1] - src[1], dst[0] - src[0]);
+        const centerX = src[0] + radius * Math.cos(thetaSrcDst);
+        const centerY = src[1] + radius * Math.sin(thetaSrcDst);
+        const angleChange = (pathIndex === 0) ? Math.PI / numSegments : -Math.PI / numSegments;
+        const thetaDstSrc = thetaSrcDst - Math.PI;
+        for (let segment = 0; segment < numSegments; segment++) {
+          const angle = thetaDstSrc + angleChange * segment;
+          const r = radius + (this.rng() - 0.5) * boughJitter;
+          outlineSegment.push([
+            centerX + r * Math.cos(angle),
+            centerY + r * Math.sin(angle)
+          ]);
+        }
+        src = dst;
+        return newPath.concat(outlineSegment);
+      }, []);
+    });
+  }
+
+  makeSparseShape(shape, maxPointsToSkip, p0, p1) {
+    return shape.map((path, pathIndex) => {
+      if (path.length < 20) return path;
+      const p = pathIndex === 0 ? p0 : p1;
+      let numSkipped = 0;
+      return path.filter(() => {
+        if (numSkipped >= maxPointsToSkip) {
+          numSkipped = 0;
+          return true;
+        }
+        const skip = this.rng() >= p;
+        if (skip) numSkipped++;
+        return !skip;
+      });
+    });
+  }
+
   base() {
     return new Promise((resolve, reject) => {
+      const shape = this.makeSparseShape(this.smoothOutlineShape, 4, 0.5, 0.8);
+      this.leafyOutlineShape = this.makeLeafyOutlineShape(shape, 0.3, 20);
+
       this.ctx.save();
-      this.fillShape(this.smoothOutlineShape, 'rgba(27,45,15,1)');
+      this.ctx.translate(this.scaleFactorX, this.scaleFactorY);
+      this.fillShape(this.leafyOutlineShape, 'rgba(0,0,0,0.2');
       this.ctx.restore();
+
       resolve();
     });
   }
 
-  drawTree(x, y, r) {
-    (() => {
-      this.ctx.beginPath();
-      let theta = 0;
-      while (theta < 2 * Math.PI) {
-        const spiralX = (x + (this.rng() * r * 0.3 + r * 0.7) * Math.cos(theta)) * this.scaleFactorX;
-        const spiralY = (y + (this.rng() * r * 0.3 + r * 0.7) * Math.sin(theta)) * this.scaleFactorY;
-        this.ctx[theta === 0 ? 'moveTo' : 'lineTo'](spiralX, spiralY);
-        theta += 0.4;
-      }
-      this.ctx.closePath();
-      const colorJitter = 16;
-      const red = Math.floor(47 + this.rng() * colorJitter - colorJitter / 2);
-      const green = Math.floor(65 + this.rng() * colorJitter - colorJitter / 2);
-      const blue = Math.floor(35 + this.rng() * colorJitter - colorJitter / 2);
-      const gradient = this.ctx.createRadialGradient(x * this.scaleFactorX, y * this.scaleFactorY, 0, x * this.scaleFactorX, y * this.scaleFactorY, r * this.scaleFactorX);
-      gradient.addColorStop(0, rgbaToCss(red, green, blue, 255));
-      gradient.addColorStop(0.5, rgbaToCss(red, green, blue, 255));
-      gradient.addColorStop(0.7, rgbaToCss(red - 10, green - 10, blue - 10, 225));
-      gradient.addColorStop(0.9, rgbaToCss(0, 0, 0, 0));
-      this.ctx.fillStyle = gradient;
-      this.ctx.fill();
-    })();
-
-    (() => {
-      this.ctx.beginPath();
-      this.ctx.moveTo(x * this.scaleFactorX, y * this.scaleFactorY);
-      let spiralRadius = 0;
-      let theta = 0;
-      let spiralRate = 0.05;
-      while (spiralRadius < r * 0.85) {
-        const spiralX = (x + spiralRadius * Math.cos(theta)) * this.scaleFactorX + (this.rng() - 0.5) * 0.5 * this.scaleFactorX;
-        const spiralY = (y + spiralRadius * Math.sin(theta)) * this.scaleFactorY + (this.rng() - 0.5) * 0.5 * this.scaleFactorY;
-        this.ctx.lineTo(spiralX, spiralY);
-        theta += 0.5;
-        spiralRadius += spiralRate;
-        spiralRate = Math.max(spiralRate - 0.0002, 0.01);
-      }
-      this.ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-      this.ctx.lineWidth = 1;
-      this.ctx.stroke();
-    })();
-  }
-
-  getEdgeTrees(outline) {
-    const edgeTrees = [];
-    let i = 0;
-    let rNext = 2;
-    let rLast;
-    while (i < outline.length) {
-      const [x, y] = outline[i];
-      edgeTrees.push([x, y, rNext]);
-      rLast = rNext;
-      do i += Math.floor(this.rng() * 4);
-      while (outline[i] && (rNext = distance(x, y, ...outline[i]) - rLast) < 1);
-    }
-    return edgeTrees;
-  }
-
   overlay() {
     return new Promise((resolve, reject) => {
-      this.getEdgeTrees(this.outline).forEach(tree => this.drawTree(...tree));
-      const trees = [];
-      this.mask.forEach((x, y) => {
-        if (this.rng() < 0.001) trees.push([x, y, this.rng() * 2.5 + 5]);
-        if (this.rng() < 0.17) trees.push([x, y, this.rng() * 2.5 + 1.25]);
+      this.ctx.save();
+      const bounds = this.getBounds();
+      const width = this.getWidth();
+      const height = this.getHeight();
+      const gradient = this.ctx.createRadialGradient(
+        bounds.minX * this.scaleFactorX,
+        bounds.minY * this.scaleFactorY,
+        0,
+        bounds.minX * this.scaleFactorX,
+        bounds.minY * this.scaleFactorY,
+        width > height ? width * this.scaleFactorX * 1.25: height * this.scaleFactorY * 1.25);
+      gradient.addColorStop(0, 'rgba(153,170,116,1)');
+      gradient.addColorStop(0.5, 'rgba(95,118,73,1)');
+      gradient.addColorStop(0.75, 'rgba(67,92,62,1)');
+      gradient.addColorStop(1, 'rgba(31,44,34,1)');
+
+      this.fillShape(this.leafyOutlineShape, gradient);
+
+      this.leafyOutlineShape.forEach(path => {
+        this.drawPath(path);
       });
-      trees.sort((treeA, treeB) => treeA[2] - treeB[2]).forEach(tree => this.drawTree(...tree));
+      this.ctx.lineCap = 'round';
+      this.ctx.lineJoin = 'round';
+      this.ctx.miterLimit = 3;
+      this.ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      this.ctx.lineWidth = this.scaleFactorX * 0.5;
+      this.ctx.stroke();
+      this.ctx.restore();
+
+      this.leafyOutlineShape.forEach(path => {
+        this.drawPath(path);
+      });
+      this.ctx.lineCap = 'round';
+      this.ctx.lineJoin = 'round';
+      this.ctx.miterLimit = 3;
+      this.ctx.strokeStyle = '#1d270c';
+      this.ctx.lineWidth = this.scaleFactorX * 0.2;
+      this.ctx.stroke();
+
       resolve();
     });
   }
