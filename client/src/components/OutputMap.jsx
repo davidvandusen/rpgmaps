@@ -80,6 +80,16 @@ class OutputMap extends React.Component {
     this.ctx.stroke();
   }
 
+  drawWatermark() {
+    const g = this.canvas.width / 256;
+    const f = this.canvas.width / 64;
+    this.ctx.font = `${f / 1.5}px serif`;
+    this.ctx.fillStyle = 'black';
+    this.ctx.fillText('rpgmaps.herokuapp.com v' + APP_VERSION, f + g + 1, this.canvas.height - g + 1);
+    this.ctx.fillStyle = 'white';
+    this.ctx.fillText('rpgmaps.herokuapp.com v' + APP_VERSION, f + g, this.canvas.height - g);
+  }
+
   applyGlobalLight() {
     let gradient;
 
@@ -112,13 +122,13 @@ class OutputMap extends React.Component {
       new terrainClasses[area.ctor](this.props.mapData, areaIndex, this.ctx, rng));
     new Promise((resolve, reject) => {
       (function next(index) {
-        if (mapComponents[index]) requestAnimationFrame(() => mapComponents[index].base().then(() => next(index + 1)));
+        if (mapComponents[index]) mapComponents[index].base().then(() => requestAnimationFrame(() => next(index + 1)));
         else resolve();
       })(0);
     }).then(() => {
       return new Promise((resolve, reject) => {
         (function next(index) {
-          if (mapComponents[index]) requestAnimationFrame(() => mapComponents[index].overlay().then(() => next(index + 1)));
+          if (mapComponents[index]) mapComponents[index].overlay().then(() => requestAnimationFrame(() => next(index + 1)));
           else resolve();
         })(0);
       });
@@ -126,6 +136,7 @@ class OutputMap extends React.Component {
       this.drawGrid();
       this.drawBorder();
       this.applyGlobalLight();
+      this.drawWatermark();
       addNoise(this.ctx, 8);
       this.drawing = false;
       if (this.pendingDraw) {

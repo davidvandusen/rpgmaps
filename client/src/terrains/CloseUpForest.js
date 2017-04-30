@@ -49,7 +49,7 @@ class CloseUpForest extends BaseTerrain {
   base() {
     return new Promise((resolve, reject) => {
       const shape = this.makeSparseShape(this.smoothOutlineShape, 4, 0.5, 0.8);
-      this.leafyOutlineShape = this.makeLeafyOutlineShape(shape, 0.3, 20);
+      this.leafyOutlineShape = this.makeLeafyOutlineShape(shape, 0.3, 8);
 
       this.ctx.save();
       this.ctx.translate(this.scaleFactorX, this.scaleFactorY);

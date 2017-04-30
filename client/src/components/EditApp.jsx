@@ -10,7 +10,7 @@ class EditApp extends React.Component {
   constructor(props) {
     super(props);
     this.roomName = location.pathname.substring(1, location.pathname.indexOf('/', 1));
-    this.state = {
+    this.state = Object.assign({
       imageData: undefined,
       status: 'init',
       mapData: undefined,
@@ -18,7 +18,7 @@ class EditApp extends React.Component {
       brushSize: this.props.config.input.brush.size.default,
       title: `Edit ${this.roomName} - RPG Maps`,
       mode: 'horizontal-split'
-    };
+    }, this.fetchPersistentState());
     this.modes = [{
       id: 'horizontal-split',
       name: 'Horizontal Split'
@@ -107,8 +107,43 @@ class EditApp extends React.Component {
         this.setState({mapData, status: 'ready'}, this.processImageData)));
   }
 
+  fetchPersistentState() {
+    return JSON.parse(window.localStorage.getItem('EditApp'));
+  }
+
+  loadState() {
+    return new Promise((resolve, reject) => {
+      try {
+        const persistentState = this.fetchPersistentState();
+        if (persistentState) this.setState(persistentState, resolve);
+        else resolve();
+      } catch (err) {
+        reject('Failed to parse saved state');
+      }
+    });
+  }
+
+  saveState() {
+    window.localStorage.setItem('EditApp', JSON.stringify(this.saveableState()));
+  }
+
+  saveableState() {
+    return EditApp.persistentState.reduce((partialState, key) => {
+      partialState[key] = this.state[key];
+      return partialState;
+    }, {});
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (EditApp.persistentState.some(key => this.state[key] !== prevState[key])) {
+      this.saveState();
+    }
+  }
+
   componentDidMount() {
-    this.setState({status: 'ready'}, this.processImageData);
+    this.loadState().then(() => {
+      this.setState({status: 'ready'}, this.processImageData);
+    });
     this.socket = io();
     this.socket.emit('joinRoom', {
       roomName: this.roomName,
@@ -200,5 +235,7 @@ class EditApp extends React.Component {
     );
   }
 }
+
+EditApp.persistentState = ['terrain', 'brushSize', 'mode'];
 
 module.exports = EditApp;
