@@ -5,20 +5,24 @@ const InputMap = require('./InputMap.jsx');
 const Bento = require('./Bento.jsx');
 const OutputMap = require('./OutputMap.jsx');
 const mapDataFactory = require('../common/mapDataFactory');
+const persistence = require('../common/persistence');
 
 class EditApp extends React.Component {
   constructor(props) {
     super(props);
+    this.mapDataFactory = mapDataFactory(this.props.config.terrains);
     this.roomName = location.pathname.substring(1, location.pathname.indexOf('/', 1));
+    const mapData = mapDataFactory.hydrateJSON(persistence.load('mapData'));
+    const imageData = mapData && this.mapDataFactory.toImageData(mapData);
     this.state = Object.assign({
-      imageData: undefined,
-      status: 'init',
-      mapData: undefined,
-      terrain: 1,
       brushSize: this.props.config.input.brush.size.default,
-      title: `Edit ${this.roomName} - RPG Maps`,
-      mode: 'horizontal-split'
-    }, this.fetchPersistentState());
+      imageData: imageData,
+      mapData: undefined,
+      mode: 'horizontal-split',
+      status: 'init',
+      terrain: 1,
+      title: `Edit ${this.roomName} - RPG Maps`
+    }, persistence.load('persistentSettings'));
     this.modes = [{
       id: 'horizontal-split',
       name: 'Horizontal Split'
@@ -36,7 +40,6 @@ class EditApp extends React.Component {
       // DOWN
       221: () => this.setBrushSize(this.state.brushSize + 1)
     };
-    this.mapDataFactory = mapDataFactory(this.props.config.terrains);
     this.updateImageData = this.updateImageData.bind(this);
     this.publishMap = this.publishMap.bind(this);
     this.setTerrain = this.setTerrain.bind(this);
@@ -70,23 +73,15 @@ class EditApp extends React.Component {
 
   setBrushSize(newBrushSize) {
     let brushSize = newBrushSize;
-    if (newBrushSize > this.props.config.input.brush.size.max) {
-      brushSize = this.props.config.input.brush.size.max;
-    }
-    if (newBrushSize < this.props.config.input.brush.size.min) {
-      brushSize = this.props.config.input.brush.size.min;
-    }
+    if (newBrushSize > this.props.config.input.brush.size.max) brushSize = this.props.config.input.brush.size.max;
+    if (newBrushSize < this.props.config.input.brush.size.min) brushSize = this.props.config.input.brush.size.min;
     this.setState({brushSize});
   }
 
   setTerrain(newTerrain) {
     let terrain = newTerrain;
-    if (terrain < 0) {
-      terrain = this.props.config.terrains.length - 1;
-    }
-    if (terrain >= this.props.config.terrains.length) {
-      terrain = 0;
-    }
+    if (terrain < 0) terrain = this.props.config.terrains.length - 1;
+    if (terrain >= this.props.config.terrains.length) terrain = 0;
     this.setState({terrain});
   }
 
@@ -107,43 +102,21 @@ class EditApp extends React.Component {
         this.setState({mapData, status: 'ready'}, this.processImageData)));
   }
 
-  fetchPersistentState() {
-    return JSON.parse(window.localStorage.getItem('EditApp'));
-  }
-
-  loadState() {
-    return new Promise((resolve, reject) => {
-      try {
-        const persistentState = this.fetchPersistentState();
-        if (persistentState) this.setState(persistentState, resolve);
-        else resolve();
-      } catch (err) {
-        reject('Failed to parse saved state');
-      }
-    });
-  }
-
-  saveState() {
-    window.localStorage.setItem('EditApp', JSON.stringify(this.saveableState()));
-  }
-
-  saveableState() {
-    return EditApp.persistentState.reduce((partialState, key) => {
-      partialState[key] = this.state[key];
-      return partialState;
-    }, {});
-  }
-
   componentDidUpdate(prevProps, prevState) {
-    if (EditApp.persistentState.some(key => this.state[key] !== prevState[key])) {
-      this.saveState();
+    if (EditApp.persistentSettings.some(key => this.state[key] !== prevState[key])) {
+      const settings = EditApp.persistentSettings.reduce((persistentSettings, key) => {
+        persistentSettings[key] = this.state[key];
+        return persistentSettings;
+      }, {});
+      persistence.save('persistentSettings', settings);
+    }
+    if (prevState.mapData !== this.state.mapData) {
+      persistence.save('mapData', this.state.mapData);
     }
   }
 
   componentDidMount() {
-    this.loadState().then(() => {
-      this.setState({status: 'ready'}, this.processImageData);
-    });
+    this.setState({status: 'ready'}, this.processImageData);
     this.socket = io();
     this.socket.emit('joinRoom', {
       roomName: this.roomName,
@@ -236,6 +209,6 @@ class EditApp extends React.Component {
   }
 }
 
-EditApp.persistentState = ['terrain', 'brushSize', 'mode'];
+EditApp.persistentSettings = ['terrain', 'brushSize', 'mode'];
 
 module.exports = EditApp;

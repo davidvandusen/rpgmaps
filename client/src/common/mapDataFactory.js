@@ -1,23 +1,36 @@
 const {imageDataToAreaDescriptors} = require('../common/imageData');
 const {outlineMask, smoothPolygon, containmentGraph} = require('../common/geometry');
-const {intToCssHex} = require('../common/color');
+const {intToCssHex, cssToRgba} = require('../common/color');
+const AreaMask = require('./AreaMask');
 
 function mapDataFactory(configTerrains) {
-  const terrainsIndex = configTerrains.reduce((obj, terrain) => {
+  const terrainsByColor = configTerrains.reduce((obj, terrain) => {
     obj[terrain.color] = terrain;
     return obj;
   }, {});
 
-  function getTerrain(color) {
-    return terrainsIndex[intToCssHex(color)];
+  const terrainsByClassName = configTerrains.reduce((obj, terrain) => {
+    obj[terrain.className] = terrain;
+    return obj;
+  }, {});
+
+  function getTerrainByColor(color) {
+    return terrainsByColor[intToCssHex(color)];
+  }
+
+  function getTerrainByClassName(className) {
+    return terrainsByClassName[className];
   }
 
   function fromImageData(imageData) {
     return imageDataToAreaDescriptors(imageData).then(areaDescriptors => {
-      areaDescriptors.forEach(ad => ad.terrain = getTerrain(ad.color));
+      areaDescriptors.forEach(ad => ad.terrain = getTerrainByColor(ad.color));
       areaDescriptors = areaDescriptors.filter(ad => ad.terrain);
       areaDescriptors.sort((ad1, ad2) => ad1.terrain.layer - ad2.terrain.layer);
-      const mapData = {};
+      const mapData = {
+        height: imageData.height,
+        width: imageData.width
+      };
       mapData.outlines = new Array(areaDescriptors.length);
       mapData.smoothOutlines = new Array(areaDescriptors.length);
       mapData.areas = new Array(areaDescriptors.length);
@@ -38,9 +51,31 @@ function mapDataFactory(configTerrains) {
     });
   }
 
+  function toImageData(mapData) {
+    const length = mapData.width * mapData.height * 4;
+    const data = new Uint8ClampedArray(length);
+    mapData.areas.forEach(area => {
+      const rgba = cssToRgba(getTerrainByClassName(area.ctor).color);
+      area.mask.forEach((x, y, i) => {
+        const offset = i * 4;
+        data[offset] = rgba[0];
+        data[offset + 1] = rgba[1];
+        data[offset + 2] = rgba[2];
+        data[offset + 3] = rgba[3];
+      });
+    });
+    return new ImageData(data, mapData.width, mapData.height);
+  }
+
   return {
-    fromImageData
+    fromImageData,
+    toImageData
   };
 }
+
+mapDataFactory.hydrateJSON = function (mapData) {
+  mapData.areas.forEach(area => area.mask = AreaMask.fromJSON(area.mask));
+  return mapData;
+};
 
 module.exports = mapDataFactory;

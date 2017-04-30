@@ -1,7 +1,7 @@
 require('../../styles/edit-app.scss');
 const React = require('react');
 const OutputMap = require('./OutputMap.jsx');
-const AreaMask = require('../common/AreaMask');
+const mapDataFactory = require('../common/mapDataFactory');
 
 class PlayApp extends React.Component {
   constructor(props) {
@@ -20,7 +20,7 @@ class PlayApp extends React.Component {
       to: 'play'
     });
     this.socket.on('publishMap', mapData => {
-      mapData.areas.forEach(area => area.mask = AreaMask.fromJSON(area.mask));
+      mapDataFactory.hydrateJSON(mapData);
       this.setState({mapData});
     });
   }
