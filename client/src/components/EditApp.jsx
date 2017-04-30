@@ -12,7 +12,8 @@ class EditApp extends React.Component {
     super(props);
     this.mapDataFactory = mapDataFactory(this.props.config.terrains);
     this.roomName = location.pathname.substring(1, location.pathname.indexOf('/', 1));
-    const mapData = mapDataFactory.hydrateJSON(persistence.load('mapData'));
+    const storedMapData = persistence.load('mapData');
+    const mapData = storedMapData && mapDataFactory.hydrateJSON(storedMapData);
     const imageData = mapData && this.mapDataFactory.toImageData(mapData);
     this.state = Object.assign({
       brushSize: this.props.config.input.brush.size.default,
