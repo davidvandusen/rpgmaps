@@ -52,6 +52,12 @@
       "color": "#8ec2d6",
       "className": "CloseUpRiver",
       "layer": 3
+    },
+    {
+      "name": "Solid Stone",
+      "color": "#5d534b",
+      "className": "SolidStone",
+      "layer": 10
     }
   ]
 }

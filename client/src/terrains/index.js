@@ -3,11 +3,13 @@ const CloseUpPath = require('./CloseUpPath');
 const CloseUpRoad = require('./CloseUpRoad');
 const CloseUpForest = require('./CloseUpForest');
 const CloseUpRiver = require('./CloseUpRiver');
+const SolidStone = require('./SolidStone');
 
 module.exports = {
   CloseUpGrass,
   CloseUpPath,
   CloseUpRoad,
   CloseUpForest,
-  CloseUpRiver
+  CloseUpRiver,
+  SolidStone
 };

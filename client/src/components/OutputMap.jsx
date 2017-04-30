@@ -91,6 +91,7 @@ class OutputMap extends React.Component {
   }
 
   applyGlobalLight() {
+    this.ctx.save();
     let gradient;
 
     gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, Math.sqrt(Math.pow(this.canvas.width, 2) + Math.pow(this.canvas.height, 2)));
@@ -107,12 +108,13 @@ class OutputMap extends React.Component {
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.ctx.globalCompositeOperation = 'source-over';
+    this.ctx.restore();
   }
 
   draw() {
     if (this.drawing) {
       this.pendingDraw = true;
+      return;
     }
     this.drawing = true;
     this.ctx.fillStyle = '#c4b191';
@@ -133,15 +135,19 @@ class OutputMap extends React.Component {
         })(0);
       });
     }).then(() => {
-      this.drawGrid();
-      this.drawBorder();
-      this.applyGlobalLight();
-      this.drawWatermark();
-      addNoise(this.ctx, 8);
+      return new Promise((resolve, reject) => requestAnimationFrame(() => {
+        this.drawGrid();
+        this.drawBorder();
+        this.applyGlobalLight();
+        this.drawWatermark();
+        addNoise(this.ctx, 8);
+        resolve();
+      }));
+    }).then(() => {
       this.drawing = false;
       if (this.pendingDraw) {
         this.pendingDraw = false;
-        setTimeout(this.draw, 0);
+        requestAnimationFrame(this.draw);
       }
     });
   }
