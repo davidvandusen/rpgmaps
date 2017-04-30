@@ -13,6 +13,10 @@ fi
 
 sed -i -bak "s/\"version\":.*,/\"version\": \"$V\",/g" ./package.json ./server/package.json ./client/package.json
 
+git add ./package.json ./server/package.json ./client/package.json
+
+git commit -m "Version ${V}"
+
 git tag ${V}
 
 echo "Updated to version $V"
