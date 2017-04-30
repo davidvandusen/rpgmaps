@@ -1,6 +1,6 @@
 {
   "name": "rpgmaps-server",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Tabletop roleplaying game map creation tool",
   "author": "David VanDusen <github@davidvandusen.com>",
   "repository": {
