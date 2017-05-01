@@ -81,13 +81,14 @@ class OutputMap extends React.Component {
   }
 
   drawWatermark() {
-    const g = this.canvas.width / 256;
-    const f = this.canvas.width / 64;
-    this.ctx.font = `${f / 1.5}px serif`;
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillText('rpgmaps.herokuapp.com v' + APP_VERSION, f + g + 1, this.canvas.height - g + 1);
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillText('rpgmaps.herokuapp.com v' + APP_VERSION, f + g, this.canvas.height - g);
+    const watermarkOffset = this.canvas.width / 256;
+    const borderWidth = this.canvas.width / 64;
+    const watermarkText = 'rpgmaps.herokuapp.com v' + APP_VERSION;
+    this.ctx.font = `${borderWidth / 1.5}px sans-serif`;
+    this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    this.ctx.fillText(watermarkText, borderWidth + watermarkOffset + 1, this.canvas.height - borderWidth - watermarkOffset + 1);
+    this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    this.ctx.fillText(watermarkText, borderWidth + watermarkOffset, this.canvas.height - borderWidth - watermarkOffset);
   }
 
   applyGlobalLight() {
@@ -124,13 +125,13 @@ class OutputMap extends React.Component {
       new terrainClasses[area.ctor](this.props.mapData, areaIndex, this.ctx, rng));
     new Promise((resolve, reject) => {
       (function next(index) {
-        if (mapComponents[index]) mapComponents[index].base().then(() => requestAnimationFrame(() => next(index + 1)));
+        if (mapComponents[index]) mapComponents[index].base().then(() => setTimeout(() => next(index + 1), 0));
         else resolve();
       })(0);
     }).then(() => {
       return new Promise((resolve, reject) => {
         (function next(index) {
-          if (mapComponents[index]) mapComponents[index].overlay().then(() => requestAnimationFrame(() => next(index + 1)));
+          if (mapComponents[index]) mapComponents[index].overlay().then(() => setTimeout(() => next(index + 1), 0));
           else resolve();
         })(0);
       });

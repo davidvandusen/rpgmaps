@@ -22,7 +22,7 @@ class Controls extends React.Component {
         <div className="control-list">
           <div className="control-list-heading">Publication</div>
           <div className="control-list-item interactable" onClick={this.props.publishMap}>
-            <div className="control-list-item-heading">Publish Current Map</div>
+            <div className="control-list-item-heading">Show To Players</div>
           </div>
           <a
             className="control-list-item interactable"

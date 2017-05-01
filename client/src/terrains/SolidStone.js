@@ -4,9 +4,6 @@ const {rgbaToCss} = require('../common/color');
 class SolidStone extends BaseTerrain {
   base() {
     return new Promise((resolve, reject) => {
-      this.ctx.save();
-      this.fillShape(this.smoothOutlineShape, '#5d534b');
-      this.ctx.restore();
       resolve();
     });
   }
@@ -14,7 +11,7 @@ class SolidStone extends BaseTerrain {
   overlay() {
     return new Promise((resolve, reject) => {
       this.ctx.save();
-      this.clipShape(this.smoothOutlineShape);
+      this.fillShape(this.smoothOutlineShape, '#5d534b');
       this.ctx.lineCap = 'round';
       this.smoothOutlineShape.forEach(path => {
         let lastPoint = path[path.length - 1];

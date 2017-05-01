@@ -16,6 +16,10 @@ module.exports = {
   },
   module: {
     rules: [{
+      test: /\.scss$/,
+      include: [path.resolve(__dirname, 'styles')],
+      use: ['style-loader', 'css-loader', 'sass-loader']
+    }, {
       test: /\.js$/,
       include: [
         path.resolve(__dirname, 'src'),
