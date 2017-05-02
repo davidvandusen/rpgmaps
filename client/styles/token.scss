@@ -1,18 +1,12 @@
 $token-size: 40px;
 
 .token {
-  background: radial-gradient(ellipse at center, #555 0%, #333 40%, #000 100%);
+  background: #000;
+  border: 2px solid #baa97b;
   border-radius: $token-size / 2;
-  box-shadow:
-    inset -1px -1px 1px 0 #20190a,
-    inset 1px 1px 1px 0 #baa97b,
-    inset 0 0 0 2px #4d3318,
-    inset 2px 2px 2px 0 #333,
-    inset 3px 3px 5px 0 #888,
-    1px 1px 3px rgba(0,0,0,0.5);
+  box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.5);
   box-sizing: border-box;
   color: rgba(255,255,255,0.9);
-  cursor: pointer;
   height: $token-size;
   left: 50%;
   position: absolute;
@@ -23,17 +17,14 @@ $token-size: 40px;
 
 .token-banner {
   background: black;
-  box-shadow:
-    inset -1px -1px 1px 0 #20190a,
-    inset 1px 1px 1px 0 #baa97b,
-    inset 0 0 0 2px #4d3318,
-    1px 1px 3px rgba(0,0,0,0.5);
+  border: 2px solid #baa97b;
+  box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.5);
   box-sizing: border-box;
   font-size: 9px;
   font-weight: $font-weight-light;
   height: 14px;
-  left: -5px;
-  line-height: 14px;
+  left: -7px;
+  line-height: 10px;
   overflow: hidden;
   position: absolute;
   text-align: center;
@@ -43,14 +34,24 @@ $token-size: 40px;
   width: $token-size + 10px;
 }
 
+.token-grip {
+  background-image: radial-gradient(rgba(127,127,127,0.75) 50%, transparent 0);
+  background-size: 4px 4px;
+  cursor: move;
+  height: 12px;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 12px;
+}
+
 .token-id {
   bottom: 9px;
-  border-radius: $token-size / 2 - 4px;
   font-size: 20px;
   font-weight: $font-weight-bold;
   height: $token-size - 4px;
   left: 2px;
-  line-height: $token-size - 4px;
+  line-height: $token-size - 6px;
   overflow: hidden;
   position: absolute;
   right: 2px;
@@ -60,7 +61,7 @@ $token-size: 40px;
 }
 
 .token-add {
-  background-color: lighten(green, 1);
+  background-color: lighten(#186a3b, 1);
   border-top-right-radius: $token-size / 2;
   border-bottom-right-radius: $token-size / 2;
   color: white;
@@ -82,7 +83,7 @@ $token-size: 40px;
   }
 
   &:hover {
-    background-color: lighten(green, 15);
+    background-color: lighten(#186a3b, 15);
     left: 0;
   }
 }
