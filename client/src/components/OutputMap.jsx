@@ -81,14 +81,45 @@ class OutputMap extends React.Component {
   }
 
   drawWatermark() {
-    const watermarkOffset = this.canvas.width / 256;
+    const offset = this.canvas.width / 128;
     const borderWidth = this.canvas.width / 64;
     const watermarkText = 'rpgmaps.herokuapp.com v' + APP_VERSION;
-    this.ctx.font = `${borderWidth / 1.5}px sans-serif`;
+    this.ctx.font = `${borderWidth * 0.7}px sans-serif`;
     this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    this.ctx.fillText(watermarkText, borderWidth + watermarkOffset + 1, this.canvas.height - borderWidth - watermarkOffset + 1);
+    this.ctx.fillText(watermarkText, borderWidth + offset + 1, this.canvas.height - borderWidth - offset + 1);
     this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    this.ctx.fillText(watermarkText, borderWidth + watermarkOffset, this.canvas.height - borderWidth - watermarkOffset);
+    this.ctx.fillText(watermarkText, borderWidth + offset, this.canvas.height - borderWidth - offset);
+  }
+
+  drawScaleText() {
+    const offset = this.canvas.width / 128;
+    const borderWidth = this.canvas.width / 64;
+    const watermarkHeight = offset * 2.2;
+    const scaleText = '1 square = 5 feet';
+    this.ctx.font = `${borderWidth}px serif`;
+    this.ctx.fillStyle = 'rgb(255,255,255)';
+    this.ctx.fillText(scaleText, borderWidth + offset, this.canvas.height - borderWidth - offset - watermarkHeight);
+  }
+
+  drawCompassRose() {
+    const offset = this.canvas.width / 128;
+    const unit = this.canvas.width / 256;
+    const borderWidth = this.canvas.width / 64;
+    const textSectionHeight = offset * 10;
+    this.ctx.translate(borderWidth + unit * 12, this.canvas.height - borderWidth - textSectionHeight);
+    this.ctx.rotate(0);
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, 0);
+    this.ctx.lineTo(0, unit * -10);
+    this.ctx.lineTo(unit * 2, unit * -4);
+    this.ctx.lineTo(unit * 0.5, unit * -4);
+    this.ctx.lineTo(unit * 0.5, 0);
+    this.ctx.closePath();
+    this.ctx.fillStyle = 'rgb(255,255,255)';
+    this.ctx.fill();
+    this.ctx.font = `${borderWidth * 1.7}px serif`;
+    this.ctx.fillText('N', -offset, borderWidth * 1.7);
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   applyGlobalLight() {
@@ -141,6 +172,8 @@ class OutputMap extends React.Component {
         this.drawBorder();
         this.applyGlobalLight();
         this.drawWatermark();
+        this.drawScaleText();
+        this.drawCompassRose();
         addNoise(this.ctx, 8);
         resolve();
       }));

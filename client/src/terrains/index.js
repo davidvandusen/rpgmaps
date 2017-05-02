@@ -4,6 +4,7 @@ const CloseUpRoad = require('./CloseUpRoad');
 const CloseUpForest = require('./CloseUpForest');
 const CloseUpRiver = require('./CloseUpRiver');
 const SolidStone = require('./SolidStone');
+const StoneGround = require('./StoneGround');
 
 module.exports = {
   CloseUpGrass,
@@ -11,5 +12,6 @@ module.exports = {
   CloseUpRoad,
   CloseUpForest,
   CloseUpRiver,
-  SolidStone
+  SolidStone,
+  StoneGround
 };

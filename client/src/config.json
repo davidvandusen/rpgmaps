@@ -54,6 +54,12 @@
       "layer": 3
     },
     {
+      "name": "Stone Ground",
+      "color": "#989389",
+      "className": "StoneGround",
+      "layer": 2
+    },
+    {
       "name": "Solid Stone",
       "color": "#5d534b",
       "className": "SolidStone",
