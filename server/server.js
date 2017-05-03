@@ -14,6 +14,7 @@ app.use(express.static('build'));
 app.use(express.static('public'));
 
 app.use((req, res, next) => {
+  res.locals.env = process.env.NODE_ENV;
   res.locals.version = packageJson.version;
   next();
 });

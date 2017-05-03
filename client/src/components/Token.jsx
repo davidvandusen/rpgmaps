@@ -85,16 +85,17 @@ class Token extends React.Component {
   }
 
   render() {
-    const styleObject = {
+    const positionObject = {};
+    if (this.state.x !== undefined) positionObject.left = `${this.state.x}px`;
+    if (this.state.y !== undefined) positionObject.top = `${this.state.y}px`;
+    const colorObject = {
       background: this.backgroundColor()
     };
-    if (this.state.x !== undefined) styleObject.left = `${this.state.x}px`;
-    if (this.state.y !== undefined) styleObject.top = `${this.state.y}px`;
     return (
       <div
         ref={el => this.el = el}
         className="token"
-        style={styleObject}>
+        style={positionObject}>
         <div
           className="token-id"
           contentEditable="true"
@@ -102,6 +103,7 @@ class Token extends React.Component {
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck="false"
+          style={colorObject}
           onInput={this.idChanged}
           onBlur={this.idChanged} />
         <div
