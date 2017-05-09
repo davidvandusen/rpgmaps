@@ -44,7 +44,13 @@ class InputMap extends React.Component {
   drawBrush() {
     if (this.mouse.x === undefined || this.mouse.y === undefined) return;
     this.ctx.beginPath();
-    this.ctx.arc(this.mouse.x + 0.5, this.mouse.y + 0.5, this.props.brushSize / 2, 0, Math.PI * 2, true);
+    let cx = this.mouse.x;
+    let cy = this.mouse.y;
+    if (this.props.brushSize % 2) {
+      cx += 0.5;
+      cy += 0.5;
+    }
+    this.ctx.arc(cx, cy, this.props.brushSize / 2, 0, Math.PI * 2, true);
     this.ctx.strokeStyle = 'rgba(255,255,255,1)';
     this.ctx.stroke();
     this.ctx.fillStyle = rgbaToCss(...this.brushColor.slice(0, 3), 127);
@@ -82,7 +88,13 @@ class InputMap extends React.Component {
         const n = Math.floor(index / 4);
         const x = n % this.paintLayer.width;
         const y = Math.floor(n / this.paintLayer.width);
-        if (pointInCircle(x, y, this.mouse.x, this.mouse.y, this.props.brushSize / 2)) {
+        let cx = this.mouse.x;
+        let cy = this.mouse.y;
+        if (this.props.brushSize % 2 === 0) {
+          cx -= 0.5;
+          cy -= 0.5;
+        }
+        if (pointInCircle(x, y, cx, cy, this.props.brushSize / 2)) {
           data[index] = this.brushColor[0];
           data[index + 1] = this.brushColor[1];
           data[index + 2] = this.brushColor[2];
