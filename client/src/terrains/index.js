@@ -1,17 +1,13 @@
-const CloseUpGrass = require('./CloseUpGrass');
-const CloseUpPath = require('./CloseUpPath');
-const CloseUpRoad = require('./CloseUpRoad');
-const CloseUpForest = require('./CloseUpForest');
-const CloseUpRiver = require('./CloseUpRiver');
-const SolidStone = require('./SolidStone');
-const StoneGround = require('./StoneGround');
-
 module.exports = {
-  CloseUpGrass,
-  CloseUpPath,
-  CloseUpRoad,
-  CloseUpForest,
-  CloseUpRiver,
-  SolidStone,
-  StoneGround
+  Boulder: require('./Boulder'),
+  CloseUpForest: require('./CloseUpForest'),
+  CloseUpGrass: require('./CloseUpGrass'),
+  CloseUpPath: require('./CloseUpPath'),
+  CloseUpRiver: require('./CloseUpRiver'),
+  CloseUpRoad: require('./CloseUpRoad'),
+  FlowingLava: require('./FlowingLava'),
+  IcyGround: require('./IcyGround'),
+  SnowyGround: require('./SnowyGround'),
+  SolidStone: require('./SolidStone'),
+  StoneGround: require('./StoneGround')
 };

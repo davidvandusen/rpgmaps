@@ -100,6 +100,30 @@
       "color": "#5d534b",
       "className": "SolidStone",
       "layer": 0
+    },
+    {
+      "name": "Icy Ground",
+      "color": "#cee5eb",
+      "className": "IcyGround",
+      "layer": 0
+    },
+    {
+      "name": "Snowy Ground",
+      "color": "#f2f3fa",
+      "className": "SnowyGround",
+      "layer": 0
+    },
+    {
+      "name": "Flowing Lava",
+      "color": "#e6403c",
+      "className": "FlowingLava",
+      "layer": 0
+    },
+    {
+      "name": "Boulder",
+      "color": "#c6c1c3",
+      "className": "Boulder",
+      "layer": 5
     }
   ]
 }
