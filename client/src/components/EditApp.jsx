@@ -151,6 +151,7 @@ class EditApp extends React.Component {
         ref={c => this.outputMap = c}
         config={this.props.config}
         showScale={false}
+        grid="off"
         mapData={this.state.mapData}>
         <p className="content-placeholder">Sketch a map and it will be rendered here</p>
       </OutputMap>

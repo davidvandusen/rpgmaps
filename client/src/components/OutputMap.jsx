@@ -229,7 +229,7 @@ class OutputMap extends React.Component {
         this.drawBorder();
         this.applyGlobalLight();
         this.drawWatermark();
-        if (this.props.showScale) {
+        if (this.props.showScale && this.props.grid !== 'off') {
           this.drawScaleText();
         }
         this.drawCompassRose();
