@@ -6,6 +6,7 @@ const terrainClasses = require('../terrains');
 class OutputMap extends React.Component {
   constructor(props) {
     super(props);
+    this.initialRender = true;
     this.draw = this.draw.bind(this);
   }
 
@@ -143,31 +144,37 @@ class OutputMap extends React.Component {
     this.ctx.restore();
   }
 
-  draw() {
+  draw(redraw) {
     if (this.drawing) {
       this.pendingDraw = true;
       return;
     }
+    this.pendingDraw = false;
     this.drawing = true;
-    this.ctx.fillStyle = '#c4b191';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    if (redraw || this.initialRender) {
+      this.initialRender = false;
+      this.ctx.fillStyle = '#c4b191';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
     const rng = seedrandom('');
     const mapComponents = this.props.mapData.areas.map((area, areaIndex) =>
       new terrainClasses[area.ctor](this.props.mapData, areaIndex, this.ctx, rng));
     new Promise((resolve, reject) => {
       (function next(index) {
-        if (mapComponents[index]) mapComponents[index].base().then(() => setTimeout(() => next(index + 1), 0));
+        if (this.pendingDraw) return reject('abort');
+        if (mapComponents[index]) mapComponents[index].base().then(() => setTimeout(next.bind(this, index + 1), 0));
         else resolve();
-      })(0);
+      }).call(this, 0);
     }).then(() => {
       return new Promise((resolve, reject) => {
         (function next(index) {
-          if (mapComponents[index]) mapComponents[index].overlay().then(() => setTimeout(() => next(index + 1), 0));
+          if (this.pendingDraw) return reject('abort');
+          if (mapComponents[index]) mapComponents[index].overlay().then(() => setTimeout(next.bind(this, index + 1), 0));
           else resolve();
-        })(0);
+        }).call(this, 0);
       });
     }).then(() => {
-      return new Promise((resolve, reject) => requestAnimationFrame(() => {
+      return new Promise((resolve, reject) => setTimeout(() => {
         this.drawGrid();
         this.drawBorder();
         this.applyGlobalLight();
@@ -176,13 +183,13 @@ class OutputMap extends React.Component {
         this.drawCompassRose();
         addNoise(this.ctx, 8);
         resolve();
-      }));
+      }, 0));
     }).then(() => {
       this.drawing = false;
-      if (this.pendingDraw) {
-        this.pendingDraw = false;
-        requestAnimationFrame(this.draw);
-      }
+      if (this.pendingDraw) setTimeout(this.draw, 0);
+    }).catch(err => {
+      this.drawing = false;
+      if (err === 'abort') setTimeout(this.draw, 0);
     });
   }
 
