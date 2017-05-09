@@ -66,6 +66,18 @@
   }
 }
 
+.control-list-item-delete {
+  cursor: pointer;
+  display: inline-block;
+  float: right;
+  margin-left: 2px;
+  padding: 3px 4px;
+
+  &:hover {
+    background: rgb(125,0,0);
+  }
+}
+
 .control-list-item-input {
   padding: 0 $spacing-unit;
 }
@@ -101,6 +113,14 @@
   color: rgb(200,200,200);
   padding: 2px;
   width: 40px;
+
+  &.narrow {
+    width: 30px;
+  }
+
+  &.wide {
+    width: 50px;
+  }
 }
 
 .control-list-item-swatch {

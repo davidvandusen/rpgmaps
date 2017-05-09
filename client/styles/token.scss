@@ -4,6 +4,7 @@ $token-border-color: #baa97b;
 $token-border-color-dark: darken(#baa97b, 18);
 
 .token {
+  cursor: move;
   height: $token-size + 2 * $token-hover-buffer;
   left: 50%;
   position: absolute;
@@ -58,25 +59,6 @@ $token-border-color-dark: darken(#baa97b, 18);
   }
 }
 
-.token-grip {
-  background:
-    radial-gradient(rgba(255,255,255,0.75) 50%, transparent 0),
-    radial-gradient(rgba(0,0,0,0.25) 75%, transparent 0);
-  background-size: 4px 4px;
-  cursor: move;
-  height: 12px;
-  opacity: 0.01;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 12px;
-
-  &:hover,
-  .token:hover & {
-    opacity: 1;
-  }
-}
-
 .token-id {
   background: #000;
   border: 2px solid $token-border-color;
@@ -95,32 +77,4 @@ $token-border-color-dark: darken(#baa97b, 18);
   text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
   top: $token-hover-buffer;
   width: $token-size;
-}
-
-.token-add {
-  background-color: lighten(#186a3b, 1);
-  border-top-right-radius: $token-size / 2;
-  border-bottom-right-radius: $token-size / 2;
-  color: white;
-  cursor: pointer;
-  font-size: $token-size / 2;
-  font-weight: $font-weight-bold;
-  height: $token-size;
-  left: -4px;
-  line-height: $token-size;
-  position: fixed;
-  text-align: center;
-  top: 50%;
-  transform: translateY(-$token-size / 2);
-  transition: 300ms;
-  width: $token-size / 2;
-
-  &:before {
-    content: '+';
-  }
-
-  &:hover {
-    background-color: lighten(#186a3b, 15);
-    left: 0;
-  }
 }

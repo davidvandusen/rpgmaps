@@ -1,6 +1,6 @@
 const React = require('react');
 
-class Controls extends React.Component {
+class EditControls extends React.Component {
   constructor(props) {
     super(props);
     this.onBrushSizeChange = this.onBrushSizeChange.bind(this);
@@ -34,7 +34,7 @@ class Controls extends React.Component {
         </div>
         <div className="control-list">
           <div className="control-list-heading">Editor Mode</div>
-          {this.props.modes.map(mode => (
+          {this.props.config.ui.mode.options.map(mode => (
             <div
               key={mode.id}
               className={`control-list-item interactable ${this.props.mode === mode.id ? 'current' : ''}`}
@@ -98,4 +98,4 @@ class Controls extends React.Component {
   }
 }
 
-module.exports = Controls;
+module.exports = EditControls;

@@ -1,6 +1,6 @@
 require('../../styles/edit-app.scss');
 const React = require('react');
-const Controls = require('./Controls.jsx');
+const EditControls = require('./EditControls.jsx');
 const InputMap = require('./InputMap.jsx');
 const Bento = require('./Bento.jsx');
 const OutputMap = require('./OutputMap.jsx');
@@ -19,18 +19,11 @@ class EditApp extends React.Component {
       brushSize: this.props.config.input.brush.size.default,
       imageData: imageData,
       mapData: undefined,
-      mode: 'horizontal-split',
+      mode: this.props.config.ui.mode.default,
       status: 'init',
       terrain: 1,
       title: `Edit ${this.roomName} - RPG Maps`
-    }, persistence.load('persistentSettings'));
-    this.modes = [{
-      id: 'horizontal-split',
-      name: 'Horizontal Split'
-    }, {
-      id: 'overlay',
-      name: 'Overlay'
-    }];
+    }, persistence.load('persistentEditAppSettings'));
     this.keymap = {
       // [
       38: () => this.setTerrain(this.state.terrain - 1),
@@ -109,7 +102,7 @@ class EditApp extends React.Component {
         persistentSettings[key] = this.state[key];
         return persistentSettings;
       }, {});
-      persistence.save('persistentSettings', settings);
+      persistence.save('persistentEditAppSettings', settings);
     }
     if (prevState.mapData !== this.state.mapData) {
       persistence.save('mapData', this.state.mapData);
@@ -157,6 +150,7 @@ class EditApp extends React.Component {
       <OutputMap
         ref={c => this.outputMap = c}
         config={this.props.config}
+        showScale={false}
         mapData={this.state.mapData}>
         <p className="content-placeholder">Sketch a map and it will be rendered here</p>
       </OutputMap>
@@ -164,7 +158,6 @@ class EditApp extends React.Component {
     if (this.state.mode === 'horizontal-split') {
       maps = (
         <Bento
-          ref={el => this.mapBento = el}
           geometryChanged={this.mapGeometryChanged}
           orientation="horizontal"
           minOffsetPercent={15}
@@ -186,13 +179,12 @@ class EditApp extends React.Component {
     }
     return (
       <Bento
-        ref={el => this.controlsBento = el}
         geometryChanged={this.mapGeometryChanged}
         orientation="vertical"
         defaultOffsetPixels={150}
         minOffsetPixels={130}
         maxOffsetPixels={300}>
-        <Controls
+        <EditControls
           setTerrain={this.setTerrain}
           setBrushSize={this.setBrushSize}
           publishMap={this.publishMap}
@@ -201,7 +193,6 @@ class EditApp extends React.Component {
           config={this.props.config}
           terrain={this.state.terrain}
           mode={this.state.mode}
-          modes={this.modes}
           brushSize={this.state.brushSize}
           status={this.state.status} />
         {maps}

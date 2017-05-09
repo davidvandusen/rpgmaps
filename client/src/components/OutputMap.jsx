@@ -18,25 +18,67 @@ class OutputMap extends React.Component {
     this.canvas.style.width = (this.props.config.output.canvas.resolution.width * this.scaleFactor) + 'px';
   }
 
-  drawGrid() {
-    const gridSpacing = this.canvas.width / 32;
+  setGridStyle() {
     this.ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     this.ctx.lineWidth = this.canvas.width / 1280;
     this.ctx.lineJoin = 'miter';
     this.ctx.lineCap = 'butt';
     this.ctx.setLineDash([]);
+  }
+
+  drawSquareGrid() {
+    const gridSpacing = this.canvas.width / 40;
+    this.ctx.beginPath();
     for (let i = gridSpacing; i < this.canvas.width; i += gridSpacing) {
-      this.ctx.beginPath();
       this.ctx.moveTo(i, 0);
       this.ctx.lineTo(i, this.canvas.height);
-      this.ctx.stroke();
     }
     for (let i = gridSpacing; i < this.canvas.height; i += gridSpacing) {
-      this.ctx.beginPath();
       this.ctx.moveTo(0, i);
       this.ctx.lineTo(this.canvas.width, i);
-      this.ctx.stroke();
     }
+    this.setGridStyle();
+    this.ctx.stroke();
+  }
+
+  drawFlatHexGrid() {
+    const gridSpacing = this.canvas.width / 32;
+    let offset = false;
+    this.ctx.beginPath();
+    const height = gridSpacing * Math.sqrt(3) * 0.5;
+    for (let y = 0; y < this.canvas.height; y += height * 0.5) {
+      for (let x = gridSpacing * (offset ? 0.25 : 1); x < this.canvas.width; x += gridSpacing * 1.5) {
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x + gridSpacing * 0.5, y);
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x - gridSpacing * 0.25, y + height * 0.5);
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x - gridSpacing * 0.25, y - height * 0.5);
+      }
+      offset = !offset;
+    }
+    this.setGridStyle();
+    this.ctx.stroke();
+  }
+
+  drawPointyHexGrid() {
+    const gridSpacing = this.canvas.width / 32;
+    let offset = false;
+    this.ctx.beginPath();
+    const width = gridSpacing * Math.sqrt(3) * 0.5;
+    for (let y = 0; y < this.canvas.height; y += gridSpacing * 0.75) {
+      for (let x = width * (offset ? 0.5 : 0); x < this.canvas.width; x += width) {
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x, y + gridSpacing * 0.5);
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x + width * 0.5, y - gridSpacing * 0.25);
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x - width * 0.5, y - gridSpacing * 0.25);
+      }
+      offset = !offset;
+    }
+    this.setGridStyle();
+    this.ctx.stroke();
   }
 
   drawBorder() {
@@ -175,11 +217,21 @@ class OutputMap extends React.Component {
       });
     }).then(() => {
       return new Promise((resolve, reject) => setTimeout(() => {
-        this.drawGrid();
+        if (this.props.grid === 'square') {
+          this.drawSquareGrid();
+        }
+        if (this.props.grid === 'flat-hex') {
+          this.drawFlatHexGrid();
+        }
+        if (this.props.grid === 'pointy-hex') {
+          this.drawPointyHexGrid();
+        }
         this.drawBorder();
         this.applyGlobalLight();
         this.drawWatermark();
-        this.drawScaleText();
+        if (this.props.showScale) {
+          this.drawScaleText();
+        }
         this.drawCompassRose();
         addNoise(this.ctx, 8);
         resolve();
@@ -194,7 +246,9 @@ class OutputMap extends React.Component {
   }
 
   shouldCanvasRedraw() {
-    if (!this.props.mapData || this.props.mapData === this.mapData) return false;
+    if (!this.props.mapData) return false;
+    if (this.props.grid !== this.grid) return true;
+    if (this.props.mapData === this.mapData) return false;
     if (!this.mapData || this.props.mapData.areas.length !== this.mapData.areas.length) return true;
     for (let i = 0; i < this.props.mapData.areas.length; i++) {
       if (this.mapData.areas[i].ctor !== this.props.mapData.areas[i].ctor || !this.mapData.areas[i].mask.equals(this.props.mapData.areas[i].mask)) return true;
@@ -208,6 +262,7 @@ class OutputMap extends React.Component {
 
   componentDidUpdate() {
     if (this.shouldCanvasRedraw()) {
+      this.grid = this.props.grid;
       this.mapData = this.props.mapData;
       this.draw();
     }

@@ -1,27 +1,61 @@
 require('../../styles/play-app.scss');
 const React = require('react');
 const OutputMap = require('./OutputMap.jsx');
+const PlayControls = require('./PlayControls.jsx');
+const Bento = require('./Bento.jsx');
 const mapDataFactory = require('../common/mapDataFactory');
 const Token = require('./Token.jsx');
+const persistence = require('../common/persistence');
 
 class PlayApp extends React.Component {
   constructor(props) {
     super(props);
     this.roomName = location.pathname.substring(1);
-    this.state = {
+    this.state = Object.assign({
       mapData: undefined,
       title: `Play ${this.roomName} - RPG Maps`,
+      grid: this.props.config.output.grid.default,
       tokens: []
-    };
+    }, persistence.load('persistentPlayAppSettings'));
+    this.changeGrid = this.changeGrid.bind(this);
     this.createToken = this.createToken.bind(this);
+    this.mapGeometryChanged = this.mapGeometryChanged.bind(this);
+    this.updateToken = this.updateToken.bind(this);
+    this.deleteToken = this.deleteToken.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this, undefined);
+  }
+
+  changeGrid(grid) {
+    this.setState({grid});
   }
 
   createToken() {
     const tokens = this.state.tokens.concat({
-      key: Math.random()
+      key: Math.random(),
+      id: '',
+      name: ''
     });
     this.setState({tokens});
+  }
+
+  updateToken(key, prop, value) {
+    const tokens = this.state.tokens;
+    const token = tokens.find(token => token.key === key);
+    token[prop] = value;
+    this.setState({tokens});
+  }
+
+  deleteToken(key) {
+    this.state.tokens.splice(this.state.tokens.findIndex(token => token.key === key), 1);
+    this.setState({tokens: this.state.tokens});
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const settings = PlayApp.persistentSettings.reduce((persistentSettings, key) => {
+      persistentSettings[key] = this.state[key];
+      return persistentSettings;
+    }, {});
+    persistence.save('persistentPlayAppSettings', settings);
   }
 
   componentDidMount() {
@@ -42,21 +76,39 @@ class PlayApp extends React.Component {
     window.removeEventListener('resize', this.forceUpdate);
   }
 
+  mapGeometryChanged() {
+    this.outputMap.forceUpdate();
+  }
+
   render() {
     document.title = this.state.title;
     return (
       <div className="full-screen-container">
-        <OutputMap
-          ref={c => this.outputMap = c}
-          config={this.props.config}
-          mapData={this.state.mapData}>
-          <p className="content-placeholder">No map published yet. To publish a map to this page, go to <a href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
-        </OutputMap>
+        <Bento
+          geometryChanged={this.mapGeometryChanged}
+          orientation="vertical"
+          defaultOffsetPixels={150}
+          minOffsetPixels={130}
+          maxOffsetPixels={300}>
+          <PlayControls
+            createToken={this.createToken}
+            updateToken={this.updateToken}
+            deleteToken={this.deleteToken}
+            changeGrid={this.changeGrid}
+            config={this.props.config}
+            tokens={this.state.tokens}
+            grid={this.state.grid} />
+          <OutputMap
+            ref={c => this.outputMap = c}
+            config={this.props.config}
+            grid={this.state.grid}
+            showScale={true}
+            mapData={this.state.mapData}>
+            <p className="content-placeholder">No map published yet. To publish a map to this page, go to <a
+              href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
+          </OutputMap>
+        </Bento>
         <div className="token-layer">
-          <div
-            className="token-add"
-            title="Create a new token"
-            onClick={this.createToken} />
           <div className="tokens">
               {this.state.tokens.map(token => <Token {...token} />)}
           </div>
@@ -65,5 +117,7 @@ class PlayApp extends React.Component {
     );
   }
 }
+
+PlayApp.persistentSettings = ['grid', 'tokens'];
 
 module.exports = PlayApp;

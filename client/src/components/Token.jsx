@@ -5,9 +5,7 @@ class Token extends React.Component {
     super(props);
     this.state = {
       x: undefined,
-      y: undefined,
-      id: '',
-      banner: ''
+      y: undefined
     };
     this.offset = {
       x: 0,
@@ -22,8 +20,6 @@ class Token extends React.Component {
     this.updateMouseButtonsDown = this.updateMouseButtonsDown.bind(this);
     this.updateMouseButtonsUp = this.updateMouseButtonsUp.bind(this);
     this.dragToken = this.dragToken.bind(this);
-    this.idChanged = this.idChanged.bind(this);
-    this.bannerChanged = this.bannerChanged.bind(this);
   }
 
   updateMousePosition(event) {
@@ -70,16 +66,8 @@ class Token extends React.Component {
     document.removeEventListener('mousemove', this.dragToken);
   }
 
-  idChanged(event) {
-    this.setState({id: event.target.innerText});
-  }
-
-  bannerChanged(event) {
-    this.setState({banner: event.target.innerText});
-  }
-
   backgroundColor() {
-    const sumOfCharCodes = Array.from(this.state.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const sumOfCharCodes = Array.from(this.props.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const colorIndex = sumOfCharCodes % Token.colors.length;
     return Token.colors[colorIndex];
   }
@@ -93,31 +81,11 @@ class Token extends React.Component {
     };
     return (
       <div
-        ref={el => this.el = el}
+        ref={el => this.el = this.grip = el}
         className="token"
         style={positionObject}>
-        <div
-          className="token-id"
-          contentEditable="true"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
-          style={colorObject}
-          onInput={this.idChanged}
-          onBlur={this.idChanged} />
-        <div
-          className="token-banner"
-          contentEditable="true"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
-          onInput={this.bannerChanged}
-          onBlur={this.bannerChanged} />
-        <div
-          ref={el => this.grip = el}
-          className="token-grip" />
+        <div className="token-id" style={colorObject}>{this.props.id}</div>
+        <div className="token-banner">{this.props.name}</div>
       </div>
     );
   }
