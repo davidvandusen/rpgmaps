@@ -59,12 +59,6 @@ class EditControls extends React.Component {
         </div>
         <div className="control-list">
           <div className="control-list-heading">Terrains &amp; Objects</div>
-          <div className="control-list-item">
-            <input
-              className="search-input"
-              ref={el => this.searchInput = el}
-              placeholder="Search..." />
-          </div>
           {this.props.config.terrains.map((terrain, i) => (
             <div
               key={terrain.color}
