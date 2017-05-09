@@ -21,7 +21,7 @@ class EditApp extends React.Component {
       mapData: undefined,
       mode: this.props.config.ui.mode.default,
       status: 'init',
-      terrain: 1,
+      terrain: this.props.config.terrains.findIndex(t => t.className === this.props.config.input.defaultForeground),
       title: `Edit ${this.roomName} - RPG Maps`
     }, persistence.load('persistentEditAppSettings'));
     this.keymap = {

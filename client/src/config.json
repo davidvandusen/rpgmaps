@@ -1,5 +1,7 @@
 {
   "input": {
+    "defaultBackground": "CloseUpGrass",
+    "defaultForeground": "CloseUpPath",
     "canvas": {
       "resolution": {
         "width": 128,

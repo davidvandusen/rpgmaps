@@ -112,7 +112,7 @@ class InputMap extends React.Component {
   }
 
   reset() {
-    fillImageData(this.paintLayer, ...cssToRgba(this.props.config.terrains[0].color));
+    fillImageData(this.paintLayer, ...cssToRgba(this.props.config.terrains.find(t => t.className === this.props.config.input.defaultBackground).color));
     this.props.updateImageData(this.paintLayer);
   }
 
