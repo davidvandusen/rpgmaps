@@ -3,10 +3,6 @@ const React = require('react');
 class Token extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      x: undefined,
-      y: undefined
-    };
     this.offset = {
       x: 0,
       y: 0
@@ -41,7 +37,7 @@ class Token extends React.Component {
   dragToken() {
     if (!this.mouse.buttons[0]) return;
     const elBounds = this.el.getBoundingClientRect();
-    this.setState({
+    this.props.updateToken(this.props.id, {
       x: this.mouse.x - this.offset.x + elBounds.width / 2,
       y: this.mouse.y - this.offset.y + elBounds.height / 2
     });
@@ -67,25 +63,27 @@ class Token extends React.Component {
   }
 
   backgroundColor() {
-    const sumOfCharCodes = Array.from(this.props.id).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const sumOfCharCodes = Array.from(this.props.name).reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const colorIndex = sumOfCharCodes % Token.colors.length;
     return Token.colors[colorIndex];
   }
 
   render() {
     const positionObject = {};
-    if (this.state.x !== undefined) positionObject.left = `${this.state.x}px`;
-    if (this.state.y !== undefined) positionObject.top = `${this.state.y}px`;
+    positionObject.zIndex = this.props.index;
+    if (this.props.x !== undefined) positionObject.left = `${this.props.x}px`;
+    if (this.props.y !== undefined) positionObject.top = `${this.props.y}px`;
     const colorObject = {
       background: this.backgroundColor()
     };
     return (
       <div
         ref={el => this.el = this.grip = el}
+        onClick={this.props.updateToken.bind(undefined, this.props.id, {})}
         className="token"
         style={positionObject}>
-        <div className="token-id" style={colorObject}>{this.props.id}</div>
-        <div className="token-banner">{this.props.name}</div>
+        <div className="token-id" style={colorObject}>{this.props.name}</div>
+        <div className="token-banner">{this.props.banner}</div>
       </div>
     );
   }

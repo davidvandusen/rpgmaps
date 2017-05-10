@@ -29,18 +29,18 @@ class PlayControls extends React.Component {
             <div className="control-list-item-heading">Create Token</div>
           </div>
           {this.props.tokens.map((token, i) => (
-            <div key={token.key} className="control-list-item">
+            <div key={token.id} className="control-list-item">
               <span
                 className="control-list-item-delete"
-                onClick={this.props.deleteToken.bind(undefined, token.key)}>&times;</span>
+                onClick={this.props.deleteToken.bind(undefined, token.id)}>&times;</span>
               <input
                 className="value-input narrow"
-                value={token.id}
-                onChange={evt => this.props.updateToken(token.key, 'id', evt.target.value)} />
+                defaultValue={token.name}
+                onChange={evt => this.props.updateToken(token.id, {name: evt.target.value})} />
               <input
                 className="value-input wide"
-                value={token.name}
-                onChange={evt => this.props.updateToken(token.key, 'name', evt.target.value)} />
+                defaultValue={token.banner}
+                onChange={evt => this.props.updateToken(token.id, {banner: evt.target.value})} />
             </div>
           ))}
         </div>

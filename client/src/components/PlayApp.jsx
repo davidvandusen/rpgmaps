@@ -30,23 +30,28 @@ class PlayApp extends React.Component {
   }
 
   createToken() {
-    const tokens = this.state.tokens.concat({
-      key: Math.random(),
-      id: '',
-      name: ''
-    });
+    const tokens = [{
+      id: Math.random(),
+      name: '',
+      banner: '',
+      x: undefined,
+      y: undefined
+    }].concat(this.state.tokens);
     this.setState({tokens});
   }
 
-  updateToken(key, prop, value) {
+  updateToken(id, newState) {
     const tokens = this.state.tokens;
-    const token = tokens.find(token => token.key === key);
-    token[prop] = value;
+    const tokenIndex = tokens.findIndex(token => token.id === id);
+    const token = tokens[tokenIndex];
+    Object.assign(token, newState);
+    tokens.splice(tokenIndex, 1);
+    tokens.unshift(token);
     this.setState({tokens});
   }
 
-  deleteToken(key) {
-    this.state.tokens.splice(this.state.tokens.findIndex(token => token.key === key), 1);
+  deleteToken(id) {
+    this.state.tokens.splice(this.state.tokens.findIndex(token => token.id === id), 1);
     this.setState({tokens: this.state.tokens});
   }
 
@@ -110,7 +115,13 @@ class PlayApp extends React.Component {
         </Bento>
         <div className="token-layer">
           <div className="tokens">
-              {this.state.tokens.map(token => <Token {...token} />)}
+              {this.state.tokens.map((token, i, list) =>
+                <Token
+                  updateToken={this.updateToken}
+                  index={list.length - i}
+                  key={token.id}
+                  {...token} />
+              )}
           </div>
         </div>
       </div>
