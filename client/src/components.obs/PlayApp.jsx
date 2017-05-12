@@ -1,4 +1,4 @@
-require('../../styles/play-app.scss');
+require('../../styles.obs/play-app.scss');
 const React = require('react');
 const OutputMap = require('./OutputMap.jsx');
 const PlayControls = require('./PlayControls.jsx');
