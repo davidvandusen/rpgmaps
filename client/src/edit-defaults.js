@@ -1,7 +1,7 @@
 const outputWidth = window.innerWidth;
 const outputHeight = window.innerHeight;
-const inputWidth = 16;
-const inputHeight = 9;
+const inputWidth = 128;
+const inputHeight = 72;
 const xRatio = (outputWidth - 20) / inputWidth;
 const yRatio = (outputHeight - 150) / inputHeight;
 const initialScale = xRatio < yRatio ? xRatio : yRatio;
@@ -14,8 +14,9 @@ module.exports = {
     y: undefined
   },
   brush: {
-    size: 15
+    size: 5
   },
+  inputImageData: undefined,
   surface: {
     scale: initialScale,
     x: outputWidth / 2 - inputWidth * initialScale / 2,

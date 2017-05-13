@@ -8,14 +8,19 @@ class InputBrush extends React.Component {
 
   draw() {
     const ctx = this.getContext();
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.save();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     if (this.props.mouse.x !== undefined && this.props.mouse.y !== undefined) {
       ctx.beginPath();
-      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size, 0, 2 * Math.PI);
       ctx.lineWidth = 0.5;
+      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale, 0, 2 * Math.PI);
       ctx.strokeStyle = 'black';
       ctx.stroke();
+      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale - 0.5, 0, 2 * Math.PI);
+      ctx.strokeStyle = 'white';
+      ctx.stroke();
     }
+    ctx.restore();
   }
 
   componentDidMount() {
@@ -43,6 +48,7 @@ class InputBrush extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  surface: state.surface,
   mouse: state.mouse,
   brush: state.brush,
   width: state.width,

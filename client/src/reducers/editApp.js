@@ -36,6 +36,21 @@ const editApp = (state, action) => {
           y
         }
       };
+    case 'PAINT_INPUT':
+      if (action.payload.indices.length === 0) return state;
+      const dataArray = new Uint8ClampedArray(state.surface.width * state.surface.height * 4);
+      if (state.inputImageData) {
+        dataArray.set(state.inputImageData.data);
+      }
+      for (const index of action.payload.indices) {
+        // TODO this should be the color of the selected terrain
+        dataArray[index * 4] = 0x80;
+        dataArray[index * 4 + 1] = 0x80;
+        dataArray[index * 4 + 2] = 0x80;
+        dataArray[index * 4 + 3] = 0xff;
+      }
+      const inputImageData = new ImageData(dataArray, state.surface.width, state.surface.height);
+      return {...state, inputImageData};
     default:
       return state;
   }
