@@ -1,6 +1,13 @@
+const outputWidth = window.innerWidth;
+const outputHeight = window.innerHeight;
+const inputWidth = 16;
+const inputHeight = 9;
+const xRatio = (outputWidth - 20) / inputWidth;
+const yRatio = (outputHeight - 150) / inputHeight;
+const initialScale = xRatio < yRatio ? xRatio : yRatio;
 module.exports = {
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: outputWidth,
+  height: outputHeight,
   captureStroke: false,
   mouse: {
     x: undefined,
@@ -10,10 +17,10 @@ module.exports = {
     size: 15
   },
   surface: {
-    scale: 1,
-    x: window.innerWidth / 2 - 1280 / 2,
-    y: window.innerHeight / 2 - 720 / 2,
-    width: 1280,
-    height: 720
+    scale: initialScale,
+    x: outputWidth / 2 - inputWidth * initialScale / 2,
+    y: outputHeight / 2 - inputHeight * initialScale / 2,
+    width: inputWidth,
+    height: inputHeight
   }
 };

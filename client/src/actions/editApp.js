@@ -18,7 +18,7 @@ function scaleSurface(delta, x, y) {
       x,
       y
     }
-  }
+  };
 }
 
 function moveMouse(x, y) {
@@ -57,10 +57,17 @@ function endCaptureStroke() {
   };
 }
 
+function centerSurface() {
+  return {
+    type: 'CENTER_SURFACE'
+  };
+}
+
 exports.bindGlobalEvents = store => {
   window.addEventListener('resize', throttle(() => store.dispatch(resizeApp(window.innerWidth, window.innerHeight)), 100));
-  window.addEventListener('wheel', throttle(event => store.dispatch(scaleSurface(event.deltaY / 100, event.clientX, event.clientY)), 16));
+  window.addEventListener('wheel', throttle(event => store.dispatch(scaleSurface(event.deltaY / 100, event.clientX, event.clientY)), 16), {passive: true});
   document.addEventListener('mousemove', throttle(event => store.dispatch(moveMouse(event.clientX, event.clientY)), 16));
+  document.addEventListener('dblclick', () => store.dispatch(centerSurface()));
   document.body.addEventListener('mouseleave', event => store.dispatch(moveMouse(undefined, undefined)));
   document.addEventListener('mousedown', () => store.dispatch(beginCaptureStroke()));
   document.addEventListener('mouseup', () => store.dispatch(endCaptureStroke()));
