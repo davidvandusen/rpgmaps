@@ -11,23 +11,12 @@ class InputImage extends React.Component {
   }
 
   draw() {
-    const ctx = this.getContext();
-    ctx.save();
-
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    ctx.translate(this.props.surface.x, this.props.surface.y);
-    ctx.scale(this.props.surface.scale, this.props.surface.scale);
-
-    ctx.beginPath();
-    ctx.rect(0, 0, this.props.surface.width, this.props.surface.height);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 1 / this.props.surface.scale;
-    ctx.stroke();
-
     if (this.props.inputImageData) {
+      const ctx = this.getContext();
+      ctx.save();
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.translate(this.props.surface.x, this.props.surface.y);
+      ctx.scale(this.props.surface.scale, this.props.surface.scale);
       const imageCtx = this.getImageContext();
       imageCtx.save();
       imageCtx.clearRect(0, 0, imageCtx.canvas.width, imageCtx.canvas.height);
@@ -35,9 +24,8 @@ class InputImage extends React.Component {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(this.imageCanvas, 0, 0);
       imageCtx.restore();
+      ctx.restore();
     }
-
-    ctx.restore();
   }
 
   componentDidMount() {

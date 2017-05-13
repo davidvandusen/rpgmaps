@@ -25,11 +25,11 @@ class InputPaint extends React.Component {
           const dx = (this.props.mouse.x - this.mouseOrigin.x) / steps;
           const dy = (this.props.mouse.y - this.mouseOrigin.y) / steps;
           for (let step = 1; step < steps; step++) {
-            ctx.arc(this.mouseOrigin.x + dx * step, this.mouseOrigin.y + dy * step, this.props.brush.size * this.props.surface.scale, 0, 2 * Math.PI);
+            ctx.arc(this.mouseOrigin.x + dx * step, this.mouseOrigin.y + dy * step, this.props.brush.size * this.props.surface.scale / 2, 0, 2 * Math.PI);
           }
         }
       }
-      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale, 0, 2 * Math.PI);
+      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2, 0, 2 * Math.PI);
       ctx.fillStyle = 'black';
       ctx.fill();
     }

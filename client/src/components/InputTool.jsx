@@ -14,10 +14,10 @@ class InputTool extends React.Component {
       if (this.props.tool === 'BRUSH') {
         ctx.beginPath();
         ctx.lineWidth = 0.5;
-        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale, 0, 2 * Math.PI);
+        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = 'black';
         ctx.stroke();
-        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale - 0.5, 0, 2 * Math.PI);
+        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2 - 0.5, 0, 2 * Math.PI);
         ctx.strokeStyle = 'white';
         ctx.stroke();
       }

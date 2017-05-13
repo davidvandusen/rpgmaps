@@ -11,7 +11,9 @@ module.exports = {
   tool: 'BRUSH',
   mouse: {
     x: undefined,
-    y: undefined
+    y: undefined,
+    isDown: false,
+    isUp: true
   },
   brush: {
     size: 5
