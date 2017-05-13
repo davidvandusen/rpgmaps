@@ -1,7 +1,7 @@
 const React = require('react');
 const {connect} = require('react-redux');
 
-class InputBrush extends React.Component {
+class InputTool extends React.Component {
   getContext() {
     return this.canvas.getContext('2d');
   }
@@ -11,14 +11,16 @@ class InputBrush extends React.Component {
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     if (this.props.mouse.x !== undefined && this.props.mouse.y !== undefined) {
-      ctx.beginPath();
-      ctx.lineWidth = 0.5;
-      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale, 0, 2 * Math.PI);
-      ctx.strokeStyle = 'black';
-      ctx.stroke();
-      ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale - 0.5, 0, 2 * Math.PI);
-      ctx.strokeStyle = 'white';
-      ctx.stroke();
+      if (this.props.tool === 'BRUSH') {
+        ctx.beginPath();
+        ctx.lineWidth = 0.5;
+        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale - 0.5, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'white';
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -35,11 +37,12 @@ class InputBrush extends React.Component {
     const canvasStyle = {
       width: this.props.width + 'px',
       height: this.props.height + 'px',
+      cursor: 'none'
     };
     return (
       <canvas
         ref={el => this.canvas = el}
-        className="input-brush"
+        className="input-tool"
         width={this.props.width}
         height={this.props.height}
         style={canvasStyle}/>
@@ -48,6 +51,7 @@ class InputBrush extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  tool: state.tool,
   surface: state.surface,
   mouse: state.mouse,
   brush: state.brush,
@@ -55,4 +59,4 @@ const mapStateToProps = state => ({
   height: state.height
 });
 
-module.exports = connect(mapStateToProps)(InputBrush);
+module.exports = connect(mapStateToProps)(InputTool);

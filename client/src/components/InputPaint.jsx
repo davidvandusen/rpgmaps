@@ -8,7 +8,6 @@ class InputPaint extends React.Component {
   }
 
   draw() {
-    if (!this.props.captureStroke) return;
     const ctx = this.getContext();
     ctx.save();
     if (this.props.mouse.x !== undefined && this.props.mouse.y !== undefined) {
@@ -39,7 +38,6 @@ class InputPaint extends React.Component {
   }
 
   clear() {
-    if (this.props.captureStroke) return;
     const ctx = this.getContext();
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -86,14 +84,15 @@ class InputPaint extends React.Component {
   }
 
   componentDidUpdate() {
-    if (!this.props.captureStroke && this.captureStroke !== this.props.captureStroke) {
+    const captureStroke = this.props.mouse.isDown && this.props.tool === 'BRUSH';
+    if (captureStroke) {
+      this.draw();
+    } else if (this.captureStroke !== captureStroke) {
       const indices = this.calculateChangeToInputImage();
       this.props.paintInput(indices);
       this.clear();
-    } else {
-      this.draw();
     }
-    this.captureStroke = this.props.captureStroke;
+    this.captureStroke = captureStroke;
   }
 
   render() {
@@ -113,7 +112,7 @@ class InputPaint extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  captureStroke: state.captureStroke,
+  tool: state.tool,
   surface: state.surface,
   mouse: state.mouse,
   brush: state.brush,

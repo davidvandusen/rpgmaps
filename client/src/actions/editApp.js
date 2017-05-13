@@ -21,14 +21,24 @@ function scaleSurface(delta, x, y) {
   };
 }
 
+function depressMouse() {
+  return {
+    type: 'DEPRESS_MOUSE'
+  };
+}
+
+function releaseMouse() {
+  return {
+    type: 'RELEASE_MOUSE'
+  };
+}
+
 function moveMouse(x, y) {
   return {
     type: 'MOVE_MOUSE',
     payload: {
-      mouse: {
-        x,
-        y
-      }
+      x,
+      y
     }
   };
 }
@@ -45,21 +55,18 @@ function decrementBrushSize() {
   };
 }
 
-function beginCaptureStroke() {
-  return {
-    type: 'BEGIN_CAPTURE_STROKE'
-  };
-}
-
-function endCaptureStroke() {
-  return {
-    type: 'END_CAPTURE_STROKE'
-  };
-}
-
 function centerSurface() {
   return {
     type: 'CENTER_SURFACE'
+  };
+}
+
+function setTool(tool) {
+  return {
+    type: 'SET_TOOL',
+    payload: {
+      tool
+    }
   };
 }
 
@@ -67,10 +74,23 @@ exports.bindGlobalEvents = store => {
   window.addEventListener('resize', throttle(() => store.dispatch(resizeApp(window.innerWidth, window.innerHeight)), 100));
   window.addEventListener('wheel', throttle(event => store.dispatch(scaleSurface(event.deltaY / 100, event.clientX, event.clientY)), 16), {passive: true});
   document.addEventListener('mousemove', throttle(event => store.dispatch(moveMouse(event.clientX, event.clientY)), 16));
+  document.addEventListener('mousedown', () => store.dispatch(depressMouse()));
+  document.addEventListener('mouseup', () => store.dispatch(releaseMouse()));
   document.addEventListener('dblclick', () => store.dispatch(centerSurface()));
-  document.body.addEventListener('mouseleave', event => store.dispatch(moveMouse(undefined, undefined)));
-  document.addEventListener('mousedown', () => store.dispatch(beginCaptureStroke()));
-  document.addEventListener('mouseup', () => store.dispatch(endCaptureStroke()));
+  document.addEventListener('keydown', event => {
+    switch (event.key) {
+      case ' ':
+        store.dispatch(setTool('DRAG'));
+        break;
+    }
+  });
+  document.addEventListener('keyup', event => {
+    switch (event.key) {
+      case ' ':
+        store.dispatch(setTool('BRUSH'));
+        break;
+    }
+  });
   document.addEventListener('keypress', event => {
     switch (event.key) {
       case ']':

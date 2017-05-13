@@ -1,15 +1,29 @@
 const editApp = (state, action) => {
   switch (action.type) {
-    case 'BEGIN_CAPTURE_STROKE':
-      return {...state, captureStroke: true};
-    case 'END_CAPTURE_STROKE':
-      return {...state, captureStroke: false};
+    case 'SET_TOOL':
+      return {...state, tool: action.payload.tool};
+    case 'DEPRESS_MOUSE':
+      return {...state,
+        mouse: {...state.mouse, isDown: true, isUp: false}
+      };
+    case 'RELEASE_MOUSE':
+      return {
+        ...state,
+        mouse: {...state.mouse, isDown: false, isUp: true}
+      };
     case 'DECREMENT_BRUSH_SIZE':
       return {...state, brush: {...state.brush, size: Math.max(1, state.brush.size - 1)}};
     case 'INCREMENT_BRUSH_SIZE':
       return {...state, brush: {...state.brush, size: state.brush.size + 1}};
     case 'MOVE_MOUSE':
-      return {...state, ...action.payload};
+      const surface = {...state.surface};
+      if (state.mouse.isDown && state.tool === 'DRAG') {
+        const dx = state.mouse.x - action.payload.x;
+        const dy = state.mouse.y - action.payload.y;
+        surface.x -= dx;
+        surface.y -= dy;
+      }
+      return {...state, surface, mouse: {...state.mouse, ...action.payload}};
     case 'RESIZE_APP':
       return {...state, ...action.payload};
     case 'CENTER_SURFACE':

@@ -8,7 +8,7 @@ const initialScale = xRatio < yRatio ? xRatio : yRatio;
 module.exports = {
   width: outputWidth,
   height: outputHeight,
-  captureStroke: false,
+  tool: 'BRUSH',
   mouse: {
     x: undefined,
     y: undefined

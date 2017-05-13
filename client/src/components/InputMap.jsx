@@ -1,13 +1,13 @@
 const React = require('react');
 const InputImage = require('./InputImage.jsx');
 const InputPaint = require('./InputPaint.jsx');
-const InputBrush = require('./InputBrush.jsx');
+const InputTool = require('./InputTool.jsx');
 
 const InputMap = () => (
   <div className="input-map">
     <InputImage />
     <InputPaint />
-    <InputBrush />
+    <InputTool />
   </div>
 );
 
