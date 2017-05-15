@@ -44,7 +44,8 @@ class InputImage extends React.Component {
   render() {
     const canvasStyle = {
       width: this.props.width + 'px',
-      height: this.props.height + 'px'
+      height: this.props.height + 'px',
+      opacity: this.props.inputImageOpacity
     };
     return (
       <canvas
@@ -58,6 +59,7 @@ class InputImage extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  inputImageOpacity: state.inputImageOpacity,
   inputImageData: state.inputImageData,
   surface: state.surface,
   width: state.width,

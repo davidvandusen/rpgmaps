@@ -1,6 +1,7 @@
 const React = require('react');
 const {connect} = require('react-redux');
 const {distance} = require('../common/geometry');
+const mapDataFactory = require('../common/mapDataFactory');
 
 class InputPaint extends React.Component {
   getContext() {
@@ -30,7 +31,7 @@ class InputPaint extends React.Component {
         }
       }
       ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2, 0, 2 * Math.PI);
-      ctx.fillStyle = 'black';
+      ctx.fillStyle = this.props.terrains[this.props.terrain].color;
       ctx.fill();
     }
     this.mouseOrigin = this.props.mouse;
@@ -59,7 +60,7 @@ class InputPaint extends React.Component {
     const sliceY = Math.floor(Math.max(0, this.props.surface.y));
     const sliceW = Math.floor(Math.min(ctx.canvas.width - sliceX, this.props.surface.width * this.props.surface.scale));
     const sliceH = Math.floor(Math.min(ctx.canvas.height - sliceY, this.props.surface.height * this.props.surface.scale));
-    if (this.props.surface.x + sliceW <= 0 || this.props.surface.y + sliceH <= 0) {
+    if (sliceX + sliceW <= 0 || sliceY + sliceH <= 0) {
       return inputPixelIndices;
     }
     const imageData = ctx.getImageData(sliceX, sliceY, sliceW, sliceH);
@@ -77,8 +78,14 @@ class InputPaint extends React.Component {
         continue;
       }
       const pixelIndex = Math.floor(adjustedX + adjustedY * sliceW) * 4;
-      const alpha = pixelData[pixelIndex + 3];
-      if (alpha >= 0x80) inputPixelIndices.push(i);
+      const alphaIndex = pixelIndex + 3;
+      if (alphaIndex < 0 || alphaIndex >= pixelData.length) {
+        continue;
+      }
+      const alpha = pixelData[alphaIndex];
+      if (alpha === 0xff) {
+        inputPixelIndices.push(i);
+      }
     }
     return inputPixelIndices;
   }
@@ -112,6 +119,8 @@ class InputPaint extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  terrains: state.terrains,
+  terrain: state.terrain,
   tool: state.tool,
   surface: state.surface,
   mouse: state.mouse,
@@ -121,10 +130,21 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  paintInput: indices => dispatch({
-    type: 'PAINT_INPUT',
-    payload: {indices}
-  })
+  paintInput: indices => {
+    dispatch((dispatch, getState) => {
+      dispatch({
+        type: 'PAINT_INPUT',
+        payload: {indices}
+      });
+      const state = getState();
+      mapDataFactory(state.terrains).fromImageData(state.inputImageData).then(mapData => {
+        dispatch({
+          type: 'SET_MAP_DATA',
+          payload: {mapData}
+        });
+      });
+    });
+  }
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(InputPaint);

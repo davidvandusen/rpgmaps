@@ -1,4 +1,4 @@
-const config = require('../../src/config.json');
+const config = require('../../src/terrains/config');
 const seedrandom = require('seedrandom');
 const Terrain = require('../../src/terrains/CloseUpRoad');
 const mapDataFactory = require('../../src/common/mapDataFactory')(config.terrains);

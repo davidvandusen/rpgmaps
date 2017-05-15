@@ -1,6 +1,6 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
-const config = require('./config.json');
+const config = require('./terrains/config');
 const PlayApp = require('./components.obs/PlayApp.jsx');
 
 const appRoot = document.createElement('div');

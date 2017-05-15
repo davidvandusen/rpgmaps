@@ -1,9 +1,14 @@
+const {cssToRgba} = require('../common/color');
+
 const editApp = (state, action) => {
   switch (action.type) {
+    case 'SET_MAP_DATA':
+      return {...state, mapData: action.payload.mapData};
     case 'SET_TOOL':
       return {...state, tool: action.payload.tool};
     case 'DEPRESS_MOUSE':
-      return {...state,
+      return {
+        ...state,
         mouse: {...state.mouse, isDown: true, isUp: false}
       };
     case 'RELEASE_MOUSE':
@@ -16,14 +21,16 @@ const editApp = (state, action) => {
     case 'INCREMENT_BRUSH_SIZE':
       return {...state, brush: {...state.brush, size: state.brush.size + 1}};
     case 'MOVE_MOUSE':
-      const surface = {...state.surface};
+      let surface = state.surface;
       if (state.mouse.isDown && state.tool === 'DRAG') {
+        surface = {...state.surface};
         const dx = state.mouse.x - action.payload.x;
         const dy = state.mouse.y - action.payload.y;
         surface.x -= dx;
         surface.y -= dy;
       }
-      return {...state, surface, mouse: {...state.mouse, ...action.payload}};
+      const mouse = {...state.mouse, ...action.payload};
+      return {...state, surface, mouse};
     case 'RESIZE_APP':
       return {...state, ...action.payload};
     case 'CENTER_SURFACE':
@@ -33,6 +40,7 @@ const editApp = (state, action) => {
         y: state.height / 2 - state.surface.height * state.surface.scale / 2
       }};
     case 'SCALE_SURFACE':
+      // TODO keep cursor in same spot on canvas while zooming
       const scale = Math.max(1, state.surface.scale + action.payload.delta);
       const delta = scale - state.surface.scale;
       const px = (action.payload.x - state.surface.x) / (state.width * scale);
@@ -56,11 +64,11 @@ const editApp = (state, action) => {
       if (state.inputImageData) {
         dataArray.set(state.inputImageData.data);
       }
+      const color = cssToRgba(state.terrains[state.terrain].color);
       for (const index of action.payload.indices) {
-        // TODO this should be the color of the selected terrain
-        dataArray[index * 4] = 0x80;
-        dataArray[index * 4 + 1] = 0x80;
-        dataArray[index * 4 + 2] = 0x80;
+        dataArray[index * 4] = color[0];
+        dataArray[index * 4 + 1] = color[1];
+        dataArray[index * 4 + 2] = color[2];
         dataArray[index * 4 + 3] = 0xff;
       }
       const inputImageData = new ImageData(dataArray, state.surface.width, state.surface.height);

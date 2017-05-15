@@ -13,12 +13,9 @@ class InputTool extends React.Component {
     if (this.props.mouse.x !== undefined && this.props.mouse.y !== undefined) {
       if (this.props.tool === 'BRUSH') {
         ctx.beginPath();
-        ctx.lineWidth = 0.5;
         ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2, 0, 2 * Math.PI);
-        ctx.strokeStyle = 'black';
-        ctx.stroke();
-        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2 - 0.5, 0, 2 * Math.PI);
         ctx.strokeStyle = 'white';
+        ctx.lineWidth = 0.5;
         ctx.stroke();
       }
     }
@@ -45,7 +42,7 @@ class InputTool extends React.Component {
         className="input-tool"
         width={this.props.width}
         height={this.props.height}
-        style={canvasStyle}/>
+        style={canvasStyle} />
     );
   }
 }
