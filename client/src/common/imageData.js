@@ -76,16 +76,14 @@ function describeContiguousArea(pixels, width, startIndex) {
   return {color, mask};
 }
 
-function addNoise(ctx, amount) {
+function addNoise(imageData, amount) {
   const rng = seedrandom('');
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   for (let i = 0; i < imageData.data.length; i += 4) {
     const by = (rng() * 2 - 1) * amount;
     imageData.data[i] += by;
     imageData.data[i + 1] += by;
     imageData.data[i + 2] += by;
   }
-  ctx.putImageData(imageData, 0, 0);
 }
 
 function blendOnto(dst, src) {

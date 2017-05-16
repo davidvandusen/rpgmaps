@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "mocha": "^3.2.0",
-    "redux-devtools": "^3.4.0",
     "webpack-dev-server": "^2.4.2"
   }
 }

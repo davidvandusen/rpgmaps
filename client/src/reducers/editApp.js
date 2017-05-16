@@ -1,7 +1,15 @@
 const {cssToRgba} = require('../common/color');
 
 const editApp = (state, action) => {
+  let terrain;
+  let scale;
   switch (action.type) {
+    case 'CYCLE_TERRAIN':
+      terrain = state.terrain === state.terrains.length - 1 ? 0 : state.terrain + 1;
+      return {...state, terrain};
+    case 'CYCLE_TERRAIN_REVERSE':
+      terrain = state.terrain === 0 ? state.terrains.length - 1 : state.terrain - 1;
+      return {...state, terrain};
     case 'SET_MAP_DATA':
       return {...state, mapData: action.payload.mapData};
     case 'SET_TOOL':
@@ -33,6 +41,16 @@ const editApp = (state, action) => {
       return {...state, surface, mouse};
     case 'RESIZE_APP':
       return {...state, ...action.payload};
+    case 'SCALE_TO_FIT':
+      const xRatio = (state.width - 20) / state.surface.width;
+      const yRatio = (state.height - 150) / state.surface.height;
+      scale = xRatio < yRatio ? xRatio : yRatio;
+      return {
+        ...state, surface: {
+          ...state.surface,
+          scale
+        }
+      };
     case 'CENTER_SURFACE':
       return {...state, surface: {
         ...state.surface,
@@ -41,7 +59,7 @@ const editApp = (state, action) => {
       }};
     case 'SCALE_SURFACE':
       // TODO keep cursor in same spot on canvas while zooming
-      const scale = Math.max(1, state.surface.scale + action.payload.delta);
+      scale = Math.max(1, state.surface.scale + action.payload.delta);
       const delta = scale - state.surface.scale;
       const px = (action.payload.x - state.surface.x) / (state.width * scale);
       const py = (action.payload.y - state.surface.y) / (state.height * scale);

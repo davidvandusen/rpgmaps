@@ -1,29 +1,19 @@
 const {cssToRgba} = require('./common/color');
+const {fillImageData} = require('./common/imageData');
 const terrains = require('./terrains/config');
 
-const outputWidth = window.innerWidth;
-const outputHeight = window.innerHeight;
 const inputWidth = 128;
 const inputHeight = 72;
-const xRatio = (outputWidth - 20) / inputWidth;
-const yRatio = (outputHeight - 150) / inputHeight;
-const initialScale = xRatio < yRatio ? xRatio : yRatio;
 const defaultForeground = "CloseUpPath";
 const defaultTerrain = terrains.findIndex(t => t.className === defaultForeground);
 const defaultBackground = "CloseUpGrass";
-const inputImageDataArray = new Uint8ClampedArray(inputWidth * inputHeight * 4);
-const defaultBackgroundColor = cssToRgba(terrains.find(t => t.className === defaultBackground).color);
-for (let i = 0; i < inputImageDataArray.length; i += 4) {
-  inputImageDataArray[i] = defaultBackgroundColor[0];
-  inputImageDataArray[i + 1] = defaultBackgroundColor[1];
-  inputImageDataArray[i + 2] = defaultBackgroundColor[2];
-  inputImageDataArray[i + 3] = defaultBackgroundColor[3];
-}
-const inputImageData = new ImageData(inputImageDataArray, inputWidth, inputHeight);
+const inputImageData = new ImageData(inputWidth, inputHeight);
+fillImageData(inputImageData, ...cssToRgba(terrains.find(t => t.className === defaultBackground).color));
 
 module.exports = {
-  width: outputWidth,
-  height: outputHeight,
+  width: undefined,
+  height: undefined,
+  randomnessSeed: '',
   tool: 'BRUSH',
   mouse: {
     x: undefined,
@@ -59,9 +49,9 @@ module.exports = {
   inputImageData: inputImageData,
   outputQuality: 10,
   surface: {
-    scale: initialScale,
-    x: outputWidth / 2 - inputWidth * initialScale / 2,
-    y: outputHeight / 2 - inputHeight * initialScale / 2,
+    scale: 1,
+    x: 0,
+    y: 0,
     width: inputWidth,
     height: inputHeight
   },

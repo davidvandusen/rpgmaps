@@ -1,7 +1,7 @@
 const React = require('react');
 const {connect} = require('react-redux');
 const {distance} = require('../common/geometry');
-const mapDataFactory = require('../common/mapDataFactory');
+const {paintInput} = require('../actions/editApp');
 
 class InputPaint extends React.Component {
   getContext() {
@@ -50,7 +50,7 @@ class InputPaint extends React.Component {
     this.draw();
   }
 
-  calculateChangeToInputImage() {
+  getPaintedIndices() {
     const ctx = this.getContext();
     const inputPixelIndices = [];
     if (this.props.surface.x > ctx.canvas.width || this.props.surface.y > ctx.canvas.height) {
@@ -94,12 +94,11 @@ class InputPaint extends React.Component {
     const captureStroke = this.props.mouse.isDown && this.props.tool === 'BRUSH';
     if (captureStroke) {
       this.draw();
-    } else if (this.captureStroke !== captureStroke) {
-      const indices = this.calculateChangeToInputImage();
-      this.props.paintInput(indices);
+    } else if (this._captureStroke !== captureStroke) {
+      this.props.paintInput(this.getPaintedIndices());
       this.clear();
     }
-    this.captureStroke = captureStroke;
+    this._captureStroke = captureStroke;
   }
 
   render() {
@@ -130,21 +129,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  paintInput: indices => {
-    dispatch((dispatch, getState) => {
-      dispatch({
-        type: 'PAINT_INPUT',
-        payload: {indices}
-      });
-      const state = getState();
-      mapDataFactory(state.terrains).fromImageData(state.inputImageData).then(mapData => {
-        dispatch({
-          type: 'SET_MAP_DATA',
-          payload: {mapData}
-        });
-      });
-    });
-  }
+  paintInput: indices => dispatch(paintInput(indices))
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(InputPaint);
