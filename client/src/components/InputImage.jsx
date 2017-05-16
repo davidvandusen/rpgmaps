@@ -6,46 +6,43 @@ class InputImage extends React.Component {
     return this.canvas.getContext('2d');
   }
 
-  getImageContext() {
-    return this.imageCanvas.getContext('2d');
+  getBufferContext() {
+    return this.bufferCanvas.getContext('2d');
   }
 
   draw() {
-    if (this.props.inputImageData) {
-      const ctx = this.getContext();
-      ctx.save();
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.translate(this.props.surface.x, this.props.surface.y);
-      ctx.scale(this.props.surface.scale, this.props.surface.scale);
-      const imageCtx = this.getImageContext();
-      imageCtx.save();
-      imageCtx.clearRect(0, 0, imageCtx.canvas.width, imageCtx.canvas.height);
-      imageCtx.putImageData(this.props.inputImageData, 0, 0);
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(this.imageCanvas, 0, 0);
-      imageCtx.restore();
-      ctx.restore();
-    }
+    const ctx = this.getContext();
+    ctx.save();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.translate(this.props.x, this.props.y);
+    ctx.scale(this.props.scale, this.props.scale);
+    const bufferCtx = this.getBufferContext();
+    bufferCtx.putImageData(this.props.buffer, 0, 0);
+    ctx.drawImage(this.bufferCanvas, 0, 0);
+    ctx.restore();
+  }
+
+  onUpdate() {
+    this.bufferCanvas.width = this.props.buffer.width;
+    this.bufferCanvas.height = this.props.buffer.height;
+    this.draw();
   }
 
   componentDidMount() {
-    this.imageCanvas = document.createElement('canvas');
-    this.imageCanvas.width = this.props.surface.width;
-    this.imageCanvas.height = this.props.surface.height;
-    this.draw();
+    this.bufferCanvas = document.createElement('canvas');
+    this.getContext().imageSmoothingEnabled = this.props.imageSmoothingEnabled;
+    this.onUpdate();
   }
 
   componentDidUpdate() {
-    this.imageCanvas.width = this.props.surface.width;
-    this.imageCanvas.height = this.props.surface.height;
-    this.draw();
+    this.onUpdate();
   }
 
   render() {
     const canvasStyle = {
       width: this.props.width + 'px',
       height: this.props.height + 'px',
-      opacity: this.props.inputImageOpacity
+      opacity: this.props.opacity
     };
     return (
       <canvas
@@ -53,17 +50,22 @@ class InputImage extends React.Component {
         className="input-image"
         width={this.props.width}
         height={this.props.height}
-        style={canvasStyle}/>
+        style={canvasStyle} />
     );
   }
 }
 
 const mapStateToProps = state => ({
-  inputImageOpacity: state.inputImageOpacity,
-  inputImageData: state.inputImageData,
-  surface: state.surface,
-  width: state.width,
-  height: state.height
+  buffer: state.graphics.inputBuffer,
+  height: state.workspace.height,
+  imageSmoothingEnabled: false,
+  opacity: state.settings.inputImageOpacity,
+  scale: state.workspace.scale,
+  surfaceWidth: state.workspace.surface.width,
+  surfaceHeight: state.workspace.surface.height,
+  width: state.workspace.width,
+  x: state.workspace.x,
+  y: state.workspace.y
 });
 
 module.exports = connect(mapStateToProps)(InputImage);

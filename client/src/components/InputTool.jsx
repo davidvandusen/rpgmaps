@@ -10,10 +10,10 @@ class InputTool extends React.Component {
     const ctx = this.getContext();
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    if (this.props.mouse.x !== undefined && this.props.mouse.y !== undefined) {
+    if (this.props.mouseX !== undefined && this.props.mouseY !== undefined) {
       if (this.props.tool === 'BRUSH') {
         ctx.beginPath();
-        ctx.arc(this.props.mouse.x, this.props.mouse.y, this.props.brush.size * this.props.surface.scale / 2, 0, 2 * Math.PI);
+        ctx.arc(this.props.mouseX, this.props.mouseY, this.props.brushSize * this.props.scale / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 0.5;
         ctx.stroke();
@@ -48,12 +48,13 @@ class InputTool extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  tool: state.tool,
-  surface: state.surface,
-  mouse: state.mouse,
-  brush: state.brush,
-  width: state.width,
-  height: state.height
+  brushSize: state.settings.brush.size,
+  height: state.workspace.height,
+  mouseX: state.mouse.x,
+  mouseY: state.mouse.y,
+  scale: state.workspace.scale,
+  tool: state.settings.tool,
+  width: state.workspace.width
 });
 
 module.exports = connect(mapStateToProps)(InputTool);

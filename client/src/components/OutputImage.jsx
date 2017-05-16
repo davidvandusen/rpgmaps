@@ -10,7 +10,7 @@ class OutputImage extends React.Component {
   }
 
   getImageContext() {
-    return this.imageCanvas.getContext('2d');
+    return this.bufferCanvas.getContext('2d');
   }
 
   draw() {
@@ -24,7 +24,7 @@ class OutputImage extends React.Component {
       imageCtx.save();
       imageCtx.clearRect(0, 0, imageCtx.canvas.width, imageCtx.canvas.height);
       imageCtx.putImageData(this.image, 0, 0);
-      ctx.drawImage(this.imageCanvas, 0, 0);
+      ctx.drawImage(this.bufferCanvas, 0, 0);
       imageCtx.restore();
       ctx.restore();
     }
@@ -96,8 +96,8 @@ class OutputImage extends React.Component {
   }
 
   onUpdate() {
-    this.imageCanvas.width = this.props.surface.width * this.props.outputQuality;
-    this.imageCanvas.height = this.props.surface.height * this.props.outputQuality;
+    this.bufferCanvas.width = this.props.surface.width * this.props.outputQuality;
+    this.bufferCanvas.height = this.props.surface.height * this.props.outputQuality;
     this.draw();
     if (this.shouldImageUpdate(this._mapData, this.props.mapData)) {
       this._mapData = this.props.mapData;
@@ -106,7 +106,7 @@ class OutputImage extends React.Component {
   }
 
   componentDidMount() {
-    this.imageCanvas = document.createElement('canvas');
+    this.bufferCanvas = document.createElement('canvas');
     this.onUpdate();
   }
 

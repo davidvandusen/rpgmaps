@@ -7,8 +7,8 @@ class OutputGrid extends React.Component {
   }
 
   setGridStyle(ctx) {
-    ctx.strokeStyle = this.props.grid.color;
-    ctx.lineWidth = this.props.grid.lineWidth;
+    ctx.strokeStyle = this.props.lineColor;
+    ctx.lineWidth = this.props.lineWidth;
     ctx.lineJoin = 'miter';
     ctx.lineCap = 'butt';
     ctx.setLineDash([]);
@@ -16,13 +16,13 @@ class OutputGrid extends React.Component {
 
   drawSquareGrid(ctx) {
     ctx.beginPath();
-    for (let i = this.props.grid.spacing; i < this.props.surface.width; i += this.props.grid.spacing) {
+    for (let i = this.props.spacing; i <= this.props.surfaceWidth; i += this.props.spacing) {
       ctx.moveTo(i, 0);
-      ctx.lineTo(i, this.canvas.height);
+      ctx.lineTo(i, ctx.canvas.height);
     }
-    for (let i = this.props.grid.spacing; i < this.props.surface.height; i += this.props.grid.spacing) {
+    for (let i = this.props.spacing; i <= this.props.surfaceHeight; i += this.props.spacing) {
       ctx.moveTo(0, i);
-      ctx.lineTo(this.canvas.width, i);
+      ctx.lineTo(ctx.canvas.width, i);
     }
     this.setGridStyle(ctx);
     ctx.stroke();
@@ -31,15 +31,15 @@ class OutputGrid extends React.Component {
   drawFlatHexGrid(ctx) {
     let offset = false;
     ctx.beginPath();
-    const height = this.props.grid.spacing * Math.sqrt(3) * 0.5;
-    for (let y = 0; y < this.props.surface.height; y += height * 0.5) {
-      for (let x = this.props.grid.spacing * (offset ? 0.25 : 1); x < this.props.surface.width; x += this.props.grid.spacing * 1.5) {
+    const height = this.props.spacing * Math.sqrt(3) * 0.5;
+    for (let y = 0; y <= this.props.surfaceHeight; y += height * 0.5) {
+      for (let x = this.props.spacing * (offset ? 0.25 : 1); x <= this.props.surfaceWidth; x += this.props.spacing * 1.5) {
         ctx.moveTo(x, y);
-        ctx.lineTo(x + this.props.grid.spacing * 0.5, y);
+        ctx.lineTo(x + this.props.spacing * 0.5, y);
         ctx.moveTo(x, y);
-        ctx.lineTo(x - this.props.grid.spacing * 0.25, y + height * 0.5);
+        ctx.lineTo(x - this.props.spacing * 0.25, y + height * 0.5);
         ctx.moveTo(x, y);
-        ctx.lineTo(x - this.props.grid.spacing * 0.25, y - height * 0.5);
+        ctx.lineTo(x - this.props.spacing * 0.25, y - height * 0.5);
       }
       offset = !offset;
     }
@@ -50,15 +50,15 @@ class OutputGrid extends React.Component {
   drawPointyHexGrid(ctx) {
     let offset = false;
     ctx.beginPath();
-    const width = this.props.grid.spacing * Math.sqrt(3) * 0.5;
-    for (let y = 0; y < this.props.surface.height; y += this.props.grid.spacing * 0.75) {
-      for (let x = width * (offset ? 0.5 : 0); x < this.props.surface.width; x += width) {
+    const width = this.props.spacing * Math.sqrt(3) * 0.5;
+    for (let y = 0; y <= this.props.surfaceHeight; y += this.props.spacing * 0.75) {
+      for (let x = width * (offset ? 0.5 : 0); x <= this.props.surfaceWidth; x += width) {
         ctx.moveTo(x, y);
-        ctx.lineTo(x, y + this.props.grid.spacing * 0.5);
+        ctx.lineTo(x, y + this.props.spacing * 0.5);
         ctx.moveTo(x, y);
-        ctx.lineTo(x + width * 0.5, y - this.props.grid.spacing * 0.25);
+        ctx.lineTo(x + width * 0.5, y - this.props.spacing * 0.25);
         ctx.moveTo(x, y);
-        ctx.lineTo(x - width * 0.5, y - this.props.grid.spacing * 0.25);
+        ctx.lineTo(x - width * 0.5, y - this.props.spacing * 0.25);
       }
       offset = !offset;
     }
@@ -67,39 +67,32 @@ class OutputGrid extends React.Component {
   }
 
   draw() {
-    if (!this.props.grid.show) return;
     const ctx = this.getContext();
     ctx.save();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.translate(this.props.surface.x, this.props.surface.y);
-    ctx.scale(this.props.surface.scale, this.props.surface.scale);
-    ctx.rect(0, 0, this.props.surface.width, this.props.surface.height);
+    ctx.translate(this.props.x, this.props.y);
+    ctx.scale(this.props.scale, this.props.scale);
+    ctx.rect(0, 0, this.props.surfaceWidth, this.props.surfaceHeight);
     ctx.clip();
-    if (this.props.grid.type === 'square') {
-      this.drawSquareGrid(ctx);
-    }
-    if (this.props.grid.type === 'pointy-top-hex') {
-      this.drawPointyHexGrid(ctx);
-    }
-    if (this.props.grid.type === 'flat-top-hex') {
-      this.drawFlatHexGrid(ctx);
-    }
+    if (this.props.type === 'square') this.drawSquareGrid(ctx);
+    if (this.props.type === 'pointy-top-hex') this.drawPointyHexGrid(ctx);
+    if (this.props.type === 'flat-top-hex') this.drawFlatHexGrid(ctx);
     ctx.restore();
   }
 
   componentDidMount() {
-    if (this.props.grid.show) this.draw();
+    if (this.props.opacity > 0) this.draw();
   }
 
   componentDidUpdate() {
-    if (this.props.grid.show) this.draw();
+    if (this.props.opacity > 0) this.draw();
   }
 
   render() {
     const canvasStyle = {
       width: this.props.width + 'px',
       height: this.props.height + 'px',
-      display: this.props.grid.show ? 'block' : 'none'
+      opacity: this.props.opacity
     };
     return (
       <canvas
@@ -113,10 +106,18 @@ class OutputGrid extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  grid: state.grid,
-  surface: state.surface,
-  width: state.width,
-  height: state.height
+  lineColor: state.settings.grid.lineColor,
+  lineWidth: state.settings.grid.lineWidth,
+  type: state.settings.grid.type,
+  spacing: state.settings.grid.spacing,
+  opacity: state.settings.grid.show ? 1 : 0,
+  surfaceWidth: state.workspace.surface.width,
+  surfaceHeight: state.workspace.surface.height,
+  scale: state.workspace.scale,
+  height: state.workspace.height,
+  width: state.workspace.width,
+  x: state.workspace.x,
+  y: state.workspace.y
 });
 
 module.exports = connect(mapStateToProps)(OutputGrid);
