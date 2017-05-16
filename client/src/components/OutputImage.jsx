@@ -30,17 +30,23 @@ class OutputImage extends React.Component {
   }
 
   update() {
+    if (this.updating) {
+      this.pendingUpdate = true;
+      return;
+    }
+    this.updating = true;
+    this.pendingUpdate = false;
     const ctx = this.getImageContext();
-    return new Promise((resolve, reject) => {
-      ctx.fillStyle = '#c4b191';
-      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      const rng = seedrandom('');
-      const mapComponents = this.props.mapData.areas.map((area, areaIndex) => {
-        return new terrainClasses[area.ctor](this.props.mapData, areaIndex, ctx, rng);
-      });
-      resolve(mapComponents);
-    }).then(mapComponents => {
-      return new Promise((resolve, reject) => (function next(index) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillStyle = '#c4b191';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const rng = seedrandom('');
+    const mapComponents = this.props.mapData.areas.map((area, areaIndex) => {
+      return new terrainClasses[area.ctor](this.props.mapData, areaIndex, ctx, rng);
+    });
+    new Promise((resolve, reject) => {
+      return (function next(index) {
+        if (this.pendingUpdate) reject('abort');
         if (mapComponents[index]) {
           mapComponents[index].base().then(() => {
             return setTimeout(next.bind(this, index + 1), 0);
@@ -48,19 +54,29 @@ class OutputImage extends React.Component {
         } else {
           resolve(mapComponents);
         }
-      }).call(this, 0));
+      }).call(this, 0);
     }).then(mapComponents => {
-      return new Promise((resolve, reject) => (function next(index) {
-        if (mapComponents[index]) {
-          mapComponents[index].overlay().then(() => {
-            return setTimeout(next.bind(this, index + 1), 0);
-          });
-        } else {
-          resolve();
-        }
-      }).call(this, 0));
+      return new Promise((resolve, reject) => {
+        return (function next(index) {
+          if (this.pendingUpdate) reject('abort');
+          if (mapComponents[index]) {
+            mapComponents[index].overlay().then(() => {
+              return setTimeout(next.bind(this, index + 1), 0);
+            });
+          } else {
+            resolve();
+          }
+        }).call(this, 0);
+      });
     }).then(() => {
+      this.updating = false;
       this.imageCanvasData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.draw();
+    }).catch(err => {
+      this.updating = false;
+      if (err === 'abort') {
+        this.update();
+      }
     });
   }
 
@@ -84,7 +100,7 @@ class OutputImage extends React.Component {
     this.imageCanvas.height = this.props.surface.height * this.props.outputQuality;
     if (this.shouldCanvasUpdate()) {
       this.mapData = this.props.mapData;
-      this.update().then(this.draw.bind(this));
+      this.update();
     } else {
       this.draw();
     }

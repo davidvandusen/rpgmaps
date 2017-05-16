@@ -11,12 +11,12 @@ class InputPaint extends React.Component {
   draw() {
     const ctx = this.getContext();
     ctx.save();
+    ctx.translate(this.props.surface.x, this.props.surface.y);
+    ctx.scale(this.props.surface.scale, this.props.surface.scale);
+    ctx.beginPath();
+    ctx.rect(0, 0, this.props.surface.width, this.props.surface.height);
+    ctx.clip();
     if (this.props.mouse.x !== undefined && this.props.mouse.y !== undefined) {
-      ctx.translate(this.props.surface.x, this.props.surface.y);
-      ctx.scale(this.props.surface.scale, this.props.surface.scale);
-      ctx.beginPath();
-      ctx.rect(0, 0, this.props.surface.width, this.props.surface.height);
-      ctx.clip();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.beginPath();
       if (this.mouseOrigin && this.mouseOrigin.x !== undefined && this.mouseOrigin.y !== undefined) {
@@ -113,7 +113,7 @@ class InputPaint extends React.Component {
         className="input-paint"
         width={this.props.width}
         height={this.props.height}
-        style={canvasStyle}/>
+        style={canvasStyle} />
     );
   }
 }
