@@ -87,7 +87,7 @@ class OutputImage extends React.Component {
     if (!newMapData) return false;
     if (newMapData === mapData) return false;
     if (!mapData) return true;
-    if (newMapData.areas.length !== newMapData.areas.length) return true;
+    if (mapData.areas.length !== newMapData.areas.length) return true;
     for (let i = 0; i < newMapData.areas.length; i++) {
       if (mapData.areas[i].ctor !== newMapData.areas[i].ctor) return true;
       if (!mapData.areas[i].mask.equals(newMapData.areas[i].mask)) return true;

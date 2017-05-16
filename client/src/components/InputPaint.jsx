@@ -94,7 +94,7 @@ class InputPaint extends React.Component {
     const captureStroke = this.props.mouse.isDown && this.props.tool === 'BRUSH';
     if (captureStroke) {
       this.draw();
-    } else if (this._captureStroke !== captureStroke) {
+    } else if (this._captureStroke !== undefined && this._captureStroke !== captureStroke) {
       this.props.paintInput(this.getPaintedIndices());
       this.clear();
     }
