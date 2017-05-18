@@ -23,47 +23,40 @@ const store = createStore(
 );
 
 store.dispatch(actionsCreators.resizeApp(window.innerWidth, window.innerHeight));
-store.dispatch(actionsCreators.paintInput([]));
 store.dispatch(actionsCreators.scaleToFit());
 store.dispatch(actionsCreators.centerSurface());
 
+const keymap = {};
+
+keymap.down = {
+  ' ': () => store.dispatch(actionsCreators.setTool('DRAG')),
+  "'": () => store.dispatch(actionsCreators.cycleTerrain()),
+  ';': () => store.dispatch(actionsCreators.cycleTerrainReverse()),
+  ']': () => store.dispatch(actionsCreators.incrementBrushSize()),
+  '[': () => store.dispatch(actionsCreators.decrementBrushSize()),
+  'c': () => store.dispatch(actionsCreators.centerSurface()),
+  'z': () => {
+    store.dispatch(actionsCreators.scaleToFit());
+    store.dispatch(actionsCreators.centerSurface());
+  }
+};
+
+keymap.up = {
+  ' ': () => store.dispatch(actionsCreators.setTool('BRUSH'))
+};
+
 window.addEventListener('resize', throttle(() => store.dispatch(actionsCreators.resizeApp(window.innerWidth, window.innerHeight)), 100), {passive: true});
-window.addEventListener('wheel', throttle(event => store.dispatch(actionsCreators.scaleSurface(event.deltaY / 100, event.clientX, event.clientY)), 16), {passive: true});
+document.addEventListener('wheel', throttle(event => store.dispatch(actionsCreators.scaleSurface(event.deltaY / 100, event.clientX, event.clientY)), 16), {passive: true});
 document.addEventListener('mousemove', throttle(event => store.dispatch(actionsCreators.moveMouse(event.clientX, event.clientY)), 16), {passive: true});
 document.addEventListener('mousedown', () => store.dispatch(actionsCreators.depressMouse()));
 document.addEventListener('mouseup', () => store.dispatch(actionsCreators.releaseMouse()));
 document.addEventListener('keydown', event => {
-  switch (event.key) {
-    case ' ':
-      store.dispatch(actionsCreators.setTool('DRAG'));
-      break;
-    case '\'':
-      store.dispatch(actionsCreators.cycleTerrain());
-      break;
-    case ';':
-      store.dispatch(actionsCreators.cycleTerrainReverse());
-      break;
-    case ']':
-      store.dispatch(actionsCreators.incrementBrushSize());
-      break;
-    case '[':
-      store.dispatch(actionsCreators.decrementBrushSize());
-      break;
-    case 'c':
-      store.dispatch(actionsCreators.centerSurface());
-      break;
-    case 'z':
-      store.dispatch(actionsCreators.scaleToFit());
-      store.dispatch(actionsCreators.centerSurface());
-      break;
-  }
+  const fn = keymap.down[event.key];
+  if (typeof fn === 'function') fn(event);
 });
 document.addEventListener('keyup', event => {
-  switch (event.key) {
-    case ' ':
-      store.dispatch(actionsCreators.setTool('BRUSH'));
-      break;
-  }
+  const fn = keymap.up[event.key];
+  if (typeof fn === 'function') fn(event);
 });
 
 render((

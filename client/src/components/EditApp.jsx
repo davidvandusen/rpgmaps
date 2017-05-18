@@ -9,8 +9,10 @@ const OutputGrid = require('./OutputGrid.jsx');
 const EditApp = () => (
   <div className="edit-app">
     <div className="workspace">
+      <OutputImage />
       <OutputGrid />
       <InputImage />
+      <InputPaint />
       <InputTool />
     </div>
   </div>

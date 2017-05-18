@@ -16,11 +16,11 @@ class OutputGrid extends React.Component {
 
   drawSquareGrid(ctx) {
     ctx.beginPath();
-    for (let i = this.props.spacing; i <= this.props.surfaceWidth; i += this.props.spacing) {
+    for (let i = this.props.spacing; i < this.props.surfaceWidth; i += this.props.spacing) {
       ctx.moveTo(i, 0);
       ctx.lineTo(i, ctx.canvas.height);
     }
-    for (let i = this.props.spacing; i <= this.props.surfaceHeight; i += this.props.spacing) {
+    for (let i = this.props.spacing; i < this.props.surfaceHeight; i += this.props.spacing) {
       ctx.moveTo(0, i);
       ctx.lineTo(ctx.canvas.width, i);
     }
@@ -32,8 +32,10 @@ class OutputGrid extends React.Component {
     let offset = false;
     ctx.beginPath();
     const height = this.props.spacing * Math.sqrt(3) * 0.5;
-    for (let y = 0; y <= this.props.surfaceHeight; y += height * 0.5) {
-      for (let x = this.props.spacing * (offset ? 0.25 : 1); x <= this.props.surfaceWidth; x += this.props.spacing * 1.5) {
+    const lastRow = this.props.surfaceHeight + this.props.spacing;
+    for (let y = 0; y < lastRow; y += height * 0.5) {
+      const lastCol = this.props.surfaceWidth + this.props.spacing;
+      for (let x = this.props.spacing * (offset ? 0.25 : 1); x < lastCol; x += this.props.spacing * 1.5) {
         ctx.moveTo(x, y);
         ctx.lineTo(x + this.props.spacing * 0.5, y);
         ctx.moveTo(x, y);
@@ -51,8 +53,10 @@ class OutputGrid extends React.Component {
     let offset = false;
     ctx.beginPath();
     const width = this.props.spacing * Math.sqrt(3) * 0.5;
-    for (let y = 0; y <= this.props.surfaceHeight; y += this.props.spacing * 0.75) {
-      for (let x = width * (offset ? 0.5 : 0); x <= this.props.surfaceWidth; x += width) {
+    const lastRow = this.props.surfaceHeight + this.props.spacing;
+    for (let y = 0; y < lastRow; y += this.props.spacing * 0.75) {
+      const lastCol = this.props.surfaceWidth + this.props.spacing;
+      for (let x = width * (offset ? 0.5 : 0); x < lastCol; x += width) {
         ctx.moveTo(x, y);
         ctx.lineTo(x, y + this.props.spacing * 0.5);
         ctx.moveTo(x, y);
@@ -80,12 +84,16 @@ class OutputGrid extends React.Component {
     ctx.restore();
   }
 
+  onUpdate() {
+    if (this.props.opacity > 0) requestAnimationFrame(this.draw.bind(this));
+  }
+
   componentDidMount() {
-    if (this.props.opacity > 0) this.draw();
+    this.onUpdate();
   }
 
   componentDidUpdate() {
-    if (this.props.opacity > 0) this.draw();
+    this.onUpdate();
   }
 
   render() {
