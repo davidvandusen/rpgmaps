@@ -1,7 +1,7 @@
 const config = require('../../src/terrains/config');
 const seedrandom = require('seedrandom');
 const Terrain = require('../../src/terrains/CloseUpGrass');
-const mapDataFactory = require('../../src/common/mapDataFactory')(config.terrains);
+const mapDataFactory = require('../../src/actions/mapDataFactory')(config.terrains);
 
 const fillStyle = config.terrains.find(t => t.className === Terrain.name).color;
 

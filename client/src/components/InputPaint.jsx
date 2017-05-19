@@ -7,7 +7,7 @@ const mapStateToProps = state => ({
   className: 'input-paint',
   height: state.workspace.height,
   imageSmoothingEnabled: true,
-  opacity: 0.75,
+  opacity: 1,
   outputQuality: state.settings.outputQuality,
   scale: state.workspace.scale,
   surfaceHeight: state.workspace.surface.height,

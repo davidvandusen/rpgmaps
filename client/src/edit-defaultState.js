@@ -4,7 +4,7 @@ const terrains = require('./terrains/config');
 
 const defaultTool = 'BRUSH';
 const defaultRandomnessSeed = '';
-const defaultInputImageOpacity = 0.5;
+const defaultInputImageOpacity = 0;
 const defaultGridType = 'pointy-top-hex';
 const defaultGridSpacing = 4;
 const defaultGridShow = true;
@@ -24,13 +24,14 @@ const paintBuffer = new ImageData(inputWidth * outputQuality, inputHeight * outp
 
 fillImageData(inputBuffer, ...cssToRgba(terrains.find(t => t.className === defaultBackground).color));
 fillImageData(outputBuffer, 0xff, 0xff, 0xff, 0xff);
-fillImageData(paintBuffer, 0, 0, 0, 0xff);
 
 module.exports = {
   graphics: {
     inputBuffer,
     outputBuffer,
-    paintBuffer
+    paintBuffer,
+    mapData: undefined,
+    fadePaintBuffer: false
   },
   mouse: {
     dx: undefined,

@@ -1,7 +1,7 @@
 const {imageDataToAreaDescriptors} = require('../common/imageData');
 const {outlineMask, smoothPolygon, containmentGraph} = require('../common/geometry');
 const {intToCssHex, cssToRgba} = require('../common/color');
-const AreaMask = require('./AreaMask');
+const AreaMask = require('../common/AreaMask');
 
 function mapDataFactory(configTerrains) {
   const terrainsByColor = configTerrains.reduce((obj, terrain) => {
