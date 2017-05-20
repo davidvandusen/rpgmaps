@@ -19,19 +19,20 @@ const outputQuality = 10;
 const inputWidth = 128;
 const inputHeight = 72;
 const inputBuffer = new ImageData(inputWidth, inputHeight);
+const crossfadeBuffer = new ImageData(inputWidth * outputQuality, inputHeight * outputQuality);
 const outputBuffer = new ImageData(inputWidth * outputQuality, inputHeight * outputQuality);
 const paintBuffer = new ImageData(inputWidth * outputQuality, inputHeight * outputQuality);
 
 fillImageData(inputBuffer, ...cssToRgba(terrains.find(t => t.className === defaultBackground).color));
-fillImageData(outputBuffer, 0xff, 0xff, 0xff, 0xff);
 
 module.exports = {
   graphics: {
     inputBuffer,
     outputBuffer,
+    crossfadeBuffer,
     paintBuffer,
     mapData: undefined,
-    fadePaintBuffer: false
+    crossfadeOpacity: 0
   },
   mouse: {
     dx: undefined,

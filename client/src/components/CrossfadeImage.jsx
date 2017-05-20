@@ -3,11 +3,11 @@ const {connect} = require('react-redux');
 const CanvasImage = require('./CanvasImage.jsx');
 
 const mapStateToProps = state => ({
-  buffer: state.graphics.paintBuffer,
-  className: 'input-paint',
+  buffer: state.graphics.crossfadeBuffer,
+  className: 'crossfade-image',
   height: state.workspace.height,
   imageSmoothingEnabled: true,
-  opacity: 0.75,
+  opacity: state.graphics.crossfadeOpacity,
   outputQuality: state.settings.outputQuality,
   scale: state.workspace.scale,
   surfaceHeight: state.workspace.surface.height,

@@ -3,7 +3,8 @@ const createReducer = require('./createReducer');
 module.exports = createReducer({}, {
   RESIZE_APP: (state, action) => ({
     ...state,
-    ...action.payload
+    width: action.payload.width,
+    height: action.payload.height
   }),
   CENTER_SURFACE: state => ({
     ...state,
@@ -34,5 +35,10 @@ module.exports = createReducer({}, {
       x,
       y
     };
-  }
+  },
+  TRANSLATE_SURFACE: (state, action) => ({
+    ...state,
+    x: action.payload.x,
+    y: action.payload.y
+  })
 });
