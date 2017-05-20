@@ -15,7 +15,7 @@ class InputTool extends React.Component {
         ctx.beginPath();
         ctx.arc(this.props.mouseX, this.props.mouseY, this.props.brushSize * this.props.scale / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = 'white';
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = 0.75;
         ctx.stroke();
       }
     }

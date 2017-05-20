@@ -3,6 +3,7 @@ const mapDataFactory = require('./mapDataFactory');
 const {renderImage, shouldImageUpdate, addStrokeToNewPaintBuffer, addPaintBufferToInputImage} = require('./imageRendering');
 
 // Graphics actions
+const setMapData = makeActionCreator('SET_MAP_DATA', 'mapData');
 const setInputBuffer = makeActionCreator('SET_INPUT_BUFFER', 'inputBuffer');
 const setCrossfadeBuffer = makeActionCreator('SET_CROSSFADE_BUFFER', 'crossfadeBuffer');
 const setOutputBuffer = makeActionCreator('SET_OUTPUT_BUFFER', 'outputBuffer');
@@ -15,7 +16,6 @@ const resetPaintBuffer = () => (dispatch, getState) => {
   const paintBuffer = new ImageData(width, height);
   dispatch(setPaintBuffer(paintBuffer));
 };
-const setMapData = makeActionCreator('SET_MAP_DATA', 'mapData');
 
 // Workspace actions
 exports.resizeApp = makeActionCreator('RESIZE_APP', 'width', 'height');
@@ -66,10 +66,11 @@ exports.releaseMouse = () => (dispatch, getState) => {
         dispatch(setCrossfadeBuffer(outputBuffer));
         (function next(opacity) {
           if (outputBuffer !== getState().graphics.crossfadeBuffer) return;
-          if (opacity > 1) return;
           dispatch(setCrossfadeOpacity(opacity));
-          requestAnimationFrame(() => next(opacity + 0.05));
-        })(0.05);
+          if (opacity < 1) {
+            requestAnimationFrame(() => next(Math.min(1, opacity + 0.1)));
+          }
+        })(0.1);
       }
     });
   }

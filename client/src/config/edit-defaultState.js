@@ -1,6 +1,6 @@
-const {cssToRgba} = require('./common/color');
-const {fillImageData} = require('./common/imageData');
-const terrains = require('./terrains/config');
+const {cssToRgba} = require('../common/color');
+const {fillImageData} = require('../common/imageData');
+const terrains = require('../terrains/config');
 
 const defaultTool = 'BRUSH';
 const defaultRandomnessSeed = '';

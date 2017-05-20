@@ -4,7 +4,6 @@ const {addNoise} = require('../common/imageData');
 const {pointInCircle, distance} = require('../common/geometry');
 const {cssToRgba} = require('../common/color');
 
-
 function forEachPointInCircle(cx, cy, r, cb) {
   for (let y = cy - r; y < cy + r; y++) {
     for (let x = cx - r; x < (cx + r); x++) {
@@ -28,32 +27,30 @@ function colorCircle(cx, cy, r, w, h, rgba, data) {
 }
 
 function addStrokeToNewPaintBuffer(state, addTrail) {
-  const width = state.workspace.surface.width * state.settings.outputQuality;
-  const height = state.workspace.surface.height * state.settings.outputQuality;
-  const x = Math.floor((state.mouse.x - state.workspace.x) / state.workspace.scale * state.settings.outputQuality);
-  const y = Math.floor((state.mouse.y - state.workspace.y) / state.workspace.scale * state.settings.outputQuality);
-  const brushRadius = state.settings.brush.size * state.settings.outputQuality * 0.5;
-  // FIXME if the last position of the mouse was inside this area, then still draw the stroke
-  if (x >= -brushRadius && x < width + brushRadius && y >= -brushRadius && y < height + brushRadius) {
-    const paintBufferData = new Uint8ClampedArray(width * height * 4);
-    paintBufferData.set(state.graphics.paintBuffer.data);
-    const rgba = cssToRgba(state.settings.terrains[state.settings.terrain].color);
-    colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
-    if (addTrail && state.mouse.dx !== undefined && state.mouse.dy !== undefined) {
-      const dist = distance(0, 0, state.mouse.dx, state.mouse.dy);
-      if (dist > state.workspace.scale * state.settings.brush.size * 0.5) {
-        const steps = dist / state.settings.brush.size * Math.PI;
-        const dx = state.mouse.dx / steps;
-        const dy = state.mouse.dy / steps;
-        for (let step = 1; step < steps; step++) {
-          const x = Math.floor((state.mouse.x - state.workspace.x - dx * step) / state.workspace.scale * state.settings.outputQuality);
-          const y = Math.floor((state.mouse.y - state.workspace.y - dy * step) / state.workspace.scale * state.settings.outputQuality);
-          colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
-        }
+  const quality = state.settings.outputQuality;
+  const scale = state.workspace.scale;
+  const x = Math.floor((state.mouse.x - state.workspace.x) / scale * quality);
+  const y = Math.floor((state.mouse.y - state.workspace.y) / scale * quality);
+  const brushRadius = state.settings.brush.size * quality * 0.5;
+  const width = state.workspace.surface.width * quality;
+  const height = state.workspace.surface.height * quality;
+  const paintBufferData = state.graphics.paintBuffer.data;
+  const rgba = cssToRgba(state.settings.terrains[state.settings.terrain].color);
+  colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
+  if (addTrail && state.mouse.dx !== undefined && state.mouse.dy !== undefined) {
+    const dist = distance(0, 0, state.mouse.dx, state.mouse.dy);
+    if (dist > scale * state.settings.brush.size * 0.5) {
+      const steps = dist / state.settings.brush.size * Math.PI;
+      const dx = state.mouse.dx / steps;
+      const dy = state.mouse.dy / steps;
+      for (let step = 1; step < steps; step++) {
+        const x = Math.floor((state.mouse.x - state.workspace.x - dx * step) / scale * quality);
+        const y = Math.floor((state.mouse.y - state.workspace.y - dy * step) / scale * quality);
+        colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
       }
     }
-    return new ImageData(paintBufferData, width, height);
   }
+  return new ImageData(paintBufferData, width, height);
 }
 
 function addPaintBufferToInputImage(state) {
