@@ -12,6 +12,7 @@ module.exports = (dispatch, actions) => ({
     }
   },
   up: {
+    // TODO this should set the tool back to whatever it was before space was pressed
     ' ': () => dispatch(actions.setTool('BRUSH'))
   }
 });

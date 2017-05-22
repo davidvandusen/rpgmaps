@@ -35,6 +35,7 @@ module.exports = {
     crossfadeOpacity: 0
   },
   mouse: {
+    inWorkspace: undefined,
     dx: undefined,
     dy: undefined,
     isDown: false,
@@ -63,14 +64,18 @@ module.exports = {
     terrains,
     tool: defaultTool,
   },
+  ui: {
+    menuOpen: undefined
+  },
   workspace: {
+    controlsHeight: 0,
     scale: 1,
     surface: {
       height: inputHeight,
       width: inputWidth
     },
-    width: undefined,
-    height: undefined,
+    width: 0,
+    height: 0,
     x: 0,
     y: 0
   }

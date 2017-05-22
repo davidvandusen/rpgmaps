@@ -9,9 +9,20 @@ module.exports = createReducer({}, {
     ...state,
     terrain: state.terrain === 0 ? state.terrains.length - 1 : state.terrain - 1
   }),
+  SET_TERRAIN: (state, action) => ({
+    ...state,
+    terrain: action.payload.index
+  }),
   SET_TOOL: (state, action) => ({
     ...state,
     tool: action.payload.tool
+  }),
+  SET_BRUSH_SIZE: (state, action) => ({
+    ...state,
+    brush: {
+      ...state.brush,
+      size: Math.min(128, Math.max(1, action.payload.size))
+    }
   }),
   DECREMENT_BRUSH_SIZE: state => ({
     ...state,
@@ -24,7 +35,7 @@ module.exports = createReducer({}, {
     ...state,
     brush: {
       ...state.brush,
-      size: state.brush.size + 1
+      size: Math.min(128, state.brush.size + 1)
     }
   })
 });

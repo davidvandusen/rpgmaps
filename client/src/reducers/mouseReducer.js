@@ -1,6 +1,7 @@
 const createReducer = require('./createReducer');
 
 module.exports = createReducer({}, {
+  MOUSE_IN_WORKSPACE: (state, action) => ({...state, inWorkspace: action.payload.inWorkspace}),
   MOVE_MOUSE: (state, action) => ({
     ...state,
     ...action.payload,
