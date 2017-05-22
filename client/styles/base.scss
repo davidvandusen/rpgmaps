@@ -14,6 +14,19 @@ a {
   text-decoration: inherit;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: 900;
+  margin: 1em 0;
+}
+
+hr {
+  background: rgb(225,225,225);
+  border: 0 none transparent;
+  height: 1px;
+  margin: 5px 0;
+}
+
 input[type=number],
 input[type=text] {
   background: $page-background;

@@ -1,7 +1,7 @@
 {
   "name": "rpgmaps-client",
   "version": "0.0.13",
-  "description": "Tabletop roleplaying game map creation tool",
+  "description": "Software for spontaneously creating encounter maps for tabletop role-playing games",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --port 8080",
     "demo": "./node_modules/.bin/webpack-dev-server --port 8081 --config webpack.demo.config.js",
@@ -9,7 +9,11 @@
     "build:prod": "./node_modules/.bin/webpack --config webpack.production.config.js",
     "test": "./node_modules/.bin/mocha"
   },
-  "author": "David VanDusen <github@davidvandusen.com>",
+  "author": {
+    "name": "David VanDusen",
+    "email": "github@davidvandusen.com",
+    "url": "http://davidvandusen.com/"
+  },
   "repository": {
     "type": "git",
     "url": "https://dvandusen@bitbucket.org/dvandusen/rpgmaps/client"

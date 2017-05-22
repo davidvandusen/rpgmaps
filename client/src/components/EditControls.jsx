@@ -3,9 +3,17 @@ const {connect} = require('react-redux');
 const {setTerrain, setControlsHeight, setBrushSize, scaleToFit, centerSurface, scaleSurface, toggleMenu} = require('../actions/actionCreators');
 
 class EditControls extends React.Component {
-  componentDidMount() {
+  onUpdate() {
     const elBounds = this.el.getBoundingClientRect();
     this.props.setControlsHeight(elBounds.height);
+  }
+
+  componentDidUpdate() {
+    this.onUpdate();
+  }
+
+  componentDidMount() {
+    this.onUpdate();
   }
 
   render() {
@@ -14,6 +22,36 @@ class EditControls extends React.Component {
         ref={el => this.el = el}
         className="controls">
         <div className="controls-primary">
+          <div className="control">
+            <div
+              className={'control-interactable' + (this.props.openMenu === 'ABOUT' ? ' active' : '')}
+              onClick={() => this.props.toggleMenu('ABOUT')}>
+              <div className="control-label control-label-brand">
+                <div className="control-label-major">RPG Maps</div>
+                <div className="control-label-minor">About v{APP_VERSION}</div>
+              </div>
+            </div>
+            <div
+              className={'control-dropdown' + (this.props.openMenu === 'ABOUT' ? ' open' : '')}
+              style={{width: '200px'}}>
+              <div className="control">
+                <div className="control-label">
+                  <h2 className="control-label-major">About</h2>
+                  <p>{APP_DESCRIPTION}</p>
+                  <p><b>Current version:</b> v{APP_VERSION}</p>
+                  <p><b>Created by:</b> <a href={APP_AUTHOR.url}>{APP_AUTHOR.name}</a></p>
+                </div>
+              </div>
+              <hr />
+              <div className="control" style={{justifyContent: 'flex-end'}}>
+                <div className="control-list">
+                  <div className="control-interactable" onClick={() => this.props.toggleMenu('ABOUT')}>
+                    <div className="control-label">OK</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="control">
             <div
               className={'control-interactable' + (this.props.openMenu === 'TERRAINS' ? ' active' : '')}
@@ -99,14 +137,6 @@ class EditControls extends React.Component {
               <div className="control-label">Play Map</div>
             </div>
           </div>
-          <div className="control">
-            <div className="control-interactable">
-              <div className="control-label control-label-brand">
-                <div className="control-label-major">RPG Maps</div>
-                <div className="control-label-minor">About v{APP_VERSION}</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -114,8 +144,11 @@ class EditControls extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  width: state.workspace.width,
+  height: state.workspace.height,
   openMenu: state.ui.menuOpen,
   brushSize: state.settings.brush.size,
+  // TODO Take into account whether the height or width should be used to calculate the percentage
   zoom: (state.workspace.surface.height * state.workspace.scale) / (state.workspace.height - state.workspace.controlsHeight) * 100,
   terrains: state.settings.terrains,
   currentTerrain: state.settings.terrains[state.settings.terrain]
@@ -123,7 +156,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   toggleMenu: menu => dispatch(toggleMenu(menu)),
-  setTerrain: index => dispatch(setTerrain(index)),
+  setTerrain: index => {
+    dispatch(setTerrain(index));
+    dispatch(toggleMenu('TERRAINS'));
+  },
   onBrushSizeChange: event => {
     const brushSize = Number(event.target.value);
     if (brushSize) dispatch(setBrushSize(brushSize));
