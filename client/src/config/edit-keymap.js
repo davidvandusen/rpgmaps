@@ -1,18 +1,25 @@
-module.exports = (dispatch, actions) => ({
+const {incrementBrushSize, decrementBrushSize, setTool, cycleForeground, cycleForegroundReverse} = require('../actions/inputActions');
+const {zoomWorkspace, centerWorkspace, scaleWorkspaceToFitSurface} = require('../actions/workspaceActions');
+const {setInputOpacity} = require('../actions/graphicsActions');
+
+module.exports = (dispatch) => ({
   down: {
-    ' ': () => dispatch(actions.setTool('DRAG')),
-    "'": () => dispatch(actions.cycleTerrain()),
-    ';': () => dispatch(actions.cycleTerrainReverse()),
-    ']': () => dispatch(actions.incrementBrushSize()),
-    '[': () => dispatch(actions.decrementBrushSize()),
-    'c': () => dispatch(actions.centerSurface()),
+    ' ': () => dispatch(setTool('DRAG')),
+    "'": () => dispatch(cycleForeground()),
+    ';': () => dispatch(cycleForegroundReverse()),
+    ']': () => dispatch(incrementBrushSize()),
+    '[': () => dispatch(decrementBrushSize()),
+    'c': () => dispatch(centerWorkspace()),
+    'i': () => dispatch(setInputOpacity(1)),
     'z': () => {
-      dispatch(actions.scaleToFit());
-      dispatch(actions.centerSurface());
+      dispatch(scaleWorkspaceToFitSurface());
+      dispatch(zoomWorkspace(-1));
+      dispatch(centerWorkspace());
     }
   },
   up: {
     // TODO this should set the tool back to whatever it was before space was pressed
-    ' ': () => dispatch(actions.setTool('BRUSH'))
+    ' ': () => dispatch(setTool('BRUSH')),
+    'i': () => dispatch(setInputOpacity(0))
   }
 });

@@ -1,14 +1,10 @@
 const {combineReducers} = require('redux');
-const graphics = require('./graphicsReducer');
-const mouse = require('./mouseReducer');
+const data = require('./dataReducer');
 const settings = require('./settingsReducer');
 const ui = require('./uiReducer');
-const workspace = require('./workspaceReducer');
 
 module.exports = combineReducers({
-  graphics,
-  mouse,
+  data,
   settings,
-  ui,
-  workspace
+  ui
 });

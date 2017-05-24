@@ -1,13 +1,11 @@
 require('../../styles/edit-app.scss');
 const React = require('react');
 const {connect} = require('react-redux');
-const InputImage = require('./InputImage.jsx');
-const InputPaint = require('./InputPaint.jsx');
 const InputTool = require('./InputTool.jsx');
-const OutputImage = require('./OutputImage.jsx');
-const CrossfadeImage = require('./CrossfadeImage.jsx');
+const EditCanvas = require('./EditCanvas.jsx');
 const EditControls = require('./EditControls.jsx');
-const {mouseInWorkspace, scaleToFit, centerSurface} = require('../actions/actionCreators');
+const {mouseInWorkspace} = require('../actions/mouseActions');
+const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace, resizeWorkspace} = require('../actions/workspaceActions');
 
 class EditApp extends React.Component {
   componentDidMount() {
@@ -21,10 +19,7 @@ class EditApp extends React.Component {
           className="workspace"
           onMouseEnter={this.props.onMouseEnterWorkspace}
           onMouseLeave={this.props.onMouseLeaveWorkspace}>
-          <OutputImage />
-          <CrossfadeImage />
-          <InputImage />
-          <InputPaint />
+          <EditCanvas />
           <InputTool />
         </div>
         <EditControls />
@@ -39,8 +34,10 @@ const mapDispatchToProps = dispatch => ({
   onMouseEnterWorkspace: () => dispatch(mouseInWorkspace(true)),
   onMouseLeaveWorkspace: () => dispatch(mouseInWorkspace(false)),
   onComponentDidMount: () => {
-    dispatch(scaleToFit());
-    dispatch(centerSurface());
+    dispatch(resizeWorkspace(window.innerWidth, window.innerHeight));
+    dispatch(scaleWorkspaceToFitSurface());
+    dispatch(zoomWorkspace(-1));
+    dispatch(centerWorkspace());
   }
 });
 

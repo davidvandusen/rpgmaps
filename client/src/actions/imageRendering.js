@@ -27,46 +27,47 @@ function colorCircle(cx, cy, r, w, h, rgba, data) {
 }
 
 function addStrokeToNewPaintBuffer(state, addTrail) {
-  const quality = state.settings.outputQuality;
-  const scale = state.workspace.scale;
-  const x = Math.floor((state.mouse.x - state.workspace.x) / scale * quality);
-  const y = Math.floor((state.mouse.y - state.workspace.y) / scale * quality);
-  const brushRadius = state.settings.brush.size * quality * 0.5;
-  const width = state.workspace.surface.width * quality;
-  const height = state.workspace.surface.height * quality;
-  const paintBufferData = state.graphics.paintBuffer.data;
-  const rgba = cssToRgba(state.settings.terrains[state.settings.terrain].color);
+  const quality = state.settings.output.quality;
+  const scale = state.ui.workspace.scale;
+  const x = Math.floor((state.ui.mouse.x - state.ui.workspace.x) / scale * quality);
+  const y = Math.floor((state.ui.mouse.y - state.ui.workspace.y) / scale * quality);
+  const brushRadius = state.settings.input.brushSize * quality * 0.5;
+  const width = state.settings.input.width * quality;
+  const height = state.settings.input.height * quality;
+  const paintBufferData = state.ui.graphics.paintBuffer.data;
+  const rgba = cssToRgba(state.settings.input.terrains[state.settings.input.foreground].color);
   colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
-  if (addTrail && state.mouse.dx !== undefined && state.mouse.dy !== undefined) {
-    const dist = distance(0, 0, state.mouse.dx, state.mouse.dy);
-    if (dist > scale * state.settings.brush.size * 0.5) {
-      const steps = dist / state.settings.brush.size * Math.PI;
-      const dx = state.mouse.dx / steps;
-      const dy = state.mouse.dy / steps;
+  if (addTrail && state.ui.mouse.dx !== undefined && state.ui.mouse.dy !== undefined) {
+    const dist = distance(0, 0, state.ui.mouse.dx, state.ui.mouse.dy);
+    if (dist > scale * state.settings.input.brushSize * 0.5) {
+      const steps = dist / state.settings.input.brushSize * Math.PI;
+      const dx = state.ui.mouse.dx / steps;
+      const dy = state.ui.mouse.dy / steps;
       for (let step = 1; step < steps; step++) {
-        const x = Math.floor((state.mouse.x - state.workspace.x - dx * step) / scale * quality);
-        const y = Math.floor((state.mouse.y - state.workspace.y - dy * step) / scale * quality);
+        const x = Math.floor((state.ui.mouse.x - state.ui.workspace.x - dx * step) / scale * quality);
+        const y = Math.floor((state.ui.mouse.y - state.ui.workspace.y - dy * step) / scale * quality);
         colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
       }
     }
   }
   return new ImageData(paintBufferData, width, height);
 }
+exports.addStrokeToNewPaintBuffer = addStrokeToNewPaintBuffer;
 
 function addPaintBufferToInputImage(state) {
-  const paintBufferData = state.graphics.paintBuffer.data;
-  const width = state.workspace.surface.width;
-  const height = state.workspace.surface.height;
-  const scaledWidth = width * state.settings.outputQuality;
+  const paintBufferData = state.ui.graphics.paintBuffer.data;
+  const width = state.settings.input.width;
+  const height = state.settings.input.height;
+  const scaledWidth = width * state.settings.output.quality;
   const numInputIndices = width * height;
   const inputBufferData = new Uint8ClampedArray(numInputIndices * 4);
-  inputBufferData.set(state.graphics.inputBuffer.data);
-  const rgba = cssToRgba(state.settings.terrains[state.settings.terrain].color);
+  inputBufferData.set(state.ui.graphics.inputBuffer.data);
+  const rgba = cssToRgba(state.settings.input.terrains[state.settings.input.foreground].color);
   for (let i = 0; i < numInputIndices; i++) {
     const x = i % width + 0.5;
     const y = Math.floor(i / width) + 0.5;
-    const scaledX = x * state.settings.outputQuality;
-    const scaledY = y * state.settings.outputQuality;
+    const scaledX = x * state.settings.output.quality;
+    const scaledY = y * state.settings.output.quality;
     const paintPixelIndex = Math.floor(scaledX + scaledY * scaledWidth);
     const alphaIndex = paintPixelIndex * 4 + 3;
     if (paintBufferData[alphaIndex] === 0xff) {
@@ -79,6 +80,7 @@ function addPaintBufferToInputImage(state) {
   }
   return new ImageData(inputBufferData, width, height);
 }
+exports.addPaintBufferToInputImage = addPaintBufferToInputImage;
 
 function drawGlobalLight(ctx) {
   const gradient1 = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.sqrt(Math.pow(ctx.canvas.width, 2) + Math.pow(ctx.canvas.height, 2)));
@@ -113,15 +115,15 @@ function renderImageLayer(mapComponents, layer) {
 
 function renderImage(state) {
   const canvas = document.createElement('canvas');
-  canvas.width = state.workspace.surface.width * state.settings.outputQuality;
-  canvas.height = state.workspace.surface.height * state.settings.outputQuality;
+  canvas.width = state.settings.input.width * state.settings.output.quality;
+  canvas.height = state.settings.input.height * state.settings.output.quality;
   const ctx = canvas.getContext('2d');
   ctx.beginPath();
   ctx.rect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.fillStyle = '#c4b191';
   ctx.fill();
-  const rng = seedrandom(state.settings.randomnessSeed);
-  const mapComponents = state.graphics.mapData.areas.map((area, areaIndex) => new terrainClasses[area.ctor](state.graphics.mapData, areaIndex, ctx, rng));
+  const rng = seedrandom(state.settings.output.randomnessSeed);
+  const mapComponents = state.data.mapData.areas.map((area, areaIndex) => new terrainClasses[area.ctor](state.data.mapData, areaIndex, ctx, rng));
   return renderImageLayer(mapComponents, 'base')
     .then(() => renderImageLayer(mapComponents, 'overlay'))
     .then(() => {
@@ -131,6 +133,7 @@ function renderImage(state) {
       return Promise.resolve(imageData);
     });
 }
+exports.renderImage = renderImage;
 
 function shouldImageUpdate(mapData, newMapData) {
   if (!newMapData) return false;
@@ -143,10 +146,4 @@ function shouldImageUpdate(mapData, newMapData) {
   }
   return false;
 }
-
-module.exports = {
-  shouldImageUpdate,
-  renderImage,
-  addStrokeToNewPaintBuffer,
-  addPaintBufferToInputImage
-};
+exports.shouldImageUpdate = shouldImageUpdate;

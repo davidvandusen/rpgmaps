@@ -1,48 +1,30 @@
 const createReducer = require('./createReducer');
 
-module.exports = createReducer({}, {
-  SET_CONTROLS_HEIGHT: (state, action) => ({
+module.exports = createReducer({
+  width: undefined,
+  height: undefined,
+  scale: undefined,
+  x: undefined,
+  y: undefined
+}, {
+  RESIZE_WORKSPACE: (state, {payload}) => ({
     ...state,
-    controlsHeight: action.payload.height
+    width: payload.width,
+    height: payload.height
   }),
-  RESIZE_APP: (state, action) => ({
+  SCALE_WORKSPACE: (state, {payload}) => ({
     ...state,
-    width: action.payload.width,
-    height: action.payload.height
+    scale: payload.scale
   }),
-  CENTER_SURFACE: state => ({
+  TRANSLATE_WORKSPACE: (state, {payload}) => ({
     ...state,
-    x: state.width / 2 - state.surface.width * state.scale / 2,
-    y: (state.height + state.controlsHeight) / 2 - state.surface.height * state.scale / 2
+    x: payload.x,
+    y: payload.y
   }),
-  SCALE_TO_FIT: state => {
-    const xRatio = state.width / state.surface.width;
-    const yRatio = (state.height - state.controlsHeight) / state.surface.height;
-    const scale = xRatio < yRatio ? xRatio : yRatio;
-    return {
-      ...state,
-      scale
-    };
-  },
-  SCALE_SURFACE: (state, action) => {
-    const scale = Math.max(1, state.scale + action.payload.delta);
-    const delta = scale - state.scale;
-    const px = ((action.payload.x === undefined ? state.width * 0.5 : action.payload.x) - state.x) / (state.width * state.scale);
-    const py = ((action.payload.y === undefined ? state.height * 0.5 : action.payload.y) - state.y) / (state.height * state.scale);
-    const dx = delta * state.width * px;
-    const dy = delta * state.height * py;
-    const x = state.x - dx;
-    const y = state.y - dy;
-    return {
-      ...state,
-      scale,
-      x,
-      y
-    };
-  },
-  TRANSLATE_SURFACE: (state, action) => ({
+  TRANSFORM_WORKSPACE: (state, {payload}) => ({
     ...state,
-    x: action.payload.x,
-    y: action.payload.y
+    x: payload.x,
+    y: payload.y,
+    scale: payload.scale
   })
 });

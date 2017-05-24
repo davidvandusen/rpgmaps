@@ -1,12 +1,24 @@
 const createReducer = require('./createReducer');
 
-module.exports = createReducer({}, {
-  MOUSE_IN_WORKSPACE: (state, action) => ({...state, inWorkspace: action.payload.inWorkspace}),
-  MOVE_MOUSE: (state, action) => ({
+module.exports = createReducer({
+  inWorkspace: undefined,
+  dx: undefined,
+  dy: undefined,
+  isDown: undefined,
+  isUp: undefined,
+  x: undefined,
+  y: undefined
+}, {
+  MOUSE_IN_WORKSPACE: (state, {payload}) => ({
     ...state,
-    ...action.payload,
-    dx: action.payload.x - state.x,
-    dy: action.payload.y - state.y
+    inWorkspace: payload.inWorkspace
+  }),
+  MOVE_MOUSE: (state, {payload}) => ({
+    ...state,
+    x: payload.x,
+    y: payload.y,
+    dx: payload.x - state.x,
+    dy: payload.y - state.y
   }),
   DEPRESS_MOUSE: state => ({
     ...state,
@@ -17,5 +29,5 @@ module.exports = createReducer({}, {
     ...state,
     isDown: false,
     isUp: true
-  }),
+  })
 });

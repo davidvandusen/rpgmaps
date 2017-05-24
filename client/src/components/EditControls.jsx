@@ -1,6 +1,8 @@
 const React = require('react');
 const {connect} = require('react-redux');
-const {setTerrain, setControlsHeight, setBrushSize, scaleToFit, centerSurface, scaleSurface, toggleMenu} = require('../actions/actionCreators');
+const {setForeground, setBrushSize} = require('../actions/inputActions');
+const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
+const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
 
 class EditControls extends React.Component {
   onUpdate() {
@@ -22,9 +24,9 @@ class EditControls extends React.Component {
         ref={el => this.el = el}
         className="controls">
         <div className="controls-primary">
-          <div className="control">
+          <div className={'control' + (this.props.menuOpen === 'ABOUT' ? ' active' : '')}>
             <div
-              className={'control-interactable' + (this.props.openMenu === 'ABOUT' ? ' active' : '')}
+              className="control-interactable"
               onClick={() => this.props.toggleMenu('ABOUT')}>
               <div className="control-label control-label-brand">
                 <div className="control-label-major">RPG Maps</div>
@@ -32,7 +34,7 @@ class EditControls extends React.Component {
               </div>
             </div>
             <div
-              className={'control-dropdown' + (this.props.openMenu === 'ABOUT' ? ' open' : '')}
+              className={'control-dropdown' + (this.props.menuOpen === 'ABOUT' ? ' open' : '')}
               style={{width: '200px'}}>
               <div className="control">
                 <div className="control-label">
@@ -45,16 +47,16 @@ class EditControls extends React.Component {
               <hr />
               <div className="control" style={{justifyContent: 'flex-end'}}>
                 <div className="control-list">
-                  <div className="control-interactable" onClick={() => this.props.toggleMenu('ABOUT')}>
+                  <div className="control-interactable" onClick={() => this.props.closeMenu()}>
                     <div className="control-label">OK</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="control">
+          <div className={'control' + (this.props.menuOpen === 'TERRAINS' ? ' active' : '')}>
             <div
-              className={'control-interactable' + (this.props.openMenu === 'TERRAINS' ? ' active' : '')}
+              className="control-interactable"
               onClick={() => this.props.toggleMenu('TERRAINS')}>
               <canvas
                 className="control-thumbnail"
@@ -70,13 +72,13 @@ class EditControls extends React.Component {
                 }}>{this.props.currentTerrain.description}</div>
               </div>
             </div>
-            <div className={'control-dropdown' + (this.props.openMenu === 'TERRAINS' ? ' open' : '')}>
+            <div className={'control-dropdown' + (this.props.menuOpen === 'TERRAINS' ? ' open' : '')}>
               {this.props.terrains.map((terrain, index) => (
                 <div
                   key={terrain.color}
-                  className="control">
+                  className={'control' + (terrain === this.props.currentTerrain ? ' active' : '')}>
                   <div
-                    className={'control-interactable' + (terrain === this.props.currentTerrain ? ' active' : '')}
+                    className="control-interactable"
                     onClick={() => this.props.setTerrain(index)}>
                     <canvas
                       className="control-thumbnail"
@@ -144,21 +146,22 @@ class EditControls extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  width: state.workspace.width,
-  height: state.workspace.height,
-  openMenu: state.ui.menuOpen,
-  brushSize: state.settings.brush.size,
-  // TODO Take into account whether the height or width should be used to calculate the percentage
-  zoom: (state.workspace.surface.height * state.workspace.scale) / (state.workspace.height - state.workspace.controlsHeight) * 100,
-  terrains: state.settings.terrains,
-  currentTerrain: state.settings.terrains[state.settings.terrain]
+  width: state.ui.workspace.width,
+  height: state.ui.workspace.height,
+  menuOpen: state.ui.controls.menuOpen,
+  brushSize: state.settings.input.brushSize,
+  zoom: state.ui.workspace.scale / state.settings.output.quality * 100,
+  terrains: state.settings.input.terrains,
+  currentTerrain: state.settings.input.terrains[state.settings.input.foreground]
 });
 
 const mapDispatchToProps = dispatch => ({
   toggleMenu: menu => dispatch(toggleMenu(menu)),
-  setTerrain: index => {
-    dispatch(setTerrain(index));
-    dispatch(toggleMenu('TERRAINS'));
+  openMenu: menu => dispatch(openMenu(menu)),
+  closeMenu: () => dispatch(closeMenu()),
+  setTerrain: foreground => {
+    dispatch(setForeground(foreground));
+    dispatch(closeMenu());
   },
   onBrushSizeChange: event => {
     const brushSize = Number(event.target.value);
@@ -166,11 +169,12 @@ const mapDispatchToProps = dispatch => ({
   },
   setControlsHeight: height => dispatch(setControlsHeight(height)),
   resetZoom: () => {
-    dispatch(scaleToFit());
-    dispatch(centerSurface());
+    dispatch(scaleWorkspaceToFitSurface());
+    dispatch(zoomWorkspace(-1));
+    dispatch(centerWorkspace());
   },
-  zoomIn: () => dispatch(scaleSurface(1)),
-  zoomOut: () => dispatch(scaleSurface(-1))
+  zoomIn: () => dispatch(zoomWorkspace(1)),
+  zoomOut: () => dispatch(zoomWorkspace(-1))
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(EditControls);

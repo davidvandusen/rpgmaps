@@ -1,5 +1,7 @@
 const React = require('react');
 
+const bufferProps = ['imageData', 'x', 'y', 'scale', 'alpha'];
+
 class CanvasImage extends React.Component {
   getContext() {
     return this.canvas.getContext('2d');
@@ -10,30 +12,48 @@ class CanvasImage extends React.Component {
   }
 
   draw() {
-    const ctx = this.getContext();
-    ctx.save();
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.translate(this.props.x, this.props.y);
-    ctx.scale(this.props.scale / this.props.outputQuality, this.props.scale / this.props.outputQuality);
-    this.getBufferContext().putImageData(this.props.buffer, 0, 0);
-    ctx.drawImage(this.bufferCanvas, 0, 0);
-    ctx.restore();
-  }
-
-  onUpdate() {
-    this.bufferCanvas.width = this.props.buffer.width;
-    this.bufferCanvas.height = this.props.buffer.height;
-    if (this.props.opacity > 0) requestAnimationFrame(this.draw.bind(this));
+    requestAnimationFrame(() => {
+      const ctx = this.getContext();
+      ctx.imageSmoothingEnabled = this.props.imageSmoothingEnabled;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.props.buffers.forEach(buffer => {
+        if (!buffer.imageData || !buffer.alpha) return;
+        ctx.save();
+        this.bufferCanvas.width = buffer.imageData.width;
+        this.bufferCanvas.height = buffer.imageData.height;
+        ctx.translate(buffer.x, buffer.y);
+        ctx.scale(buffer.scale, buffer.scale);
+        ctx.globalAlpha = buffer.alpha;
+        const bufferCtx = this.getBufferContext();
+        bufferCtx.clearRect(0, 0, buffer.imageData.width, buffer.imageData.height);
+        bufferCtx.putImageData(buffer.imageData, 0, 0);
+        ctx.drawImage(this.bufferCanvas, 0, 0);
+        ctx.restore();
+      });
+    });
   }
 
   componentDidMount() {
     this.bufferCanvas = document.createElement('canvas');
-    this.getContext().imageSmoothingEnabled = this.props.imageSmoothingEnabled;
-    this.onUpdate();
+    this.draw();
   }
 
-  componentDidUpdate() {
-    this.onUpdate();
+  shouldCanvasRedraw(prevProps) {
+    if (prevProps.width !== this.props.width || prevProps.height !== this.props.height) return true;
+    if (prevProps.imageSmoothingEnabled !== this.props.imageSmoothingEnabled) return true;
+    const oldBuffers = prevProps.buffers;
+    const newBuffers = this.props.buffers;
+    if (oldBuffers.length !== newBuffers.length) return true;
+    for (let i = 0; i < oldBuffers.length; i++) {
+      for (const prop of bufferProps) {
+        if (oldBuffers[i][prop] !== newBuffers[i][prop]) return true;
+      }
+    }
+    return false;
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.shouldCanvasRedraw(prevProps)) this.draw();
   }
 
   render() {

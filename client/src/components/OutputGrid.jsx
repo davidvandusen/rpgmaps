@@ -118,14 +118,14 @@ const mapStateToProps = state => ({
   lineWidth: state.settings.grid.lineWidth,
   type: state.settings.grid.type,
   spacing: state.settings.grid.spacing,
-  opacity: state.settings.grid.show ? 1 : 0,
-  surfaceWidth: state.workspace.surface.width,
-  surfaceHeight: state.workspace.surface.height,
-  scale: state.workspace.scale,
-  height: state.workspace.height,
-  width: state.workspace.width,
-  x: state.workspace.x,
-  y: state.workspace.y
+  opacity: state.settings.grid.opacity,
+  surfaceWidth: state.settings.input.width,
+  surfaceHeight: state.settings.input.height,
+  scale: state.ui.workspace.scale,
+  height: state.ui.workspace.height,
+  width: state.ui.workspace.width,
+  x: state.ui.workspace.x,
+  y: state.ui.workspace.y
 });
 
 module.exports = connect(mapStateToProps)(OutputGrid);
