@@ -3,18 +3,9 @@ const persistent = require('./persistent');
 const dataReducer = require('./dataReducer');
 const settingsReducer = require('./settingsReducer');
 const uiReducer = require('./uiReducer');
-const mapDataFactory = require('../common/mapDataFactory');
 
 module.exports = combineReducers({
-  data: persistent(dataReducer, {
-    key: 'play.data',
-    deserialize: str => {
-      const obj = JSON.parse(str);
-      obj.mapData = mapDataFactory.hydrateJSON(obj.mapData);
-      return obj;
-    }
-  }),
+  data: dataReducer,
   settings: persistent(settingsReducer, {key: 'play.settings'}),
-  // UI is transient, unlike settings and data
   ui: uiReducer
 });

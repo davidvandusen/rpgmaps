@@ -118,7 +118,7 @@ const mapStateToProps = state => ({
   lineWidth: state.settings.grid.lineWidth,
   type: state.settings.grid.type,
   spacing: state.settings.grid.spacing,
-  opacity: state.settings.grid.opacity,
+  opacity: state.data.mapData ? state.settings.grid.opacity : 0,
   surfaceWidth: state.settings.input.width,
   surfaceHeight: state.settings.input.height,
   scale: state.ui.workspace.scale,

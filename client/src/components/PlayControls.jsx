@@ -2,6 +2,7 @@ const React = require('react');
 const {connect} = require('react-redux');
 const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
 const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
+const {setGridType, setGridSpacing, setGridLineColor} = require('../actions/gridActions');
 
 class PlayControls extends React.Component {
   onUpdate() {
@@ -60,6 +61,55 @@ class PlayControls extends React.Component {
           </div>
 
           <div className="control">
+            <div className="control-label">Spacing:
+              <span className="control-input">
+                  <input
+                    type="number"
+                    style={{width: '3em'}}
+                    value={this.props.gridSpacing}
+                    onChange={this.props.onGridSpacingChange} />
+                </span>
+            </div>
+          </div>
+
+          <div className="control">
+            <div className="control-list">
+              <div className="control-label">Type:</div>
+              <div
+                className={'control-interactable' + (this.props.gridType === 'pointy-top-hex' ? ' active' : '')}
+                onClick={() => this.props.setGridType('pointy-top-hex')}>
+                <div className="control-label">Pointy Top Hex</div>
+              </div>
+              <div
+                className={'control-interactable' + (this.props.gridType === 'flat-top-hex' ? ' active' : '')}
+                onClick={() => this.props.setGridType('flat-top-hex')}>
+                <div className="control-label">Flat Top Hex</div>
+              </div>
+              <div
+                className={'control-interactable' + (this.props.gridType === 'square' ? ' active' : '')}
+                onClick={() => this.props.setGridType('square')}>
+                <div className="control-label">Square</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="control">
+            <div className="control-list">
+              <div className="control-label">Color:</div>
+              <div
+                className={'control-interactable' + (this.props.gridLineColor === 'black' ? ' active' : '')}
+                onClick={() => this.props.setGridLineColor('black')}>
+                <div className="control-label">Black</div>
+              </div>
+              <div
+                className={'control-interactable' + (this.props.gridLineColor === 'white' ? ' active' : '')}
+                onClick={() => this.props.setGridLineColor('white')}>
+                <div className="control-label">White</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="control">
             <div className="control-list">
               <div className="control-label">Zoom:</div>
               <div
@@ -95,7 +145,7 @@ class PlayControls extends React.Component {
             <div
               className="control-interactable"
               onClick={() => window.open(`/${this.props.roomName}/edit`, `edit/${this.props.roomName}`)}>
-            <div className="control-label">Edit Map</div>
+              <div className="control-label">Edit Map</div>
             </div>
           </div>
 
@@ -107,6 +157,9 @@ class PlayControls extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  gridType: state.settings.grid.type,
+  gridSpacing: state.settings.grid.spacing,
+  gridLineColor: state.settings.grid.lineColor,
   roomName: state.ui.controls.roomName,
   width: state.ui.workspace.width,
   height: state.ui.workspace.height,
@@ -125,7 +178,13 @@ const mapDispatchToProps = dispatch => ({
     dispatch(centerWorkspace());
   },
   zoomIn: () => dispatch(zoomWorkspace(1)),
-  zoomOut: () => dispatch(zoomWorkspace(-1))
+  zoomOut: () => dispatch(zoomWorkspace(-1)),
+  setGridType: type => dispatch(setGridType(type)),
+  onGridSpacingChange: event => {
+    const gridSpacing = Number(event.target.value);
+    if (gridSpacing) dispatch(setGridSpacing(gridSpacing));
+  },
+  setGridLineColor: color => dispatch(setGridLineColor(color))
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(PlayControls);
