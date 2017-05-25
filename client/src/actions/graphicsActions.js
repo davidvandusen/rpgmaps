@@ -6,7 +6,11 @@ const {fillImageData} = require('../common/imageData');
 const {shouldImageUpdate, renderImage} = require('./imageRendering');
 
 const setInputBuffer = makeActionCreator('SET_INPUT_BUFFER', 'inputBuffer');
-exports.setInputBuffer = setInputBuffer;
+exports.setInputBuffer = inputBuffer => dispatch => {
+  // Clear the old mapData; setting the inputBuffer invalidates the existing mapData until the input is processed
+  dispatch(setMapData());
+  dispatch(setInputBuffer(inputBuffer));
+};
 
 const setInputOpacity = makeActionCreator('SET_INPUT_OPACITY', 'inputOpacity');
 exports.setInputOpacity = setInputOpacity;

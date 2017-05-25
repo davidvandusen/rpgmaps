@@ -2,6 +2,7 @@
   align-items: center;
   border-right: 1px solid rgba(255,255,255,0.25);
   box-sizing: border-box;
+  cursor: default;
   display: flex;
   flex-direction: row;
   line-height: 24px;
@@ -86,10 +87,12 @@
 
 .control-label-major {
   font-size: 14px;
+  line-height: 18px;
 }
 
 .control-label-minor {
   font-size: 11px;
+  line-height: 13px;
 }
 
 .control-list {

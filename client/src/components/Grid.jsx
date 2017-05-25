@@ -1,7 +1,7 @@
 const React = require('react');
 const {connect} = require('react-redux');
 
-class OutputGrid extends React.Component {
+class Grid extends React.Component {
   getContext() {
     return this.canvas.getContext('2d');
   }
@@ -128,4 +128,4 @@ const mapStateToProps = state => ({
   y: state.ui.workspace.y
 });
 
-module.exports = connect(mapStateToProps)(OutputGrid);
+module.exports = connect(mapStateToProps)(Grid);

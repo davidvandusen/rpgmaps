@@ -1,27 +1,16 @@
 const makeKeymap = require('./edit-keymap');
-const registerCommonEvents = require('./common-events');
-const terrains = require('./terrains');
+const registerCommonUIEvents = require('./common-events');
 const mapDataFactory = require('../common/mapDataFactory');
-const {setMapData} = require('../actions/dataActions');
 const {resetInputBuffer, setInputBuffer, resetPaintBuffer, setOutputOpacity, setCrossfadeOpacity, setInputOpacity, setPaintOpacity, processInput} = require('../actions/graphicsActions');
-const {setTerrains, setDefaultForeground, setDefaultBackground, setForeground, setBackground} = require('../actions/inputActions');
+const {setRoomName} = require('../actions/controlsActions');
 
 module.exports = ({dispatch, getState}) => {
-  const state = getState();
-
   const roomName = location.pathname.substring(1, location.pathname.indexOf('/', 1));
-  document.title = `Edit ${roomName} - RPG Maps`;
+  window.name = `edit/${roomName}`;
+  dispatch(setRoomName(roomName));
 
-  // HACK Checking for initial load with no persisted settings
-  if (state.settings.input.terrains.length === 0) {
-    dispatch(setTerrains(terrains));
-    const defaultForeground = terrains.findIndex(t => t.className === 'CloseUpPath');
-    const defaultBackground = terrains.findIndex(t => t.className === 'CloseUpGrass');
-    dispatch(setDefaultForeground(defaultForeground));
-    dispatch(setDefaultBackground(defaultBackground));
-    dispatch(setForeground(defaultForeground));
-    dispatch(setBackground(defaultBackground));
-  }
+  // TODO show status in title (save status to state and add listener for changes)
+  document.title = `Edit ${roomName} - RPG Maps`;
 
   dispatch(setOutputOpacity(1));
   dispatch(setCrossfadeOpacity(0));
@@ -30,18 +19,12 @@ module.exports = ({dispatch, getState}) => {
 
   dispatch(resetPaintBuffer());
 
+  const state = getState();
   const mapData = state.data.mapData;
-  if (mapData) {
-    // HACK Set mapData to undefined so that image processing thinks the image changed
-    dispatch(setMapData());
-    const imageData = mapDataFactory(terrains).toImageData(mapData);
-    dispatch(setInputBuffer(imageData));
-  } else {
-    dispatch(resetInputBuffer());
-  }
+  if (mapData) dispatch(setInputBuffer(mapDataFactory(state.settings.input.terrains).toImageData(mapData)));
+  else dispatch(resetInputBuffer());
   dispatch(processInput());
 
-  // Register UI events
   const keymap = makeKeymap(dispatch);
-  registerCommonEvents(dispatch, keymap);
+  registerCommonUIEvents(dispatch, keymap);
 };

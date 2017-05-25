@@ -1,8 +1,18 @@
 const React = require('react');
-const ReactDOM = require('react-dom');
-const config = require('./config/terrains');
-const PlayApp = require('./components.obs/PlayApp.jsx');
+const {render} = require('react-dom');
+const {createStore, applyMiddleware} = require('redux');
+const thunk = require('redux-thunk').default;
+const {Provider} = require('react-redux');
+const rootReducer = require('./reducers/rootReducer');
+const initialize = require('./config/play-initialize');
+const PlayApp = require('./components/PlayApp.jsx');
 
-const appRoot = document.createElement('div');
-document.body.appendChild(appRoot);
-ReactDOM.render(<PlayApp config={config} />, appRoot);
+const store = createStore(rootReducer, applyMiddleware(thunk));
+
+initialize(store);
+
+render((
+  <Provider store={store}>
+    <PlayApp />
+  </Provider>
+), document.getElementById('react-root'));

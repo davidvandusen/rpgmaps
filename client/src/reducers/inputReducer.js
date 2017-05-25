@@ -1,11 +1,15 @@
 const createReducer = require('./createReducer');
+const terrains = require('../config/terrains');
+
+const defaultForeground = terrains.findIndex(t => t.className === 'CloseUpPath');
+const defaultBackground = terrains.findIndex(t => t.className === 'CloseUpGrass');
 
 module.exports = createReducer({
-  defaultBackground: 0,
-  defaultForeground: 1,
-  background: 0,
-  foreground: 1,
-  terrains: [],
+  defaultBackground,
+  defaultForeground,
+  background: defaultBackground,
+  foreground: defaultForeground,
+  terrains,
   tool: 'BRUSH',
   brushSize: 5,
   width: 128,

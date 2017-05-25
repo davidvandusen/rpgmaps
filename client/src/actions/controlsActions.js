@@ -17,3 +17,6 @@ const toggleMenu = (menuOpen) => (dispatch, getState) => {
   }
 };
 exports.toggleMenu = toggleMenu;
+
+const setRoomName = makeActionCreator('SET_ROOM_NAME', 'roomName');
+exports.setRoomName = setRoomName;

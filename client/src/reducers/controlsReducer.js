@@ -2,7 +2,8 @@ const createReducer = require('./createReducer');
 
 module.exports = createReducer({
   controlsHeight: undefined,
-  menuOpen: undefined
+  menuOpen: undefined,
+  roomName: undefined
 }, {
   SET_CONTROLS_HEIGHT: (state, {payload}) => ({
     ...state,
@@ -12,4 +13,8 @@ module.exports = createReducer({
     ...state,
     menuOpen: payload.menuOpen
   }),
+  SET_ROOM_NAME: (state, {payload}) => ({
+    ...state,
+    roomName: payload.roomName
+  })
 });
