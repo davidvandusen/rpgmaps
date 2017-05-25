@@ -1,5 +1,5 @@
 const makeActionCreator = require('./makeActionCreator');
-const mapDataFactory = require('./mapDataFactory');
+const mapDataFactory = require('../common/mapDataFactory');
 const {setMapData} = require('./dataActions');
 const {cssToRgba} = require('../common/color');
 const {fillImageData} = require('../common/imageData');
@@ -37,7 +37,6 @@ const resetInputBuffer = () => (dispatch, getState) => {
   const background = state.settings.input.terrains[state.settings.input.background];
   fillImageData(inputBuffer, ...cssToRgba(background.color));
   dispatch(setInputBuffer(inputBuffer));
-  dispatch(processInput());
 };
 exports.resetInputBuffer = resetInputBuffer;
 

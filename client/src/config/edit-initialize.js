@@ -1,30 +1,45 @@
 const makeKeymap = require('./edit-keymap');
 const registerCommonEvents = require('./common-events');
-const {resetInputBuffer, resetPaintBuffer, setOutputOpacity, setCrossfadeOpacity, setInputOpacity, setPaintOpacity} = require('../actions/graphicsActions');
 const terrains = require('./terrains');
+const mapDataFactory = require('../common/mapDataFactory');
+const {setMapData} = require('../actions/dataActions');
+const {resetInputBuffer, setInputBuffer, resetPaintBuffer, setOutputOpacity, setCrossfadeOpacity, setInputOpacity, setPaintOpacity, processInput} = require('../actions/graphicsActions');
 const {setTerrains, setDefaultForeground, setDefaultBackground, setForeground, setBackground} = require('../actions/inputActions');
 
-module.exports = ({dispatch}) => {
+module.exports = ({dispatch, getState}) => {
+  const state = getState();
+
   const roomName = location.pathname.substring(1, location.pathname.indexOf('/', 1));
   document.title = `Edit ${roomName} - RPG Maps`;
 
-  // Perform an initial set of actions to bring the initial UI state to one that is ready for user input
+  // HACK Checking for initial load with no persisted settings
+  if (state.settings.input.terrains.length === 0) {
+    dispatch(setTerrains(terrains));
+    const defaultForeground = terrains.findIndex(t => t.className === 'CloseUpPath');
+    const defaultBackground = terrains.findIndex(t => t.className === 'CloseUpGrass');
+    dispatch(setDefaultForeground(defaultForeground));
+    dispatch(setDefaultBackground(defaultBackground));
+    dispatch(setForeground(defaultForeground));
+    dispatch(setBackground(defaultBackground));
+  }
+
   dispatch(setOutputOpacity(1));
   dispatch(setCrossfadeOpacity(0));
   dispatch(setInputOpacity(0));
   dispatch(setPaintOpacity(0.75));
 
-  // TODO eventually this should be gotten from persistence; how is it set initially?
-  dispatch(setTerrains(terrains));
-  const defaultForeground = terrains.findIndex(t => t.className === 'CloseUpPath');
-  const defaultBackground = terrains.findIndex(t => t.className === 'CloseUpGrass');
-  dispatch(setDefaultForeground(defaultForeground));
-  dispatch(setDefaultBackground(defaultBackground));
-  dispatch(setForeground(defaultForeground));
-  dispatch(setBackground(defaultBackground));
-
   dispatch(resetPaintBuffer());
-  dispatch(resetInputBuffer());
+
+  const mapData = state.data.mapData;
+  if (mapData) {
+    // HACK Set mapData to undefined so that image processing thinks the image changed
+    dispatch(setMapData());
+    const imageData = mapDataFactory(terrains).toImageData(mapData);
+    dispatch(setInputBuffer(imageData));
+  } else {
+    dispatch(resetInputBuffer());
+  }
+  dispatch(processInput());
 
   // Register UI events
   const keymap = makeKeymap(dispatch);

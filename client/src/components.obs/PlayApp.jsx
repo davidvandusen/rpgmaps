@@ -3,7 +3,7 @@ const React = require('react');
 const OutputMap = require('./OutputMap.jsx');
 const PlayControls = require('./PlayControls.jsx');
 const Bento = require('./Bento.jsx');
-const mapDataFactory = require('../actions/mapDataFactory');
+const mapDataFactory = require('../common/mapDataFactory');
 const Token = require('./Token.jsx');
 const persistence = require('../common/persistence');
 

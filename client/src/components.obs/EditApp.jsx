@@ -4,7 +4,7 @@ const EditControls = require('./EditControls.jsx');
 const InputMap = require('./InputMap.jsx');
 const Bento = require('./Bento.jsx');
 const OutputMap = require('./OutputMap.jsx');
-const mapDataFactory = require('../actions/mapDataFactory');
+const mapDataFactory = require('../common/mapDataFactory');
 const persistence = require('../common/persistence');
 
 class EditApp extends React.Component {
