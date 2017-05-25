@@ -11,7 +11,7 @@ const depressMouse = makeActionCreator('DEPRESS_MOUSE');
 exports.depressMouse = () => (dispatch, getState) => {
   dispatch(depressMouse());
   const state = getState();
-  if (state.ui.mouse.inWorkspace && state.settings.input.tool === 'BRUSH') {
+  if (state.ui.mouse.inWorkspace && state.ui.graphics.inputBuffer && state.settings.input.tool === 'BRUSH') {
     const paintBuffer = addStrokeToNewPaintBuffer(state, false);
     dispatch(setPaintBuffer(paintBuffer));
   }
@@ -21,8 +21,9 @@ const releaseMouse = makeActionCreator('RELEASE_MOUSE');
 
 exports.releaseMouse = () => (dispatch, getState) => {
   dispatch(releaseMouse());
-  if (getState().settings.input.tool === 'BRUSH') {
-    const inputBuffer = addPaintBufferToInputImage(getState());
+  const state = getState();
+  if (state.ui.mouse.inWorkspace && state.ui.graphics.inputBuffer && state.settings.input.tool === 'BRUSH') {
+    const inputBuffer = addPaintBufferToInputImage(state);
     dispatch(setInputBuffer(inputBuffer));
     dispatch(resetPaintBuffer());
     dispatch(processInput())
@@ -40,7 +41,7 @@ exports.moveMouse = (x, y) => (dispatch, getState) => {
       const y = state.ui.workspace.y + state.ui.mouse.dy;
       dispatch(translateWorkspace(x, y))
     }
-    if (state.settings.input.tool === 'BRUSH') {
+    if (state.ui.graphics.inputBuffer && state.settings.input.tool === 'BRUSH') {
       const paintBuffer = addStrokeToNewPaintBuffer(state, true);
       dispatch(setPaintBuffer(paintBuffer));
     }

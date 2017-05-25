@@ -56,8 +56,8 @@ exports.resetPaintBuffer = resetPaintBuffer;
 const processInput = () => (dispatch, getState) => {
   mapDataFactory(getState().settings.input.terrains).fromImageData(getState().ui.graphics.inputBuffer).then(mapData => {
     const lastMapData = getState().data.mapData;
+    dispatch(setMapData(mapData));
     if (shouldImageUpdate(lastMapData, mapData)) {
-      dispatch(setMapData(mapData));
       return renderImage(getState());
     }
     return Promise.resolve(false);
@@ -67,12 +67,13 @@ const processInput = () => (dispatch, getState) => {
       dispatch(setCrossfadeBuffer(outputBuffer));
       const fadeIncrement = 0.04;
       (function next(opacity) {
-        if (outputBuffer !== getState().ui.graphics.crossfadeBuffer) return;
+        const crossfadeBuffer = getState().ui.graphics.crossfadeBuffer;
+        if (outputBuffer !== crossfadeBuffer) return;
         dispatch(setCrossfadeOpacity(opacity));
         if (opacity < 1) {
           requestAnimationFrame(() => next(opacity + fadeIncrement));
         } else {
-          dispatch(setOutputBuffer(getState().ui.graphics.crossfadeBuffer));
+          dispatch(setOutputBuffer(crossfadeBuffer));
           dispatch(setCrossfadeBuffer());
         }
       })(fadeIncrement);

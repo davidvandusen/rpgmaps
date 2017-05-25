@@ -121,7 +121,11 @@
   user-select: none;
 }
 
-.controls-auxiliary,
+.controls-auxiliary {
+  display: flex;
+  flex-direction: row;
+}
+
 .controls-primary {
   display: flex;
   flex-direction: row;

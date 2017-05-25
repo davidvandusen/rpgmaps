@@ -10,7 +10,7 @@ module.exports = createReducer({
   background: defaultBackground,
   foreground: defaultForeground,
   terrains,
-  tool: 'BRUSH',
+  tool: 'NONE',
   brushSize: 5,
   width: 128,
   height: 72

@@ -1,5 +1,6 @@
 const React = require('react');
 const {connect} = require('react-redux');
+const {publishMap} = require('../actions/dataActions');
 const {setForeground, setBrushSize} = require('../actions/inputActions');
 const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
 const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
@@ -148,8 +149,20 @@ class EditControls extends React.Component {
 
           <div className="control">
             <div
+              className={'control-interactable' + (this.props.mapUpdated ? '' : ' disabled')}
+              onClick={() => this.props.publishMap()}>
+              <div className="control-label">Update Players</div>
+            </div>
+          </div>
+
+          <div className="control">
+            <div
               className="control-interactable"
-              onClick={() => window.open(`/${this.props.roomName}`, `play/${this.props.roomName}`)}>
+              onClick={() => {
+                this.props.publishMap();
+                if (this._playWindow) this._playWindow.focus();
+                else this._playWindow = window.open(`/${this.props.roomName}`, `play/${this.props.roomName}`);
+              }}>
               <div className="control-label">Play Map</div>
             </div>
           </div>
@@ -162,6 +175,7 @@ class EditControls extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  mapUpdated: state.data.mapData !== state.data.publishedMap,
   roomName: state.ui.controls.roomName,
   width: state.ui.workspace.width,
   height: state.ui.workspace.height,
@@ -191,7 +205,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(centerWorkspace());
   },
   zoomIn: () => dispatch(zoomWorkspace(1)),
-  zoomOut: () => dispatch(zoomWorkspace(-1))
+  zoomOut: () => dispatch(zoomWorkspace(-1)),
+  publishMap: () => dispatch(publishMap())
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(EditControls);

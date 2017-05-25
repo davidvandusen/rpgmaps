@@ -3,7 +3,7 @@ const {render} = require('react-dom');
 const {createStore, applyMiddleware} = require('redux');
 const thunk = require('redux-thunk').default;
 const {Provider} = require('react-redux');
-const rootReducer = require('./reducers/rootReducer');
+const rootReducer = require('./reducers/play-rootReducer');
 const initialize = require('./config/play-initialize');
 const PlayApp = require('./components/PlayApp.jsx');
 

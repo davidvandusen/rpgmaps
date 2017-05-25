@@ -1,4 +1,5 @@
 const {zoomWorkspace, centerWorkspace, scaleWorkspaceToFitSurface} = require('../actions/workspaceActions');
+const {setTool} = require('../actions/inputActions');
 
 module.exports = (dispatch) => ({
   down: {
