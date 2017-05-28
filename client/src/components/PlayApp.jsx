@@ -1,123 +1,46 @@
 require('../../styles/play-app.scss');
 const React = require('react');
-const OutputMap = require('./OutputMap.jsx');
+const {connect} = require('react-redux');
+const {mouseInWorkspace} = require('../actions/mouseActions');
+const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace, resizeWorkspace} = require('../actions/workspaceActions');
+const Grid = require('./Grid.jsx');
+const PlayCanvas = require('./PlayCanvas.jsx');
 const PlayControls = require('./PlayControls.jsx');
-const Bento = require('./Bento.jsx');
-const mapDataFactory = require('../common/mapDataFactory');
-const Token = require('./Token.jsx');
-const persistence = require('../common/persistence');
+const Tokens = require('./Tokens.jsx');
 
 class PlayApp extends React.Component {
-  constructor(props) {
-    super(props);
-    this.roomName = location.pathname.substring(1);
-    this.state = Object.assign({
-      mapData: undefined,
-      title: `Play ${this.roomName} - RPG Maps`,
-      grid: this.props.config.output.grid.default,
-      tokens: []
-    }, persistence.load('persistentPlayAppSettings'));
-    this.changeGrid = this.changeGrid.bind(this);
-    this.createToken = this.createToken.bind(this);
-    this.mapGeometryChanged = this.mapGeometryChanged.bind(this);
-    this.updateToken = this.updateToken.bind(this);
-    this.deleteToken = this.deleteToken.bind(this);
-    this.forceUpdate = this.forceUpdate.bind(this, undefined);
-  }
-
-  changeGrid(grid) {
-    this.setState({grid});
-  }
-
-  createToken() {
-    const tokens = this.state.tokens.concat({
-      key: Math.random(),
-      id: '',
-      name: ''
-    });
-    this.setState({tokens});
-  }
-
-  updateToken(key, prop, value) {
-    const tokens = this.state.tokens;
-    const token = tokens.find(token => token.key === key);
-    token[prop] = value;
-    this.setState({tokens});
-  }
-
-  deleteToken(key) {
-    this.state.tokens.splice(this.state.tokens.findIndex(token => token.key === key), 1);
-    this.setState({tokens: this.state.tokens});
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const settings = PlayApp.persistentSettings.reduce((persistentSettings, key) => {
-      persistentSettings[key] = this.state[key];
-      return persistentSettings;
-    }, {});
-    persistence.save('persistentPlayAppSettings', settings);
-  }
-
   componentDidMount() {
-    this.socket = io();
-    this.socket.emit('joinRoom', {
-      roomName: this.roomName,
-      to: 'play'
-    });
-    this.socket.on('publishMap', mapData => {
-      mapDataFactory.hydrateJSON(mapData);
-      this.setState({mapData});
-    });
-    window.addEventListener('resize', this.forceUpdate);
-  }
-
-  componentWillUnmount() {
-    this.socket.disconnect();
-    window.removeEventListener('resize', this.forceUpdate);
-  }
-
-  mapGeometryChanged() {
-    this.outputMap.forceUpdate();
+    this.props.onComponentDidMount();
   }
 
   render() {
-    document.title = this.state.title;
     return (
-      <div className="full-screen-container">
-        <Bento
-          geometryChanged={this.mapGeometryChanged}
-          orientation="vertical"
-          defaultOffsetPixels={150}
-          minOffsetPixels={130}
-          maxOffsetPixels={300}>
-          <PlayControls
-            createToken={this.createToken}
-            updateToken={this.updateToken}
-            deleteToken={this.deleteToken}
-            changeGrid={this.changeGrid}
-            config={this.props.config}
-            tokens={this.state.tokens}
-            grid={this.state.grid} />
-          <OutputMap
-            ref={c => this.outputMap = c}
-            config={this.props.config}
-            grid={this.state.grid}
-            showScale={true}
-            mapData={this.state.mapData}>
-            <p className="content-placeholder">No map published yet. To publish a map to this page, go to <a
-              href={location.href + '/edit'}>{location.href + '/edit'}</a></p>
-          </OutputMap>
-        </Bento>
-        <div className="token-layer">
-          <div className="tokens">
-              {this.state.tokens.map(token => <Token {...token} />)}
-          </div>
+      <div className="edit-app">
+        <div
+          className="workspace"
+          onMouseEnter={this.props.onMouseEnterWorkspace}
+          onMouseLeave={this.props.onMouseLeaveWorkspace}>
+          <PlayCanvas />
+          <Grid />
+          <Tokens />
         </div>
+        <PlayControls />
       </div>
     );
   }
 }
 
-PlayApp.persistentSettings = ['grid', 'tokens'];
+const mapStateToProps = state => ({});
 
-module.exports = PlayApp;
+const mapDispatchToProps = dispatch => ({
+  onMouseEnterWorkspace: () => dispatch(mouseInWorkspace(true)),
+  onMouseLeaveWorkspace: () => dispatch(mouseInWorkspace(false)),
+  onComponentDidMount: () => {
+    dispatch(resizeWorkspace(window.innerWidth, window.innerHeight));
+    dispatch(scaleWorkspaceToFitSurface());
+    dispatch(zoomWorkspace(-1));
+    dispatch(centerWorkspace());
+  }
+});
+
+module.exports = connect(mapStateToProps, mapDispatchToProps)(PlayApp);

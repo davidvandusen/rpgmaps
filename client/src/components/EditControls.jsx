@@ -1,95 +1,214 @@
 const React = require('react');
+const {connect} = require('react-redux');
+const {publishMap} = require('../actions/dataActions');
+const {setForeground, setBrushSize} = require('../actions/inputActions');
+const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
+const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
 
 class EditControls extends React.Component {
-  constructor(props) {
-    super(props);
-    this.onBrushSizeChange = this.onBrushSizeChange.bind(this);
+  onUpdate() {
+    const elBounds = this.el.getBoundingClientRect();
+    this.props.setControlsHeight(elBounds.height);
   }
 
-  onBrushSizeChange() {
-    this.props.setBrushSize(Number(this.brushSizeInput.value));
+  componentDidUpdate() {
+    this.onUpdate();
+  }
+
+  componentDidMount() {
+    this.onUpdate();
   }
 
   render() {
     return (
-      <div className="controls">
-        <div className="control-list">
-          <div className="control-meta">
-            <span className="control-meta-key">RPG Maps</span>
-            <span className="control-meta-value">v{APP_VERSION}</span>
-          </div>
-        </div>
-        <div className="control-list">
-          <div className="control-list-heading">Publication</div>
-          <div className="control-list-item interactable" onClick={this.props.publishMap}>
-            <div className="control-list-item-heading">Show To Players</div>
-          </div>
-          <a
-            className="control-list-item interactable"
-            onClick={this.props.publishMap}
-            href={location.href.substring(0, location.href.indexOf('/edit'))}
-            target="_blank">
-            <div className="control-list-item-heading">Play Map &#x2197;</div>
-          </a>
-        </div>
-        <div className="control-list">
-          <div className="control-list-heading">Editor Mode</div>
-          {this.props.config.ui.mode.options.map(mode => (
+      <div
+        ref={el => this.el = el}
+        className="controls">
+
+        <div className="controls-primary">
+
+          <div
+            className={'control' + (this.props.menuOpen === 'ABOUT' ? ' active' : '')}
+            onClick={() => this.props.toggleMenu('ABOUT')}>
+            <div className="control-label control-label-brand">
+              <div className="control-label-major">RPG Maps</div>
+              <div className="control-label-minor">About v{APP_VERSION}</div>
+            </div>
             <div
-              key={mode.id}
-              className={`control-list-item interactable ${this.props.mode === mode.id ? 'current' : ''}`}
-              onClick={this.props.changeMode.bind(null, mode.id)}>
-              <div className="control-list-item-heading">{mode.name}</div>
+              className={'control-dropdown' + (this.props.menuOpen === 'ABOUT' ? ' open' : '')}
+              style={{width: '200px'}}>
+              <div className="control">
+                <div className="control-label">
+                  <h2 className="control-label-major">About</h2>
+                  <p>{APP_DESCRIPTION}</p>
+                  <p><b>Current version:</b> v{APP_VERSION}</p>
+                  <p><b>Created by:</b> <a href={APP_AUTHOR.url}>{APP_AUTHOR.name}</a></p>
+                </div>
+              </div>
+              <hr />
+              <div className="control" style={{justifyContent: 'flex-end'}}>
+                <div className="control-list">
+                  <div
+                    className="control-interactable"
+                    onClick={event => {
+                      event.stopPropagation();
+                      this.props.closeMenu();
+                    }}>
+                    <div className="control-label">OK</div>
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="control-list">
-          <div className="control-list-heading">Brush Settings</div>
-          <div className="control-list-item">
-            <span className="control-list-item-heading">Size</span>
-            <span className="control-list-item-input">
-              <input
-                className="value-input"
-                type="number"
-                ref={el => this.brushSizeInput = el}
-                value={this.props.brushSize}
-                onChange={this.onBrushSizeChange} />
-            </span>
           </div>
+
+          <div
+            className={'control' + (this.props.menuOpen === 'TERRAINS' ? ' active' : '')}
+            onClick={() => this.props.toggleMenu('TERRAINS')}>
+            <canvas
+              className="control-thumbnail"
+              width="40"
+              height="40"
+              style={{background: this.props.currentTerrain.color}} />
+            <div className="control-label">
+              <div className="control-label-major">{this.props.currentTerrain.name}</div>
+              <div className="control-label-minor" style={{
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                width: '160px'
+              }}>{this.props.currentTerrain.description}</div>
+            </div>
+            <div className={'control-dropdown' + (this.props.menuOpen === 'TERRAINS' ? ' open' : '')}>
+              {this.props.terrains.map((terrain, index) => (
+                <div
+                  key={terrain.color}
+                  className={'control' + (terrain === this.props.currentTerrain ? ' active' : '')}>
+                  <div
+                    className="control-interactable"
+                    onClick={event => {
+                      event.stopPropagation();
+                      this.props.setTerrain(index);
+                    }}>
+                    <canvas
+                      className="control-thumbnail"
+                      width="40"
+                      height="40"
+                      style={{background: terrain.color}} />
+                    <div className="control-label">
+                      <div className="control-label-major">{terrain.name}</div>
+                      <div className="control-label-minor">{terrain.description}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="control" title="[ to decrease brush size, ] to increase brush size">
+            <div className="control-label">Brush size:
+              <span className="control-input">
+                  <input
+                    type="number"
+                    style={{width: '3em'}}
+                    value={this.props.brushSize}
+                    onKeyDown={e => e.stopPropagation()}
+                    onKeyUp={e => e.stopPropagation()}
+                    onChange={this.props.onBrushSizeChange} />
+                </span>
+            </div>
+          </div>
+
+          <div className="control">
+            <div className="control-list">
+              <div className="control-label">Zoom:</div>
+              <div
+                className="control-interactable"
+                title="scroll wheel"
+                onClick={this.props.zoomOut}>
+                <div className="control-label">-</div>
+              </div>
+              <div
+                className="control-label"
+                style={{textAlign: 'center', width: '3em'}}>{Math.round(this.props.zoom)}%
+              </div>
+              <div
+                className="control-interactable"
+                title="scroll wheel"
+                onClick={this.props.zoomIn}>
+                <div className="control-label">+</div>
+              </div>
+              <div
+                className="control-interactable"
+                title="Z"
+                onClick={this.props.resetZoom}>
+                <div className="control-label">Reset</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div className="control-list">
-          <div className="control-list-heading">Terrains &amp; Objects</div>
-          {this.props.config.terrains.map((terrain, i) => (
+
+        <div className="controls-auxiliary">
+
+          <div className="control">
             <div
-              key={terrain.color}
-              className={`control-list-item interactable ${this.props.terrain === i ? 'current' : ''}`}
-              onClick={this.props.setTerrain.bind(null, i)}>
-              <span className="control-list-item-swatch" style={{background: terrain.color}} />
-              <span className="control-list-item-heading">{terrain.name}</span>
+              className={'control-interactable' + (this.props.mapUpdated ? '' : ' disabled')}
+              onClick={() => this.props.publishMap()}>
+              <div className="control-label">Update Players</div>
             </div>
-          ))}
-        </div>
-        <div className="control-list">
-          <div className="control-list-heading">Start Over?</div>
-          <div className="control-list-item interactable danger" onClick={this.props.reset}>Clear Map!</div>
-        </div>
-        <div className="processing">
-          {this.props.status === 'init' ? (
-            <div>
-              Initializing...
+          </div>
+
+          <div className="control">
+            <div
+              className="control-interactable"
+              onClick={() => {
+                this.props.publishMap();
+                if (this._playWindow) this._playWindow.focus();
+                else this._playWindow = window.open(`/${this.props.roomName}`, `play/${this.props.roomName}`);
+              }}>
+              <div className="control-label">Play Map</div>
             </div>
-          ) : this.props.status === 'processing' ? (
-            <div>
-              <span className="dot" />
-              Processing...
-            </div>
-          ) : (
-            <div>&nbsp;</div>
-          )}
+          </div>
+
         </div>
+
       </div>
-    )
+    );
   }
 }
 
-module.exports = EditControls;
+const mapStateToProps = state => ({
+  mapUpdated: state.data.mapData !== state.data.publishedMap,
+  roomName: state.ui.controls.roomName,
+  width: state.ui.workspace.width,
+  height: state.ui.workspace.height,
+  menuOpen: state.ui.controls.menuOpen,
+  brushSize: state.settings.input.brushSize,
+  zoom: state.ui.workspace.scale / state.settings.output.quality * 100,
+  terrains: state.settings.input.terrains,
+  currentTerrain: state.settings.input.terrains[state.settings.input.foreground]
+});
+
+const mapDispatchToProps = dispatch => ({
+  toggleMenu: menu => dispatch(toggleMenu(menu)),
+  openMenu: menu => dispatch(openMenu(menu)),
+  closeMenu: () => dispatch(closeMenu()),
+  setTerrain: foreground => {
+    dispatch(setForeground(foreground));
+    dispatch(closeMenu());
+  },
+  onBrushSizeChange: event => {
+    const brushSize = Number(event.target.value);
+    if (brushSize) dispatch(setBrushSize(brushSize));
+  },
+  setControlsHeight: height => dispatch(setControlsHeight(height)),
+  resetZoom: () => {
+    dispatch(scaleWorkspaceToFitSurface());
+    dispatch(zoomWorkspace(-1));
+    dispatch(centerWorkspace());
+  },
+  zoomIn: () => dispatch(zoomWorkspace(1)),
+  zoomOut: () => dispatch(zoomWorkspace(-1)),
+  publishMap: () => dispatch(publishMap())
+});
+
+module.exports = connect(mapStateToProps, mapDispatchToProps)(EditControls);

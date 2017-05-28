@@ -1,1 +1,1 @@
-require('../../styles/play-app.scss');
+require('../../styles.obs/play-app.scss');

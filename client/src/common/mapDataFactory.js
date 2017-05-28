@@ -1,6 +1,6 @@
-const {imageDataToAreaDescriptors} = require('../common/imageData');
-const {outlineMask, smoothPolygon, containmentGraph} = require('../common/geometry');
-const {intToCssHex, cssToRgba} = require('../common/color');
+const {imageDataToAreaDescriptors} = require('./imageData');
+const {outlineMask, smoothPolygon, containmentGraph} = require('./geometry');
+const {intToCssHex, cssToRgba} = require('./color');
 const AreaMask = require('./AreaMask');
 
 function mapDataFactory(configTerrains) {

@@ -76,26 +76,24 @@ function describeContiguousArea(pixels, width, startIndex) {
   return {color, mask};
 }
 
-function addNoise(ctx, amount) {
+function addNoise(imageData, amount) {
   const rng = seedrandom('');
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   for (let i = 0; i < imageData.data.length; i += 4) {
     const by = (rng() * 2 - 1) * amount;
     imageData.data[i] += by;
     imageData.data[i + 1] += by;
     imageData.data[i + 2] += by;
   }
-  ctx.putImageData(imageData, 0, 0);
 }
 
-function blendOnto(dst, src) {
+function blendOnto(dst, src, amount = 1) {
   const srcData = src.data;
   const dstData = dst.data;
   for (let i = 0; i < srcData.length; i += 4) {
     const srcAlpha = srcData[i + 3];
     if (srcAlpha === 0) continue;
     const dstAlpha = dstData[i + 3];
-    const srcOpacity = srcAlpha / 0xff;
+    const srcOpacity = srcAlpha / 0xff * amount;
     const dstOpacity = dstAlpha / 0xff - srcOpacity;
     dstData[i] = Math.floor(srcData[i] * srcOpacity) + Math.ceil(dstData[i] * dstOpacity);
     dstData[i + 1] = Math.floor(srcData[i + 1] * srcOpacity) + Math.ceil(dstData[i + 1] * dstOpacity);

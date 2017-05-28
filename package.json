@@ -1,14 +1,18 @@
 {
   "name": "rpgmaps",
-  "version": "0.0.13",
-  "description": "Tabletop roleplaying game map creation tool",
+  "version": "0.1.0",
+  "description": "Software for spontaneously creating encounter maps for tabletop role-playing games",
   "scripts": {
     "install": "./install.sh",
     "postinstall": "./postinstall.sh",
     "start": "./start.sh",
     "release": "./release.sh"
   },
-  "author": "David VanDusen <github@davidvandusen.com>",
+  "author": {
+    "name": "David VanDusen",
+    "email": "github@davidvandusen.com",
+    "url": "http://davidvandusen.com/"
+  },
   "repository": {
     "type": "git",
     "url": "https://dvandusen@bitbucket.org/dvandusen/rpgmaps.git"

@@ -1,0 +1,133 @@
+@import 'variables';
+
+.controls {
+  background: rgb(65,65,65);
+  bottom: 0;
+  box-sizing: border-box;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  .processing {
+    background: rgb(55,55,55);
+    bottom: 0;
+    border-top: $spacing-unit solid $control-border-color;
+    box-sizing: border-box;
+    color: rgb(127,127,127);
+    left: 0;
+    padding: 0.4vw;
+    position: absolute;
+    right: 0;
+
+    .dot {
+      background: rgb(225,0,0);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.4em;
+      height: 0.8em;
+      width: 0.8em;
+    }
+  }
+}
+
+.control-list {
+  border-bottom: 1px solid $control-border-color;
+  padding: $spacing-unit;
+}
+
+.control-list-heading {
+  font-weight: $font-weight-bold;
+  padding: $spacing-unit;
+  text-shadow: 1px 1px 0 rgb(0,0,0);
+}
+
+.control-list-item {
+  display: block;
+  padding: $spacing-unit;
+
+  &.interactable {
+    cursor: pointer;
+  }
+
+  &.interactable:hover {
+    background: rgb(75,75,75);
+  }
+
+  &.interactable.danger:hover {
+    background: rgb(125,0,0);
+  }
+
+  &.current,
+  &.current.interactable {
+    background: rgb(225,225,225);
+    color: rgb(45,45,45);
+    font-weight: $font-weight-normal;
+  }
+}
+
+.control-list-item-delete {
+  cursor: pointer;
+  display: inline-block;
+  float: right;
+  margin-left: 2px;
+  padding: 3px 4px;
+
+  &:hover {
+    background: rgb(125,0,0);
+  }
+}
+
+.control-list-item-input {
+  padding: 0 $spacing-unit;
+}
+
+.control-meta {
+  padding: $spacing-unit;
+}
+
+.control-meta-key {
+  font-weight: $font-weight-bold;
+  margin-right: $spacing-unit;
+}
+
+.search-input {
+  background: rgb(40,40,40);
+  border: 0 none transparent;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: rgb(200,200,200);
+  height: $base-font-size + (2 * $spacing-unit);
+  padding: $spacing-unit (2 * $spacing-unit);
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.value-input {
+  background: rgb(40,40,40);
+  border: 1px solid rgb(120,120,120);
+  box-sizing: border-box;
+  color: rgb(200,200,200);
+  padding: 2px;
+  width: 40px;
+
+  &.narrow {
+    width: 30px;
+  }
+
+  &.wide {
+    width: 50px;
+  }
+}
+
+.control-list-item-swatch {
+  border: 1px solid rgb(35,35,35);
+  box-sizing: border-box;
+  display: inline-block;
+  height: $base-font-size - 3px;
+  margin-right: $spacing-unit;
+  width: $base-font-size - 3px;
+}
