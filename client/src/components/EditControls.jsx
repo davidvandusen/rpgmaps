@@ -110,6 +110,8 @@ class EditControls extends React.Component {
                     type="number"
                     style={{width: '3em'}}
                     value={this.props.brushSize}
+                    onKeyDown={e => e.stopPropagation()}
+                    onKeyUp={e => e.stopPropagation()}
                     onChange={this.props.onBrushSizeChange} />
                 </span>
             </div>

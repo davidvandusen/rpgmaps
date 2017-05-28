@@ -3,6 +3,7 @@ const {connect} = require('react-redux');
 const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
 const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
 const {setGridType, setGridSpacing, setGridLineColor} = require('../actions/gridActions');
+const {createToken, deleteToken, nameToken, describeToken} = require('../actions/tokensActions');
 
 class PlayControls extends React.Component {
   onUpdate() {
@@ -60,6 +61,78 @@ class PlayControls extends React.Component {
             </div>
           </div>
 
+          <div
+            className={'control' + (this.props.menuOpen === 'TOKENS' ? ' active' : '')}
+            onClick={() => this.props.toggleMenu('TOKENS')}>
+            <div className="control-label">Tokens</div>
+          </div>
+          <div
+            className={'control-dropdown' + (this.props.menuOpen === 'TOKENS' ? ' open' : '')}
+            style={{width: '200px'}}>
+            {
+              this.props.tokens.length === 0 &&
+              <div className="control">
+                <div className="control-label control-readonly">No tokens</div>
+              </div>
+            }
+            {this.props.tokens.map(token => (
+              <div
+                key={token._id}
+                className="control">
+                <div className="control-list">
+                  <div className="control-input">
+                    <input
+                      type="text"
+                      style={{width: '2em'}}
+                      value={token.name}
+                      onKeyDown={e => e.stopPropagation()}
+                      onKeyUp={e => e.stopPropagation()}
+                      onChange={event => {
+                        this.props.nameToken(token._id, event.target.value);
+                      }} />
+                  </div>
+                  <div className="control-input">
+                    <input
+                      type="text"
+                      style={{width: '8em'}}
+                      value={token.description}
+                      onKeyDown={e => e.stopPropagation()}
+                      onKeyUp={e => e.stopPropagation()}
+                      onChange={event => {
+                        this.props.describeToken(token._id, event.target.value);
+                      }} />
+                  </div>
+                  <div
+                    className="control-interactable"
+                    onClick={() => {
+                      this.props.deleteToken(token._id);
+                    }}>
+                    <div className="control-label">&times;</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <hr />
+            <div className="control" style={{justifyContent: 'flex-end'}}>
+              <div className="control-list">
+                <div
+                  className="control-interactable"
+                  onClick={() => {
+                    this.props.createToken();
+                  }}>
+                  <div className="control-label" style={{whiteSpace: 'nowrap'}}>New Token</div>
+                </div>
+                <div
+                  className="control-interactable"
+                  onClick={() => {
+                    this.props.closeMenu();
+                  }}>
+                  <div className="control-label">Done</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="control">
             <div className="control-label">Spacing:
               <span className="control-input">
@@ -67,7 +140,12 @@ class PlayControls extends React.Component {
                     type="number"
                     style={{width: '3em'}}
                     value={this.props.gridSpacing}
-                    onChange={this.props.onGridSpacingChange} />
+                    onKeyDown={e => e.stopPropagation()}
+                    onKeyUp={e => e.stopPropagation()}
+                    onChange={event => {
+                      const gridSpacing = Number(event.target.value);
+                      if (gridSpacing) this.props.setGridSpacing(gridSpacing);
+                    }} />
                 </span>
             </div>
           </div>
@@ -157,6 +235,7 @@ class PlayControls extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  tokens: state.settings.tokens,
   gridType: state.settings.grid.type,
   gridSpacing: state.settings.grid.spacing,
   gridLineColor: state.settings.grid.lineColor,
@@ -180,11 +259,12 @@ const mapDispatchToProps = dispatch => ({
   zoomIn: () => dispatch(zoomWorkspace(1)),
   zoomOut: () => dispatch(zoomWorkspace(-1)),
   setGridType: type => dispatch(setGridType(type)),
-  onGridSpacingChange: event => {
-    const gridSpacing = Number(event.target.value);
-    if (gridSpacing) dispatch(setGridSpacing(gridSpacing));
-  },
-  setGridLineColor: color => dispatch(setGridLineColor(color))
+  setGridSpacing: gridSpacing => dispatch(setGridSpacing(gridSpacing)),
+  setGridLineColor: color => dispatch(setGridLineColor(color)),
+  createToken: () => dispatch(createToken()),
+  deleteToken: _id => dispatch(deleteToken(_id)),
+  nameToken: (_id, name) => dispatch(nameToken(_id, name)),
+  describeToken: (_id, description) => dispatch(describeToken(_id, description))
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(PlayControls);

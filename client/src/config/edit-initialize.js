@@ -26,6 +26,9 @@ module.exports = ({dispatch, getState, subscribe}) => {
   });
 
   let previousMap = getState().data.publishedMap;
+  if (previousMap) {
+    socket.emit('publishMap', previousMap);
+  }
   subscribe(() => {
     const publishedMap = getState().data.publishedMap;
     if (publishedMap !== previousMap) {

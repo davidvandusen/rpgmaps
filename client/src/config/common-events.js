@@ -11,10 +11,10 @@ function makeKeyHandler(handlers) {
 
 module.exports = (dispatch, keymap) => {
   window.addEventListener('resize', throttle(() => dispatch(resizeWorkspace(window.innerWidth, window.innerHeight)), 100), {passive: true});
-  document.addEventListener('wheel', throttle(event => dispatch(zoomWorkspace(event.deltaY / 100, event.clientX, event.clientY, true)), 16), {passive: true});
-  document.addEventListener('mousemove', throttle(event => dispatch(moveMouse(event.clientX, event.clientY)), 16), {passive: true});
-  document.addEventListener('mousedown', () => dispatch(depressMouse()));
-  document.addEventListener('mouseup', () => dispatch(releaseMouse()));
-  document.addEventListener('keydown', makeKeyHandler(keymap.down));
-  document.addEventListener('keyup', makeKeyHandler(keymap.up));
+  window.addEventListener('wheel', throttle(event => dispatch(zoomWorkspace(event.deltaY / 100, event.clientX, event.clientY, true)), 16), {passive: true});
+  window.addEventListener('mousemove', throttle(event => dispatch(moveMouse(event.clientX, event.clientY)), 16), {passive: true});
+  window.addEventListener('mousedown', () => dispatch(depressMouse()));
+  window.addEventListener('mouseup', () => dispatch(releaseMouse()));
+  window.addEventListener('keydown', makeKeyHandler(keymap.down));
+  window.addEventListener('keyup', makeKeyHandler(keymap.up));
 };

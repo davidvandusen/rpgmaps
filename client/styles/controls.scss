@@ -101,6 +101,11 @@
   flex-direction: row;
 }
 
+.control-readonly {
+  color: rgb(150, 150, 150);
+  font-style: italic;
+}
+
 .control-thumbnail {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255,255,255,0.5);

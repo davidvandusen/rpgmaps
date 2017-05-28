@@ -1,4 +1,4 @@
-require('../../styles/edit-app.scss');
+require('../../styles/play-app.scss');
 const React = require('react');
 const {connect} = require('react-redux');
 const {mouseInWorkspace} = require('../actions/mouseActions');
