@@ -1,6 +1,6 @@
 {
   "name": "rpgmaps-server",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "description": "Software for spontaneously creating encounter maps for tabletop role-playing games",
   "author": {
     "name": "David VanDusen",
