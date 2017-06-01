@@ -1,7 +1,7 @@
 const React = require('react');
 const {connect} = require('react-redux');
 const {publishMap} = require('../actions/dataActions');
-const {setForeground, setBrushSize} = require('../actions/inputActions');
+const {setForeground, setBrushSize, setBrushShape} = require('../actions/inputActions');
 const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
 const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
 
@@ -103,8 +103,24 @@ class EditControls extends React.Component {
             </div>
           </div>
 
+          <div className="control">
+            <div className="control-list">
+              <div className="control-label">Brush:</div>
+              <div
+                className={'control-interactable' + (this.props.brushShape === 'CIRCLE' ? ' active' : '')}
+                onClick={() => this.props.setBrushShape('CIRCLE')}>
+                <div className="control-label">Circle</div>
+              </div>
+              <div
+                className={'control-interactable' + (this.props.brushShape === 'SQUARE' ? ' active' : '')}
+                onClick={() => this.props.setBrushShape('SQUARE')}>
+                <div className="control-label">Square</div>
+              </div>
+            </div>
+          </div>
+
           <div className="control" title="[ to decrease brush size, ] to increase brush size">
-            <div className="control-label">Brush size:
+            <div className="control-label">Size:
               <span className="control-input">
                   <input
                     type="number"
@@ -140,7 +156,7 @@ class EditControls extends React.Component {
                 className="control-interactable"
                 title="Z"
                 onClick={this.props.resetZoom}>
-                <div className="control-label">Reset</div>
+                <div className="control-label">Fit</div>
               </div>
             </div>
           </div>
@@ -183,6 +199,7 @@ const mapStateToProps = state => ({
   height: state.ui.workspace.height,
   menuOpen: state.ui.controls.menuOpen,
   brushSize: state.settings.input.brushSize,
+  brushShape: state.settings.input.brushShape,
   zoom: state.ui.workspace.scale / state.settings.output.quality * 100,
   terrains: state.settings.input.terrains,
   currentTerrain: state.settings.input.terrains[state.settings.input.foreground]
@@ -196,6 +213,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(setForeground(foreground));
     dispatch(closeMenu());
   },
+  setBrushShape: shape => dispatch(setBrushShape(shape)),
   onBrushSizeChange: event => {
     const brushSize = Number(event.target.value);
     if (brushSize) dispatch(setBrushSize(brushSize));

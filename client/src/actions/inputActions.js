@@ -1,5 +1,8 @@
 const makeActionCreator = require('./makeActionCreator');
 
+const setBrushShape = makeActionCreator('SET_BRUSH_SHAPE', 'brushShape');
+exports.setBrushShape = setBrushShape;
+
 const setBrushSize = makeActionCreator('SET_BRUSH_SIZE', 'brushSize');
 exports.setBrushSize = setBrushSize;
 

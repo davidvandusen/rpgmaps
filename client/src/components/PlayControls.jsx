@@ -210,7 +210,7 @@ class PlayControls extends React.Component {
                 className="control-interactable"
                 title="Z"
                 onClick={this.props.resetZoom}>
-                <div className="control-label">Reset</div>
+                <div className="control-label">Fit</div>
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ const {cssToRgba} = require('../common/color');
 
 function forEachPointInCircle(cx, cy, r, cb) {
   for (let y = cy - r; y < cy + r; y++) {
-    for (let x = cx - r; x < (cx + r); x++) {
+    for (let x = cx - r; x < cx + r; x++) {
       if (pointInCircle(x, y, cx, cy, r)) {
         cb(x, y);
       }
@@ -16,6 +16,26 @@ function forEachPointInCircle(cx, cy, r, cb) {
 
 function colorCircle(cx, cy, r, w, h, rgba, data) {
   forEachPointInCircle(cx, cy, r, (px, py) => {
+    if (px < 0 || py < 0 || px >= w || py >= h) return;
+    const pixelIndex = Math.floor(px + py * w);
+    const rgbaIndex = pixelIndex * 4;
+    data[rgbaIndex] = rgba[0];
+    data[rgbaIndex + 1] = rgba[1];
+    data[rgbaIndex + 2] = rgba[2];
+    data[rgbaIndex + 3] = rgba[3];
+  });
+}
+
+function forEachPointInSquare(top, left, sideLength, cb) {
+  for (let y = top; y < top + sideLength; y++) {
+    for (let x = left; x < left + sideLength; x++) {
+      cb(x, y);
+    }
+  }
+}
+
+function colorSquare(top, left, sideLength, w, h, rgba, data) {
+  forEachPointInSquare(top, left, sideLength, (px, py) => {
     if (px < 0 || py < 0 || px >= w || py >= h) return;
     const pixelIndex = Math.floor(px + py * w);
     const rgbaIndex = pixelIndex * 4;
@@ -36,7 +56,12 @@ function addStrokeToNewPaintBuffer(state, addTrail) {
   const height = state.settings.input.height * quality;
   const paintBufferData = state.ui.graphics.paintBuffer.data;
   const rgba = cssToRgba(state.settings.input.terrains[state.settings.input.foreground].color);
-  colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
+  if (state.settings.input.brushShape === 'CIRCLE') {
+    colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
+  }
+  if (state.settings.input.brushShape === 'SQUARE') {
+    colorSquare(y - brushRadius, x - brushRadius, brushRadius * 2, width, height, rgba, paintBufferData);
+  }
   if (addTrail && state.ui.mouse.dx !== undefined && state.ui.mouse.dy !== undefined) {
     const dist = distance(0, 0, state.ui.mouse.dx, state.ui.mouse.dy);
     if (dist > scale * state.settings.input.brushSize * 0.5) {
@@ -46,7 +71,12 @@ function addStrokeToNewPaintBuffer(state, addTrail) {
       for (let step = 1; step < steps; step++) {
         const x = Math.floor((state.ui.mouse.x - state.ui.workspace.x - dx * step) / scale * quality);
         const y = Math.floor((state.ui.mouse.y - state.ui.workspace.y - dy * step) / scale * quality);
-        colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
+        if (state.settings.input.brushShape === 'CIRCLE') {
+          colorCircle(x, y, brushRadius, width, height, rgba, paintBufferData);
+        }
+        if (state.settings.input.brushShape === 'SQUARE') {
+          colorSquare(y - brushRadius, x - brushRadius, brushRadius * 2, width, height, rgba, paintBufferData);
+        }
       }
     }
   }

@@ -13,7 +13,14 @@ class InputTool extends React.Component {
     if (this.props.mouseX !== undefined && this.props.mouseY !== undefined) {
       if (this.props.tool === 'BRUSH' && this.props.mouseInWorkspace) {
         ctx.beginPath();
-        ctx.arc(this.props.mouseX, this.props.mouseY, this.props.brushSize * this.props.scale / 2, 0, 2 * Math.PI);
+        const brushSize = this.props.brushSize * this.props.scale;
+        const halfBrushSize = brushSize / 2;
+        if (this.props.brushShape === 'CIRCLE') {
+          ctx.arc(this.props.mouseX, this.props.mouseY, halfBrushSize, 0, 2 * Math.PI);
+        }
+        if (this.props.brushShape === 'SQUARE') {
+          ctx.rect(this.props.mouseX - halfBrushSize, this.props.mouseY - halfBrushSize, brushSize, brushSize);
+        }
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 0.75;
         ctx.stroke();
@@ -48,6 +55,7 @@ class InputTool extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  brushShape: state.settings.input.brushShape,
   brushSize: state.settings.input.brushSize,
   height: state.ui.workspace.height,
   mouseX: state.ui.mouse.x,

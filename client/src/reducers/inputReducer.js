@@ -11,6 +11,7 @@ module.exports = createReducer({
   foreground: defaultForeground,
   terrains,
   tool: 'NONE',
+  brushShape: 'CIRCLE',
   brushSize: 5,
   width: 128,
   height: 72
@@ -38,6 +39,10 @@ module.exports = createReducer({
   SET_TOOL: (state, {payload}) => ({
     ...state,
     tool: payload.tool
+  }),
+  SET_BRUSH_SHAPE: (state, {payload}) => ({
+    ...state,
+    brushShape: payload.brushShape
   }),
   SET_BRUSH_SIZE: (state, {payload}) => ({
     ...state,
