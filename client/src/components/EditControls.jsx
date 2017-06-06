@@ -4,6 +4,7 @@ const {publishMap} = require('../actions/dataActions');
 const {setForeground, setBrushSize, setBrushShape} = require('../actions/inputActions');
 const {setControlsHeight, closeMenu, openMenu, toggleMenu} = require('../actions/controlsActions');
 const {scaleWorkspaceToFitSurface, centerWorkspace, zoomWorkspace} = require('../actions/workspaceActions');
+const {importMap, exportMap} = require('../actions/persistenceActions');
 
 class EditControls extends React.Component {
   onUpdate() {
@@ -45,19 +46,6 @@ class EditControls extends React.Component {
                   <p><b>Created by:</b> <a href={APP_AUTHOR.url}>{APP_AUTHOR.name}</a></p>
                 </div>
               </div>
-              <hr />
-              <div className="control" style={{justifyContent: 'flex-end'}}>
-                <div className="control-list">
-                  <div
-                    className="control-interactable"
-                    onClick={event => {
-                      event.stopPropagation();
-                      this.props.closeMenu();
-                    }}>
-                    <div className="control-label">OK</div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -84,10 +72,7 @@ class EditControls extends React.Component {
                   className={'control' + (terrain === this.props.currentTerrain ? ' active' : '')}>
                   <div
                     className="control-interactable"
-                    onClick={event => {
-                      event.stopPropagation();
-                      this.props.setTerrain(index);
-                    }}>
+                    onClick={() => this.props.setTerrain(index)}>
                     <canvas
                       className="control-thumbnail"
                       width="40"
@@ -165,6 +150,20 @@ class EditControls extends React.Component {
 
         <div className="controls-auxiliary">
 
+          <div
+            className={'control' + (this.props.menuOpen === 'FILE' ? ' active' : '')}
+            onClick={() => this.props.toggleMenu('FILE')}>
+            <div className="control-label">File</div>
+            <div className={'control-dropdown' + (this.props.menuOpen === 'FILE' ? ' open' : '')}>
+              <div className="control">
+                <div className="control-label" onClick={this.props.exportMap}>Export</div>
+              </div>
+              <div className="control">
+                <div className="control-label" onClick={this.props.importMap}>Import</div>
+              </div>
+            </div>
+          </div>
+
           <div className="control">
             <div
               className={'control-interactable' + (this.props.mapUpdated ? '' : ' disabled')}
@@ -211,7 +210,6 @@ const mapDispatchToProps = dispatch => ({
   closeMenu: () => dispatch(closeMenu()),
   setTerrain: foreground => {
     dispatch(setForeground(foreground));
-    dispatch(closeMenu());
   },
   setBrushShape: shape => dispatch(setBrushShape(shape)),
   onBrushSizeChange: event => {
@@ -226,7 +224,9 @@ const mapDispatchToProps = dispatch => ({
   },
   zoomIn: () => dispatch(zoomWorkspace(1)),
   zoomOut: () => dispatch(zoomWorkspace(-1)),
-  publishMap: () => dispatch(publishMap())
+  publishMap: () => dispatch(publishMap()),
+  importMap: () => dispatch(importMap()),
+  exportMap: () => dispatch(exportMap())
 });
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(EditControls);
