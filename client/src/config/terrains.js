@@ -1,12 +1,5 @@
 module.exports = [
   {
-    name: 'Boulder',
-    description: 'Sunlit large rock with shadow',
-    color: '#c6c1c3',
-    className: 'Boulder',
-    layer: 5
-  },
-  {
     name: 'Cobblestone',
     description: 'Small, white, flat stones',
     color: '#d7cfbc',
@@ -21,13 +14,6 @@ module.exports = [
     layer: 5
   },
   {
-    name: 'Flowing Lava',
-    description: 'Stream of red glowing lava',
-    color: '#e6403c',
-    className: 'FlowingLava',
-    layer: 0
-  },
-  {
     name: 'Grass Field',
     description: 'Sunlit grass at normal scale',
     color: '#b0bc94',
@@ -35,25 +21,11 @@ module.exports = [
     layer: 1
   },
   {
-    name: 'Icy Ground',
-    description: 'Smooth patch of ice',
-    color: '#cee5eb',
-    className: 'IcyGround',
-    layer: 0
-  },
-  {
     name: 'Smooth Path',
     description: 'Featureless dirt road',
     color: '#c8bb99',
     className: 'CloseUpPath',
     layer: 2
-  },
-  {
-    name: 'Snowy Ground',
-    description: 'Snow covered field or mound',
-    color: '#f2f3fa',
-    className: 'SnowyGround',
-    layer: 0
   },
   {
     name: 'Solid Stone',

@@ -64,3 +64,23 @@ state
   }]
 }
 ```
+
+menu
+
+RPGMaps      File        Edit  View           Input                Help
+------------ ----------- ----- -------------- -------------------- ------------------
+About        New         Undo  Zoom Out       Increase Brush Size  Keymap Reference
+------------ Open        Redo  Zoom In        Decrease Brush Size
+Preferences  Save              Fit On Screen  Select Brush Shape >
+             Save As...        Fill Screen    --------------------
+                                              Select Terrain     >
+
+- Publish Map
+- Play Map
+- Show Grid
+- Hide Grid
+- Select Grid Color
+- Select Grid Type
+- Set Grid Spacing
+- Add Token
+- Tokens List
