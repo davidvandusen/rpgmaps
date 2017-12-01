@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://dvandusen@bitbucket.org/dvandusen/rpgmaps/server"
   },
-  "license": "UNLICENSED",
+  "license": "CC-BY-NC-4.0",
   "private": true,
   "dependencies": {
     "ejs": "^2.5.6",
