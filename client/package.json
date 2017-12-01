@@ -1,6 +1,6 @@
 {
   "name": "rpgmaps-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Software for spontaneously creating encounter maps for tabletop role-playing games",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --port 8080",
